@@ -1,9 +1,94 @@
-body{font-family:Poppins,Arial;background:url('bg.jpg') center/cover fixed;padding:20px;text-align:center;color:#fff;}
-.card{background:rgba(255,255,255,0.15);backdrop-filter:blur(10px);padding:20px;border-radius:15px;margin:10px auto;width:90%;max-width:400px;}
-.time-label{font-size:24px;opacity:.9;}
-.time-large{font-size:48px;font-weight:bold;}
-.selector button{margin:5px;padding:10px 20px;border-radius:25px;background:rgba(255,255,255,0.3);color:#fff;border:none;}
-.selector .active{background:#6fa89f;}
-.countdown-container{display:flex;justify-content:center;gap:10px;margin-top:20px;}
-.count-box{background:rgba(255,255,255,0.2);padding:10px 15px;border-radius:12px;font-size:32px;font-weight:bold;}
-label{display:block;font-size:14px;}
+/* BACKGROUND */
+body{
+    font-family:Poppins,Arial;
+    background:url('bg.jpg') center/cover fixed;
+    padding:20px;
+    text-align:center;
+    color:#fff;
+    position:relative;
+}
+
+/* DARK OVERLAY FOR READABILITY */
+body::before{
+    content:"";
+    position:fixed;
+    top:0; left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.55);
+    backdrop-filter:blur(2px);
+    z-index:-1;
+}
+
+/* CARD STYLE */
+.card{
+    background:rgba(255,255,255,0.12);
+    backdrop-filter:blur(10px);
+    border-radius:16px;
+    padding:20px;
+    margin:12px auto;
+    width:90%;
+    max-width:400px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.4);
+}
+
+/* LABEL */
+.time-label{
+    font-size:22px;
+    opacity:0.95;
+    font-weight:500;
+    margin-bottom:6px;
+    text-shadow:0 2px 6px rgba(0,0,0,0.6);
+}
+
+/* LARGE TIME DISPLAY */
+.time-large{
+    font-size:48px;
+    font-weight:700;
+    letter-spacing:1px;
+    text-shadow:0 3px 8px rgba(0,0,0,0.7);
+}
+
+/* SELECTOR BUTTONS */
+.selector button{
+    margin:5px;
+    padding:10px 20px;
+    border-radius:25px;
+    background:rgba(255,255,255,0.3);
+    color:#fff;
+    border:none;
+    font-size:18px;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.3s;
+}
+.selector button:hover{
+    background:rgba(255,255,255,0.5);
+}
+.selector .active{
+    background:#6fa89f;
+}
+
+/* COUNTDOWN */
+.countdown-container{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-top:20px;
+}
+
+.count-box{
+    background:rgba(255,255,255,0.2);
+    padding:10px 15px;
+    border-radius:12px;
+    font-size:32px;
+    font-weight:700;
+    text-shadow:0 2px 6px rgba(0,0,0,0.5);
+}
+
+label{
+    display:block;
+    font-size:14px;
+    opacity:0.9;
+    margin-top:4px;
+}
