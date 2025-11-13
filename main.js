@@ -48,9 +48,10 @@ async function loadPrayerTimes() {
 
         console.log("Today's times:", prayerTimes);
 
-        document.getElementById("syurukTime").innerText = formatToAMPM(prayerTimes.syuruk);
+        document.getElementById("ismakTime").innerText = formatToAMPM(prayerTimes.ismak);
         document.getElementById("subuhTime").innerText   = formatToAMPM(prayerTimes.subuh);
         document.getElementById("syurukTime").innerText  = formatToAMPM(prayerTimes.syuruk);
+        document.getElementById("dhuhaTime").innerText  = formatToAMPM(prayerTimes.dhuha);
         document.getElementById("zohorTime").innerText   = formatToAMPM(prayerTimes.zohor);
         document.getElementById("asarTime").innerText    = formatToAMPM(prayerTimes.asar);
         document.getElementById("maghribTime").innerText = formatToAMPM(prayerTimes.maghrib);
@@ -87,8 +88,10 @@ function determineNextPrayer() {
     const now = new Date();
 
     const schedule = [
+        { name: "Ismak", time: prayerTimes.ismak },
         { name: "Subuh", time: prayerTimes.subuh },
         { name: "Syuruk", time: prayerTimes.syuruk },
+        { name: "Dhuha", time: prayerTimes.dhuha },
         { name: "Zohor", time: prayerTimes.zohor },
         { name: "Asar", time: prayerTimes.asar },
         { name: "Maghrib", time: prayerTimes.maghrib },
