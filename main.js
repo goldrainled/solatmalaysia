@@ -48,8 +48,14 @@ async function loadPrayerTimes() {
 
         console.log("Today's times:", prayerTimes);
 
-        document.getElementById("syurukTime").innerText =
-            formatToAMPM(prayerTimes.syuruk);
+        document.getElementById("syurukTime").innerText = formatToAMPM(prayerTimes.syuruk);
+        document.getElementById("subuhTime").innerText   = formatToAMPM(prayerTimes.subuh);
+        document.getElementById("syurukTime").innerText  = formatToAMPM(prayerTimes.syuruk);
+        document.getElementById("zohorTime").innerText   = formatToAMPM(prayerTimes.zohor);
+        document.getElementById("asarTime").innerText    = formatToAMPM(prayerTimes.asar);
+        document.getElementById("maghribTime").innerText = formatToAMPM(prayerTimes.maghrib);
+        document.getElementById("isyakTime").innerText   = formatToAMPM(prayerTimes.isyak);
+
 
         determineNextPrayer();
     }
