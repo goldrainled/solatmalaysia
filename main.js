@@ -31,7 +31,6 @@ async function loadPrayerTimes() {
         Isyak: todayEntry.isha
     };
 
-    // Update UI times
     document.getElementById("ismakTime").innerText = format(prayerTimes.Ismak);
     document.getElementById("subuhTime").innerText = format(prayerTimes.Subuh);
     document.getElementById("syurukTime").innerText = format(prayerTimes.Syuruk);
@@ -47,7 +46,7 @@ loadPrayerTimes();
 
 
 /* ============================
-   FORMAT TIME 12H
+   FORMAT 12H TIME
 ============================ */
 function format(t) {
     let [h, m] = t.split(":").map(Number);
@@ -63,12 +62,10 @@ function format(t) {
 function determineNextPrayer() {
     const now = new Date();
 
-    // Reset label for today
     document.getElementById("nextLabel").innerText = "Menuju";
 
     const list = Object.entries(prayerTimes);
 
-    // Check today's remaining prayers
     for (let [name, time] of list) {
         let [h, m] = time.split(":");
         let t = new Date();
@@ -81,19 +78,15 @@ function determineNextPrayer() {
         }
     }
 
-    /* -------------------------------------
-       AFTER ISYAK → Tomorrow Subuh
-    -------------------------------------- */
-
+    // After Isyak → tomorrow Subuh
     let tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    let [subuhH, subuhM] = prayerTimes.Subuh.split(":");
-    tomorrow.setHours(subuhH, subuhM, 0, 0);
+    let [h, m] = prayerTimes.Subuh.split(":");
+    tomorrow.setHours(h, m, 0, 0);
 
     nextPrayerTime = tomorrow;
 
-    // Update UI for tomorrow
     document.getElementById("nextLabel").innerText = "Menuju (Esok)";
     document.getElementById("nextPrayerName").innerText = "Subuh";
 }
@@ -103,12 +96,12 @@ function determineNextPrayer() {
    COUNTDOWN
 ============================ */
 setInterval(() => {
+
     if (!nextPrayerTime) return;
 
     let now = new Date();
     let diff = nextPrayerTime - now;
 
-    // If time reached → move to next prayer
     if (diff <= 0) {
         determineNextPrayer();
         return;
@@ -151,7 +144,7 @@ updateClock();
 function highlightCurrentPrayer() {
     const now = new Date();
     const list = Object.entries(prayerTimes);
-    let active = "Isyak"; // default after midnight
+    let active = "Isyak";
 
     for (let [name, time] of list) {
         let [h, m] = time.split(":").map(Number);
