@@ -1,37 +1,30 @@
-<!DOCTYPE html>
-<html lang="ms">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Waktu Solat Dashboard</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-
-<button class="toggle-theme">Toggle Theme</button>
-
-<div class="container">
-  <div class="card left">
-    <div class="time-box">
-      <h2 id="nextLabel">Menuju Zohor</h2>
-      <div class="time" id="nextTime">12:52</div>
-    </div>
-    <div class="time-box">
-      <h2>Masa Sekarang</h2>
-      <div class="time" id="nowTime">11:03 AM</div>
-    </div>
-    <div class="countdown">
-      <div><span id="hr">00</span>JAM</div>
-      <div><span id="min">00</span>MINIT</div>
-      <div><span id="sec">00</span>SAAT</div>
-    </div>
-  </div>
-
-  <div class="card right prayer-list">
-    <!-- Prayer times will be inserted dynamically -->
-  </div>
+<div class="card">
+    <div class="time-label">Syuruk</div>
+    <div class="time-large" id="syurukTime">6:48 AM</div>
 </div>
 
-<script src="script.js"></script>
-</body>
-</html>
+<div class="card">
+    <div class="time-label">Masa Sekarang</div>
+    <div class="time-large" id="currentTime">12:14 PM</div>
+</div>
+
+<div class="selector">
+    <button>Zohor</button>
+    <button class="active">Asar</button>
+    <button>Maghrib</button>
+</div>
+
+<div class="countdown-container">
+    <div class="count-box">
+        <span id="cdHour">00</span>
+        <label>JAM</label>
+    </div>
+    <div class="count-box">
+        <span id="cdMin">37</span>
+        <label>MINIT</label>
+    </div>
+    <div class="count-box">
+        <span id="cdSec">26</span>
+        <label>SAAT</label>
+    </div>
+</div>
