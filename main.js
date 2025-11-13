@@ -159,5 +159,63 @@ function updateCurrentTime() {
         `${h}:${m}:${s} ${ampm}`;
 }
 
+function highlightCurrentPrayer(prayerName) {
+    let allCards = [
+        "cardIsmak",
+        "cardSubuh",
+        "cardSyuruk",
+        "cardZohor",
+        "cardAsar",
+        "cardMaghrib",
+        "cardIsyak"
+    ];
+
+    // Remove highlight from all
+    allCards.forEach(id => {
+        document.getElementById(id).classList.remove("currentPrayer");
+    });
+
+    // Add highlight to active
+    let id = "card" + prayerName;
+    let el = document.getElementById(id);
+    if (el) el.classList.add("currentPrayer");
+}
+
+function getCurrentPrayer() {
+    const now = new Date();
+    let lastPrayer = "Isyak"; // default after midnight
+
+    const schedule = [
+        { name: "Ismak", time: prayerTimes.ismak },
+        { name: "Subuh", time: prayerTimes.subuh },
+        { name: "Syuruk", time: prayerTimes.syuruk },
+        { name: "Zohor", time: prayerTimes.zohor },
+        { name: "Asar",  time: prayerTimes.asar },
+        { name: "Maghrib", time: prayerTimes.maghrib },
+        { name: "Isyak", time: prayerTimes.isyak }
+    ];
+
+    for (let p of schedule) {
+        let [h, m] = p.time.split(":").map(Number);
+        let t = new Date();
+        t.setHours(h, m, 0, 0);
+
+        if (t <= now) lastPrayer = p.name;
+    }
+
+    highlightCurrentPrayer(lastPrayer);
+}
+
+function updateCurrentTime() {
+    ...
+    highlightIfReady();
+}
+
+function highlightIfReady() {
+    if (Object.keys(prayerTimes).length > 0) {
+        getCurrentPrayer();
+    }
+}
+
 setInterval(updateCurrentTime, 1000);
 updateCurrentTime();
