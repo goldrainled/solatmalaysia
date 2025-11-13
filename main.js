@@ -12,21 +12,22 @@ let nextPrayerTime = null;
 // ===============================
 async function loadPrayerTimes() {
     try {
-        const url = `https://api.waktusolat.app/v2/solat/${ZONE}`;
+        const url = `https://api.waktusolat.app/v2/times/today?zone=${ZONE}`;
         const res = await fetch(url);
         const data = await res.json();
 
-        prayerTimes = data.prayers; // e.g. prayers.subuh, prayers.zohor, ...
+        prayerTimes = data.data.times;
 
         document.getElementById("syurukTime").innerText =
             formatToAMPM(prayerTimes.syuruk);
 
-        determineNextPrayer();  
+        determineNextPrayer();
     }
     catch (err) {
         console.error("Failed to load API:", err);
     }
 }
+
 
 loadPrayerTimes();
 setInterval(loadPrayerTimes, 60 * 60 * 1000); // refresh every 1 hour
@@ -149,4 +150,5 @@ function updateCurrentTime() {
 
 setInterval(updateCurrentTime, 1000);
 updateCurrentTime();
+
 
