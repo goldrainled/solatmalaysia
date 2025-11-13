@@ -22,21 +22,21 @@ async function loadPrayerTimes() {
             return;
         }
 
-        // Today’s date format on e-Solat: "13-Nov-2024"
+        // Today's date formatting for e-Solat ("13-Nov-2024")
         const today = new Date();
-        const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-        const esolatDate = `${today.getDate().toString().padStart(2,"0")}-${monthNames[today.getMonth()]}-${today.getFullYear()}`;
+        const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        const esDate = `${today.getDate().toString().padStart(2,"0")}-${months[today.getMonth()]}-${today.getFullYear()}`;
 
-        console.log("Looking for:", esolatDate);
+        console.log("Searching date:", esDate);
 
-        const todayEntry = data.prayerTime.find(item => item.date === esolatDate);
+        const todayEntry = data.prayerTime.find(p => p.date === esDate);
 
         if (!todayEntry) {
-            console.warn("Today's date not found in timetable!");
+            console.warn("No prayer times found for today.");
             return;
         }
 
-        // Map API → local variables
+        // Map to easier names
         prayerTimes = {
             subuh: todayEntry.fajr,
             syuruk: todayEntry.syuruk,
@@ -46,19 +46,20 @@ async function loadPrayerTimes() {
             isyak: todayEntry.isha
         };
 
-        console.log("Today's prayer times:", prayerTimes);
+        console.log("Today's times:", prayerTimes);
 
-        document.getElementById("syurukTime").innerText = formatToAMPM(prayerTimes.syuruk);
+        document.getElementById("syurukTime").innerText =
+            formatToAMPM(prayerTimes.syuruk);
 
         determineNextPrayer();
-
-    } catch (err) {
+    }
+    catch (err) {
         console.error("API ERROR:", err);
     }
 }
 
 loadPrayerTimes();
-setInterval(loadPrayerTimes, 60 * 60 * 1000); // refresh every hour
+setInterval(loadPrayerTimes, 60 * 60 * 1000);
 
 
 // ===============================
@@ -69,7 +70,7 @@ function formatToAMPM(t) {
     let [h, m, s] = t.split(":").map(Number);
     let ampm = h >= 12 ? "PM" : "AM";
     h = (h % 12) || 12;
-    return `${h}:${m.toString().padStart(2, "0")} ${ampm}`;
+    return `${h}:${m.toString().padStart(2,"0")} ${ampm}`;
 }
 
 
@@ -89,6 +90,8 @@ function determineNextPrayer() {
     ];
 
     for (let p of schedule) {
+        if (!p.time) continue;
+        
         let [h, m] = p.time.split(":");
         let target = new Date();
         target.setHours(h, m, 0, 0);
@@ -96,7 +99,6 @@ function determineNextPrayer() {
         if (target > now) {
             nextPrayerName = p.name;
             nextPrayerTime = target;
-
             document.getElementById("nextPrayerName").innerText = p.name;
             highlightPrayerButton(p.name);
             return;
@@ -106,7 +108,7 @@ function determineNextPrayer() {
 
 
 // ===============================
-// 4. HIGHLIGHT ACTIVE BUTTON
+// 4. HIGHLIGHT BUTTON
 // ===============================
 function highlightPrayerButton(name) {
     document.querySelectorAll(".selector button")
@@ -136,9 +138,9 @@ function updateCountdown() {
     let m = Math.floor((diff / 1000 / 60) % 60);
     let s = Math.floor((diff / 1000) % 60);
 
-    document.getElementById("cdHour").innerText = h.toString().padStart(2, "0");
-    document.getElementById("cdMin").innerText = m.toString().padStart(2, "0");
-    document.getElementById("cdSec").innerText = s.toString().padStart(2, "0");
+    document.getElementById("cdHour").innerText = h.toString().padStart(2,"0");
+    document.getElementById("cdMin").innerText = m.toString().padStart(2,"0");
+    document.getElementById("cdSec").innerText = s.toString().padStart(2,"0");
 }
 
 setInterval(updateCountdown, 1000);
@@ -151,8 +153,8 @@ function updateCurrentTime() {
     let now = new Date();
 
     let h = now.getHours();
-    let m = now.getMinutes().toString().padStart(2, "0");
-    let s = now.getSeconds().toString().padStart(2, "0");
+    let m = now.getMinutes().toString().padStart(2,"0");
+    let s = now.getSeconds().toString().padStart(2,"0");
 
     let ampm = h >= 12 ? "PM" : "AM";
     h = (h % 12) || 12;
