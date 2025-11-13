@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solat Malaysia</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="card">
+    <div class="time-label">Menuju Solat</div>
+    <div class="time-large" id="nextPrayerName">--</div>
+</div>
+
+<div class="card">
+    <div class="time-label">Syuruk</div>
+    <div class="time-large" id="syurukTime">--:--</div>
+</div>
+
+<div class="card">
+    <div class="time-label">Masa Sekarang</div>
+    <div class="time-large" id="currentTime">--:-- --</div>
+</div>
+
+<div class="selector">
+    <button id="btnZohor">Zohor</button>
+    <button id="btnAsar">Asar</button>
+    <button id="btnMaghrib">Maghrib</button>
+</div>
+
+<div class="countdown-container">
+    <div class="count-box"><span id="cdHour">00</span><label>JAM</label></div>
+    <div class="count-box"><span id="cdMin">00</span><label>MINIT</label></div>
+    <div class="count-box"><span id="cdSec">00</span><label>SAAT</label></div>
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>

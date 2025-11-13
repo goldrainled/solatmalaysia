@@ -1,0 +1,9 @@
+body{font-family:Poppins,Arial;background:url('bg.jpg') center/cover fixed;padding:20px;text-align:center;color:#fff;}
+.card{background:rgba(255,255,255,0.15);backdrop-filter:blur(10px);padding:20px;border-radius:15px;margin:10px auto;width:90%;max-width:400px;}
+.time-label{font-size:24px;opacity:.9;}
+.time-large{font-size:48px;font-weight:bold;}
+.selector button{margin:5px;padding:10px 20px;border-radius:25px;background:rgba(255,255,255,0.3);color:#fff;border:none;}
+.selector .active{background:#6fa89f;}
+.countdown-container{display:flex;justify-content:center;gap:10px;margin-top:20px;}
+.count-box{background:rgba(255,255,255,0.2);padding:10px 15px;border-radius:12px;font-size:32px;font-weight:bold;}
+label{display:block;font-size:14px;}
