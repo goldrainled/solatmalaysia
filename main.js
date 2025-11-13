@@ -115,21 +115,9 @@ function determineNextPrayer() {
 }
 
 
-// ===============================
-// 4. HIGHLIGHT BUTTON
-// ===============================
-function highlightPrayerButton(name) {
-    document.querySelectorAll(".selector button")
-        .forEach(btn => btn.classList.remove("active"));
-
-    if (name === "Zohor") document.getElementById("btnZohor").classList.add("active");
-    if (name === "Asar") document.getElementById("btnAsar").classList.add("active");
-    if (name === "Maghrib") document.getElementById("btnMaghrib").classList.add("active");
-}
-
 
 // ===============================
-// 5. COUNTDOWN
+// 4. COUNTDOWN
 // ===============================
 function updateCountdown() {
     if (!nextPrayerTime) return;
@@ -155,7 +143,7 @@ setInterval(updateCountdown, 1000);
 
 
 // ===============================
-// 6. LIVE CLOCK
+// 5. LIVE CLOCK
 // ===============================
 function updateCurrentTime() {
     let now = new Date();
