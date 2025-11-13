@@ -16,7 +16,7 @@ async function loadPrayerTimes() {
         const res = await fetch(url);
         const data = await res.json();
 
-        prayerTimes = data.prayers.data; // e.g. prayers.subuh, prayers.zohor, ...
+        prayerTimes = data.prayers; // e.g. prayers.subuh, prayers.zohor, ...
 
         document.getElementById("syurukTime").innerText =
             formatToAMPM(prayerTimes.syuruk);
@@ -149,3 +149,4 @@ function updateCurrentTime() {
 
 setInterval(updateCurrentTime, 1000);
 updateCurrentTime();
+
