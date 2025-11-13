@@ -38,6 +38,7 @@ async function loadPrayerTimes() {
 
         // Map to easier names
         prayerTimes = {
+            ismak: todayEntry.imsak,
             subuh: todayEntry.fajr,
             syuruk: todayEntry.syuruk,
             zohor: todayEntry.dhuhr,
