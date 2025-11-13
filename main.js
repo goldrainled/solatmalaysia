@@ -6,7 +6,6 @@ let prayerTimes = {};
 let nextPrayerName = "";
 let nextPrayerTime = null;
 
-
 // ===============================
 // 1. GET TODAY PRAYER TIME FROM e-SOLAT (MONTH ENDPOINT)
 // ===============================
@@ -23,10 +22,12 @@ async function loadPrayerTimes() {
             return;
         }
 
-        // Today's date format on e-Solat: "13-Nov-2024"
+        // Today's date format: "13-Nov-2024"
         const today = new Date();
         const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
         const esolatDate = `${today.getDate().toString().padStart(2,"0")}-${monthNames[today.getMonth()]}-${today.getFullYear()}`;
+
+        console.log("Looking for date:", esolatDate);
 
         const todayEntry = data.prayerTime.find(item => item.date === esolatDate);
 
@@ -35,7 +36,7 @@ async function loadPrayerTimes() {
             return;
         }
 
-        // Map API → our variable format
+        // Map times
         prayerTimes = {
             subuh: todayEntry.fajr,
             syuruk: todayEntry.syuruk,
@@ -45,6 +46,9 @@ async function loadPrayerTimes() {
             isyak: todayEntry.isha
         };
 
+        console.log("Today's prayers:", prayerTimes);
+
+        // Update UI
         document.getElementById("syurukTime").innerText = formatToAMPM(prayerTimes.syuruk);
 
         determineNextPrayer();
@@ -57,21 +61,19 @@ async function loadPrayerTimes() {
 loadPrayerTimes();
 setInterval(loadPrayerTimes, 60 * 60 * 1000);
 
-
 // ===============================
-// 2. FORMAT 24H → 12H
+// FORMAT
 // ===============================
 function formatToAMPM(t) {
     if (!t) return "--:--";
-    let [h, m] = t.split(":").map(Number);
+    let [h, m, s] = t.split(":").map(Number);
     let ampm = h >= 12 ? "PM" : "AM";
     h = (h % 12) || 12;
-    return `${h}:${m.toString().padStart(2, "0")} ${ampm}`;
+    return `${h}:${m.toString().padStart(2,"0")} ${ampm}`;
 }
 
-
 // ===============================
-// 3. DETERMINE NEXT PRAYER
+// NEXT PRAYER
 // ===============================
 function determineNextPrayer() {
     const now = new Date();
@@ -93,27 +95,27 @@ function determineNextPrayer() {
         if (target > now) {
             nextPrayerName = p.name;
             nextPrayerTime = target;
-            highlightPrayerButton(p.name);
             document.getElementById("nextPrayerName").innerText = p.name;
+            highlightPrayerButton(p.name);
             return;
         }
     }
 }
 
-
 // ===============================
-// 4. HIGHLIGHT BTN
+// HIGHLIGHT BUTTON
 // ===============================
 function highlightPrayerButton(name) {
-    document.querySelectorAll(".selector button").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".selector button")
+        .forEach(btn => btn.classList.remove("active"));
+
     if (name === "Zohor") document.getElementById("btnZohor").classList.add("active");
     if (name === "Asar") document.getElementById("btnAsar").classList.add("active");
     if (name === "Maghrib") document.getElementById("btnMaghrib").classList.add("active");
 }
 
-
 // ===============================
-// 5. COUNTDOWN
+// COUNTDOWN
 // ===============================
 function updateCountdown() {
     if (!nextPrayerTime) return;
@@ -121,37 +123,10 @@ function updateCountdown() {
     let now = new Date();
     let diff = nextPrayerTime - now;
 
-    if (diff < 0) {
-        determineNextPrayer();
-        return;
-    }
-
     let h = Math.floor(diff / (1000 * 60 * 60));
     let m = Math.floor((diff / 1000 / 60) % 60);
     let s = Math.floor((diff / 1000) % 60);
 
     document.getElementById("cdHour").innerText = h.toString().padStart(2, "0");
     document.getElementById("cdMin").innerText = m.toString().padStart(2, "0");
-    document.getElementById("cdSec").innerText = s.toString().padStart(2, "0");
-}
-
-setInterval(updateCountdown, 1000);
-
-
-// ===============================
-// 6. LIVE CLOCK
-// ===============================
-function updateCurrentTime() {
-    let now = new Date();
-    let hh = now.getHours();
-    let mm = now.getMinutes().toString().padStart(2, "0");
-    let ss = now.getSeconds().toString().padStart(2, "0");
-
-    let ampm = hh >= 12 ? "PM" : "AM";
-    hh = (hh % 12) || 12;
-
-    document.getElementById("currentTime").innerText = `${hh}:${mm}:${ss} ${ampm}`;
-}
-
-setInterval(updateCurrentTime, 1000);
-updateCurrentTime();
+    document.getElementById("cdSec").innerText = s.toString
