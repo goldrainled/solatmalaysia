@@ -108,7 +108,6 @@ function determineNextPrayer() {
             nextPrayerName = p.name;
             nextPrayerTime = target;
             document.getElementById("nextPrayerName").innerText = p.name;
-            highlightPrayerButton(p.name);
             return;
         }
     }
@@ -153,11 +152,17 @@ function updateCurrentTime() {
     let s = now.getSeconds().toString().padStart(2,"0");
 
     let ampm = h >= 12 ? "PM" : "AM";
-    h = (h % 12) || 12;
+    let h12 = (h % 12) || 12;
 
     document.getElementById("currentTime").innerText =
-        `${h}:${m}:${s} ${ampm}`;
+        `${h12}:${m}:${s} ${ampm}`;
+
+    highlightIfReady();   // <-- highlight current prayer
 }
+
+setInterval(updateCurrentTime, 1000);
+updateCurrentTime();
+
 
 function highlightCurrentPrayer(prayerName) {
     let allCards = [
