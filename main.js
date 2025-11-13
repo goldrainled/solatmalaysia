@@ -1,28 +1,51 @@
 // ===============================
 // CONFIG
 // ===============================
-const ZONE = "JHR02"; // Kota Tinggi
+const ZONE = "JHR02";
 let prayerTimes = {};
 let nextPrayerName = "";
 let nextPrayerTime = null;
 
+
 // ===============================
-// 1. GET TODAY’S PRAYER TIME
+// 1. GET TODAY PRAYER TIME FROM e-SOLAT (MONTH ENDPOINT)
 // ===============================
 async function loadPrayerTimes() {
     try {
-        const url = `https://api.waktusolat.app/v2/solat/today?zone=${ZONE}`;
+        const url = `https://www.e-solat.gov.my/index.php?r=esolatApi/takwimsolat&period=month&zone=${ZONE}`;
         const res = await fetch(url);
         const data = await res.json();
 
         console.log("API DATA:", data);
 
-        // prayers object
-        prayerTimes = data.prayers;
+        if (!data.prayerTime) {
+            console.error("No prayerTime array found.");
+            return;
+        }
 
-        // Write Syuruk
-        document.getElementById("syurukTime").innerText =
-            formatToAMPM(prayerTimes.syuruk);
+        // Today's date format on e-Solat: "13-Nov-2024"
+        const today = new Date();
+        const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        const esolatDate = `${today.getDate().toString().padStart(2,"0")}-${monthNames[today.getMonth()]}-${today.getFullYear()}`;
+
+        const todayEntry = data.prayerTime.find(item => item.date === esolatDate);
+
+        if (!todayEntry) {
+            console.warn("Today not found in monthly data");
+            return;
+        }
+
+        // Map API → our variable format
+        prayerTimes = {
+            subuh: todayEntry.fajr,
+            syuruk: todayEntry.syuruk,
+            zohor: todayEntry.dhuhr,
+            asar: todayEntry.asr,
+            maghrib: todayEntry.maghrib,
+            isyak: todayEntry.isha
+        };
+
+        document.getElementById("syurukTime").innerText = formatToAMPM(prayerTimes.syuruk);
 
         determineNextPrayer();
 
@@ -32,13 +55,14 @@ async function loadPrayerTimes() {
 }
 
 loadPrayerTimes();
-setInterval(loadPrayerTimes, 60 * 60 * 1000); // refresh every hour
+setInterval(loadPrayerTimes, 60 * 60 * 1000);
 
 
 // ===============================
 // 2. FORMAT 24H → 12H
 // ===============================
 function formatToAMPM(t) {
+    if (!t) return "--:--";
     let [h, m] = t.split(":").map(Number);
     let ampm = h >= 12 ? "PM" : "AM";
     h = (h % 12) || 12;
@@ -50,7 +74,6 @@ function formatToAMPM(t) {
 // 3. DETERMINE NEXT PRAYER
 // ===============================
 function determineNextPrayer() {
-
     const now = new Date();
 
     const schedule = [
@@ -79,12 +102,10 @@ function determineNextPrayer() {
 
 
 // ===============================
-// 4. HIGHLIGHT BUTTON
+// 4. HIGHLIGHT BTN
 // ===============================
 function highlightPrayerButton(name) {
-    document.querySelectorAll(".selector button")
-        .forEach(btn => btn.classList.remove("active"));
-
+    document.querySelectorAll(".selector button").forEach(b => b.classList.remove("active"));
     if (name === "Zohor") document.getElementById("btnZohor").classList.add("active");
     if (name === "Asar") document.getElementById("btnAsar").classList.add("active");
     if (name === "Maghrib") document.getElementById("btnMaghrib").classList.add("active");
@@ -129,8 +150,7 @@ function updateCurrentTime() {
     let ampm = hh >= 12 ? "PM" : "AM";
     hh = (hh % 12) || 12;
 
-    document.getElementById("currentTime").innerText =
-        `${hh}:${mm}:${ss} ${ampm}`;
+    document.getElementById("currentTime").innerText = `${hh}:${mm}:${ss} ${ampm}`;
 }
 
 setInterval(updateCurrentTime, 1000);
