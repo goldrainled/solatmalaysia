@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Waktu Solat Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<button class="toggle-theme">Toggle Theme</button>
+
+<div class="container">
+  <div class="card left">
+    <div class="time-box">
+      <h2 id="nextLabel">Menuju Zohor</h2>
+      <div class="time" id="nextTime">12:52</div>
+    </div>
+    <div class="time-box">
+      <h2>Masa Sekarang</h2>
+      <div class="time" id="nowTime">11:03 AM</div>
+    </div>
+    <div class="countdown">
+      <div><span id="hr">00</span>JAM</div>
+      <div><span id="min">00</span>MINIT</div>
+      <div><span id="sec">00</span>SAAT</div>
+    </div>
+  </div>
+
+  <div class="card right prayer-list">
+    <!-- Prayer times will be inserted dynamically -->
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
