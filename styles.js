@@ -96,10 +96,14 @@ function updateTimes() {
 }
 
 function formatTime(d) {
-  const h = String(d.getHours()).padStart(2,'0');
-  const m = String(d.getMinutes()).padStart(2,'0');
-  return `${h}:${m}`;
-}
+  let hours = d.getHours();
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  const seconds = String(d.getSeconds()).padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // convert 0 -> 12
+  return `${String(hours).padStart(2,'0')}:${minutes}:${seconds} ${ampm}`;
+  }
 
 // Theme toggle
 document.querySelector('.toggle-theme').addEventListener('click', ()=> {
@@ -115,3 +119,4 @@ loadTimes().then(()=> {
   updateTimes();
   setInterval(updateTimes, 1000);
 });
+
