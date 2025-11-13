@@ -53,13 +53,31 @@ function determineNextPrayer() {
         let [h, m] = time.split(":");
         let t = new Date();
         t.setHours(h, m, 0, 0);
+
+        // if prayer is still ahead today
         if (t > now) {
             nextPrayerTime = t;
             document.getElementById("nextPrayerName").innerText = name;
             return;
         }
     }
+
+    // -----------------------------
+    // AFTER ISYAK → tomorrow Subuh
+    // -----------------------------
+    let tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    let [subuhH, subuhM] = prayerTimes.Subuh.split(":");
+
+    tomorrow.setHours(subuhH, subuhM, 0, 0);
+
+    nextPrayerTime = tomorrow;
+
+    document.getElementById("nextPrayerName").innerHTML =
+        `Subuh<br><small style="font-size:20px;opacity:0.8">(Esok)</small>`;
 }
+
 
 setInterval(() => {
     if (nextPrayerTime) {
