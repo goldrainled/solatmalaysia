@@ -84,8 +84,9 @@ setInterval(() => {
         let now = new Date();
         let diff = nextPrayerTime - now;
 
+        // If countdown finished → move to next prayer
         if (diff <= 0) {
-            loadPrayerTimes();
+            determineNextPrayer();  
             return;
         }
 
@@ -98,6 +99,7 @@ setInterval(() => {
         document.getElementById("cdSec").innerText = String(s).padStart(2,'0');
     }
 }, 1000);
+
 
 function updateClock() {
     let now = new Date();
