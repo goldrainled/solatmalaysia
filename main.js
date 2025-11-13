@@ -7,7 +7,7 @@ let nextPrayerName = "";
 let nextPrayerTime = null;
 
 // ===============================
-// 1. GET TODAY PRAYER TIME FROM e-SOLAT (MONTH ENDPOINT)
+// 1. GET TODAY PRAYER TIME FROM e-SOLAT
 // ===============================
 async function loadPrayerTimes() {
     try {
@@ -15,28 +15,16 @@ async function loadPrayerTimes() {
         const res = await fetch(url);
         const data = await res.json();
 
-        console.log("API DATA:", data);
+        if (!data.prayerTime) return;
 
-        if (!data.prayerTime) {
-            console.error("No prayerTime array found.");
-            return;
-        }
-
-        // Today's date formatting for e-Solat ("13-Nov-2024")
+        // Today's date for eSolat format
         const today = new Date();
         const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-        const esDate = `${today.getDate().toString().padStart(2,"0")}-${months[today.getMonth()]}-${today.getFullYear()}`;
-
-        console.log("Searching date:", esDate);
+        const esDate = `${String(today.getDate()).padStart(2,"0")}-${months[today.getMonth()]}-${today.getFullYear()}`;
 
         const todayEntry = data.prayerTime.find(p => p.date === esDate);
+        if (!todayEntry) return;
 
-        if (!todayEntry) {
-            console.warn("No prayer times found for today.");
-            return;
-        }
-
-        // Map to easier names
         prayerTimes = {
             ismak: todayEntry.imsak,
             subuh: todayEntry.fajr,
@@ -47,39 +35,35 @@ async function loadPrayerTimes() {
             isyak: todayEntry.isha
         };
 
-        console.log("Today's times:", prayerTimes);
-
         document.getElementById("ismakTime").innerText = formatToAMPM(prayerTimes.ismak);
-        document.getElementById("subuhTime").innerText   = formatToAMPM(prayerTimes.subuh);
-        document.getElementById("syurukTime").innerText  = formatToAMPM(prayerTimes.syuruk);
-        document.getElementById("zohorTime").innerText   = formatToAMPM(prayerTimes.zohor);
-        document.getElementById("asarTime").innerText    = formatToAMPM(prayerTimes.asar);
+        document.getElementById("subuhTime").innerText = formatToAMPM(prayerTimes.subuh);
+        document.getElementById("syurukTime").innerText = formatToAMPM(prayerTimes.syuruk);
+        document.getElementById("zohorTime").innerText = formatToAMPM(prayerTimes.zohor);
+        document.getElementById("asarTime").innerText = formatToAMPM(prayerTimes.asar);
         document.getElementById("maghribTime").innerText = formatToAMPM(prayerTimes.maghrib);
-        document.getElementById("isyakTime").innerText   = formatToAMPM(prayerTimes.isyak);
-
+        document.getElementById("isyakTime").innerText = formatToAMPM(prayerTimes.isyak);
 
         determineNextPrayer();
-    }
-    catch (err) {
-        console.error("API ERROR:", err);
+        getCurrentPrayer(); // highlight immediately
+
+    } catch (err) {
+        console.error("API Error:", err);
     }
 }
 
 loadPrayerTimes();
 setInterval(loadPrayerTimes, 60 * 60 * 1000);
 
-
 // ===============================
 // 2. FORMAT 24H → 12H
 // ===============================
 function formatToAMPM(t) {
     if (!t) return "--:--";
-    let [h, m, s] = t.split(":").map(Number);
+    let [h, m] = t.split(":").map(Number);
     let ampm = h >= 12 ? "PM" : "AM";
     h = (h % 12) || 12;
-    return `${h}:${m.toString().padStart(2,"0")} ${ampm}`;
+    return `${h}:${String(m).padStart(2,"0")} ${ampm}`;
 }
-
 
 // ===============================
 // 3. DETERMINE NEXT PRAYER
@@ -98,22 +82,18 @@ function determineNextPrayer() {
     ];
 
     for (let p of schedule) {
-        if (!p.time) continue;
-        
         let [h, m] = p.time.split(":");
-        let target = new Date();
-        target.setHours(h, m, 0, 0);
+        let t = new Date();
+        t.setHours(h, m, 0, 0);
 
-        if (target > now) {
+        if (t > now) {
             nextPrayerName = p.name;
-            nextPrayerTime = target;
+            nextPrayerTime = t;
             document.getElementById("nextPrayerName").innerText = p.name;
             return;
         }
     }
 }
-
-
 
 // ===============================
 // 4. COUNTDOWN
@@ -133,23 +113,22 @@ function updateCountdown() {
     let m = Math.floor((diff / 1000 / 60) % 60);
     let s = Math.floor((diff / 1000) % 60);
 
-    document.getElementById("cdHour").innerText = h.toString().padStart(2,"0");
-    document.getElementById("cdMin").innerText = m.toString().padStart(2,"0");
-    document.getElementById("cdSec").innerText = s.toString().padStart(2,"0");
+    document.getElementById("cdHour").innerText = String(h).padStart(2,"0");
+    document.getElementById("cdMin").innerText = String(m).padStart(2,"0");
+    document.getElementById("cdSec").innerText = String(s).padStart(2,"0");
 }
 
 setInterval(updateCountdown, 1000);
 
-
 // ===============================
-// 5. LIVE CLOCK
+// 5. LIVE CLOCK + HIGHLIGHT
 // ===============================
 function updateCurrentTime() {
     let now = new Date();
 
     let h = now.getHours();
-    let m = now.getMinutes().toString().padStart(2,"0");
-    let s = now.getSeconds().toString().padStart(2,"0");
+    let m = String(now.getMinutes()).padStart(2,"0");
+    let s = String(now.getSeconds()).padStart(2,"0");
 
     let ampm = h >= 12 ? "PM" : "AM";
     let h12 = (h % 12) || 12;
@@ -157,15 +136,17 @@ function updateCurrentTime() {
     document.getElementById("currentTime").innerText =
         `${h12}:${m}:${s} ${ampm}`;
 
-    highlightIfReady();   // <-- highlight current prayer
+    getCurrentPrayer(); // highlight every second
 }
 
 setInterval(updateCurrentTime, 1000);
 updateCurrentTime();
 
-
+// ===============================
+// 6. HIGHLIGHT CURRENT PRAYER
+// ===============================
 function highlightCurrentPrayer(prayerName) {
-    let allCards = [
+    let cards = [
         "cardIsmak",
         "cardSubuh",
         "cardSyuruk",
@@ -175,29 +156,27 @@ function highlightCurrentPrayer(prayerName) {
         "cardIsyak"
     ];
 
-    // Remove highlight from all
-    allCards.forEach(id => {
+    cards.forEach(id => {
         document.getElementById(id).classList.remove("currentPrayer");
     });
 
-    // Add highlight to active
     let id = "card" + prayerName;
-    let el = document.getElementById(id);
-    if (el) el.classList.add("currentPrayer");
+    let card = document.getElementById(id);
+    if (card) card.classList.add("currentPrayer");
 }
 
 function getCurrentPrayer() {
     const now = new Date();
-    let lastPrayer = "Isyak"; // default after midnight
+    let active = "Isyak";
 
     const schedule = [
-        { name: "Ismak", time: prayerTimes.ismak },
-        { name: "Subuh", time: prayerTimes.subuh },
-        { name: "Syuruk", time: prayerTimes.syuruk },
-        { name: "Zohor", time: prayerTimes.zohor },
-        { name: "Asar",  time: prayerTimes.asar },
+        { name: "Ismak",   time: prayerTimes.ismak },
+        { name: "Subuh",   time: prayerTimes.subuh },
+        { name: "Syuruk",  time: prayerTimes.syuruk },
+        { name: "Zohor",   time: prayerTimes.zohor },
+        { name: "Asar",    time: prayerTimes.asar },
         { name: "Maghrib", time: prayerTimes.maghrib },
-        { name: "Isyak", time: prayerTimes.isyak }
+        { name: "Isyak",   time: prayerTimes.isyak }
     ];
 
     for (let p of schedule) {
@@ -205,22 +184,8 @@ function getCurrentPrayer() {
         let t = new Date();
         t.setHours(h, m, 0, 0);
 
-        if (t <= now) lastPrayer = p.name;
+        if (t <= now) active = p.name;
     }
 
-    highlightCurrentPrayer(lastPrayer);
+    highlightCurrentPrayer(active);
 }
-
-function updateCurrentTime() {
-    ...
-    highlightIfReady();
-}
-
-function highlightIfReady() {
-    if (Object.keys(prayerTimes).length > 0) {
-        getCurrentPrayer();
-    }
-}
-
-setInterval(updateCurrentTime, 1000);
-updateCurrentTime();
