@@ -1,49 +1,33 @@
 // ===============================
-// CONFIGURATION
+// CONFIG
 // ===============================
-const ZONE = "JHR02";   // Kota Tinggi
+const ZONE = "JHR02"; // Kota Tinggi
 let prayerTimes = {};
 let nextPrayerName = "";
 let nextPrayerTime = null;
 
-
 // ===============================
-// 1. Get Today’s Prayer Times (JAKIM e-Solat API)
+// 1. GET TODAY’S PRAYER TIME
 // ===============================
 async function loadPrayerTimes() {
     try {
-        const url = `https://www.e-solat.gov.my/index.php?r=esolatApi/takwimsolat&zone=${ZONE}&period=today`;
+        const url = `https://api.waktusolat.app/v2/solat/today?zone=${ZONE}`;
         const res = await fetch(url);
         const data = await res.json();
 
-        console.log("API Result:", data);
+        console.log("API DATA:", data);
 
-        // eSolat returns prayerTime array
-        if (!data.prayerTime || data.prayerTime.length === 0) {
-            console.warn("No prayer times for today");
-            document.getElementById("syurukTime").innerText = "--:--";
-            return;
-        }
+        // prayers object
+        prayerTimes = data.prayers;
 
-        const today = data.prayerTime[0];
-
-        // Map to your variable names
-        prayerTimes = {
-            subuh: today.fajr,
-            syuruk: today.syuruk,
-            zohor: today.dhuhr,
-            asar: today.asr,
-            maghrib: today.maghrib,
-            isyak: today.isha
-        };
-
+        // Write Syuruk
         document.getElementById("syurukTime").innerText =
             formatToAMPM(prayerTimes.syuruk);
 
         determineNextPrayer();
-    }
-    catch (err) {
-        console.error("Failed to load API:", err);
+
+    } catch (err) {
+        console.error("API ERROR:", err);
     }
 }
 
@@ -51,41 +35,35 @@ loadPrayerTimes();
 setInterval(loadPrayerTimes, 60 * 60 * 1000); // refresh every hour
 
 
-
 // ===============================
-// 2. Convert 24h → 12h AM/PM
+// 2. FORMAT 24H → 12H
 // ===============================
-function formatToAMPM(timeStr) {
-    if (!timeStr) return "--:--";
-
-    let [h, m, s] = timeStr.split(":").map(Number);
-    let suffix = h >= 12 ? "PM" : "AM";
+function formatToAMPM(t) {
+    let [h, m] = t.split(":").map(Number);
+    let ampm = h >= 12 ? "PM" : "AM";
     h = (h % 12) || 12;
-
-    return `${h}:${m.toString().padStart(2, "0")} ${suffix}`;
+    return `${h}:${m.toString().padStart(2, "0")} ${ampm}`;
 }
 
 
-
 // ===============================
-// 3. Determine Next Solat
+// 3. DETERMINE NEXT PRAYER
 // ===============================
 function determineNextPrayer() {
+
     const now = new Date();
 
     const schedule = [
-        { name: "Subuh",    time: prayerTimes.subuh },
-        { name: "Syuruk",   time: prayerTimes.syuruk },
-        { name: "Zohor",    time: prayerTimes.zohor },
-        { name: "Asar",     time: prayerTimes.asar },
-        { name: "Maghrib",  time: prayerTimes.maghrib },
-        { name: "Isyak",    time: prayerTimes.isyak }
+        { name: "Subuh", time: prayerTimes.subuh },
+        { name: "Syuruk", time: prayerTimes.syuruk },
+        { name: "Zohor", time: prayerTimes.zohor },
+        { name: "Asar", time: prayerTimes.asar },
+        { name: "Maghrib", time: prayerTimes.maghrib },
+        { name: "Isyak", time: prayerTimes.isyak }
     ];
 
     for (let p of schedule) {
-        if (!p.time) continue;
-
-        let [h, m, s] = p.time.split(":").map(Number);
+        let [h, m] = p.time.split(":");
         let target = new Date();
         target.setHours(h, m, 0, 0);
 
@@ -93,28 +71,19 @@ function determineNextPrayer() {
             nextPrayerName = p.name;
             nextPrayerTime = target;
             highlightPrayerButton(p.name);
+            document.getElementById("nextPrayerName").innerText = p.name;
             return;
         }
     }
-
-    // If all passed → next Subuh tomorrow
-    let [h, m] = prayerTimes.subuh.split(":").map(Number);
-    let tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(h, m, 0, 0);
-
-    nextPrayerName = "Subuh";
-    nextPrayerTime = tomorrow;
 }
 
 
-
 // ===============================
-// 4. Highlight Active Solat Button
+// 4. HIGHLIGHT BUTTON
 // ===============================
 function highlightPrayerButton(name) {
-    const btns = document.querySelectorAll(".selector button");
-    btns.forEach(btn => btn.classList.remove("active"));
+    document.querySelectorAll(".selector button")
+        .forEach(btn => btn.classList.remove("active"));
 
     if (name === "Zohor") document.getElementById("btnZohor").classList.add("active");
     if (name === "Asar") document.getElementById("btnAsar").classList.add("active");
@@ -122,9 +91,8 @@ function highlightPrayerButton(name) {
 }
 
 
-
 // ===============================
-// 5. Countdown to Next Solat
+// 5. COUNTDOWN
 // ===============================
 function updateCountdown() {
     if (!nextPrayerTime) return;
@@ -138,7 +106,7 @@ function updateCountdown() {
     }
 
     let h = Math.floor(diff / (1000 * 60 * 60));
-    let m = Math.floor((diff / (1000 * 60)) % 60);
+    let m = Math.floor((diff / 1000 / 60) % 60);
     let s = Math.floor((diff / 1000) % 60);
 
     document.getElementById("cdHour").innerText = h.toString().padStart(2, "0");
@@ -146,4 +114,24 @@ function updateCountdown() {
     document.getElementById("cdSec").innerText = s.toString().padStart(2, "0");
 }
 
-setInterval(updateCountd
+setInterval(updateCountdown, 1000);
+
+
+// ===============================
+// 6. LIVE CLOCK
+// ===============================
+function updateCurrentTime() {
+    let now = new Date();
+    let hh = now.getHours();
+    let mm = now.getMinutes().toString().padStart(2, "0");
+    let ss = now.getSeconds().toString().padStart(2, "0");
+
+    let ampm = hh >= 12 ? "PM" : "AM";
+    hh = (hh % 12) || 12;
+
+    document.getElementById("currentTime").innerText =
+        `${hh}:${mm}:${ss} ${ampm}`;
+}
+
+setInterval(updateCurrentTime, 1000);
+updateCurrentTime();
