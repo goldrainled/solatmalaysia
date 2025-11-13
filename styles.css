@@ -37,7 +37,6 @@ body::before{
     object-fit: cover;
     opacity: 0;
     animation: fadeBG 40s infinite ease-in-out;
-    filter: brightness(0.95) contrast(1.05);
 }
 
 /* Fade Timing */
@@ -57,62 +56,36 @@ body::before{
 /* CARD STYLE */
 .card{
     background: rgba(255,255,255,0.15);
-    backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px);
     border-radius: 20px;
     padding: 25px;
     margin: 18px auto;
     width: 90%;
     max-width: 420px;
     border: 1px solid rgba(255,255,255,0.35);
-
     box-shadow: 0 0 12px rgba(255,255,255,0.15);
-    animation: glowPulse 3.5s ease-in-out infinite;
 }
 
-@keyframes glowPulse {
-    0%   { box-shadow: 0 0 10px rgba(255,255,255,0.15); }
-    50%  { box-shadow: 0 0 25px rgba(255,255,255,0.28); }
-    100% { box-shadow: 0 0 10px rgba(255,255,255,0.15); }
-}
-
-.card{
-    position: relative;
-}
-
-.card::after{
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 20px;
-    padding: 2px;
-    background: linear-gradient(135deg,
-        rgba(255,255,255,0.6),
-        rgba(120,200,255,0.6),
-        rgba(255,255,255,0.6)
-    );
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: exclude;
-    -webkit-mask-composite: xor;
-    animation: borderFlow 5s linear infinite;
-}
-
-@keyframes borderFlow{
-    0%   { filter: hue-rotate(0deg); }
-    100% { filter: hue-rotate(360deg); }
+/* FIX SIZE: NEXT PRAYER CARD */
+#nextPrayerCard {
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 35px;
+    padding-bottom: 35px;
 }
 
 /* TEXT */
 .time-label{
     font-size: 22px;
     opacity: 0.95;
-    font-weight: 500;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .time-large{
     font-size: 52px;
     font-weight: 700;
-    letter-spacing: 1px;
 }
 
 /* COUNTDOWN */
@@ -148,20 +121,8 @@ label{
     opacity: 0.9;
 }
 
-/* FIX NEXT-PRAYER CARD SIZE */
-#nextPrayerCard {
-    min-height: 150px; 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-/* MOBILE FIX */
+/* MOBILE */
 @media (max-width: 480px){
-    .time-large{
-        font-size: 40px;
-    }
-    .count-box{
-        font-size: 26px;
-    }
+    .time-large{ font-size: 40px; }
+    .count-box{ font-size: 26px; }
 }
