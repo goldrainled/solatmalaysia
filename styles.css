@@ -161,6 +161,12 @@ body::before{
     box-shadow: 0 0 10px rgba(255,255,255,0.15);
 }
 
+.currentPrayer {
+    background: rgba(255, 215, 0, 0.35) !important; 
+    border: 2px solid #ffd700 !important;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.55);
+}
+
 label{
     display: block;
     font-size: 14px;
