@@ -148,6 +148,14 @@ label{
     opacity: 0.9;
 }
 
+/* FIX NEXT-PRAYER CARD SIZE */
+#nextPrayerCard {
+    min-height: 150px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 /* MOBILE FIX */
 @media (max-width: 480px){
     .time-large{
