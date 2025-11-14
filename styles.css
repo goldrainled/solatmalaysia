@@ -170,19 +170,25 @@ html, body {
   .container-grid {
     grid-template-columns:1fr;
     grid-template-rows:
-      clamp(8vh,10vh,12vh)  /* Clock */
-      clamp(8vh,10vh,12vh)  /* Current */
-      clamp(8vh,10vh,12vh)  /* Next */
-      clamp(8vh,10vh,12vh)  /* Countdown */
-      1fr;                 /* Prayer list */
-    gap:clamp(10px,1vh,10px);
+      clamp(7vh, 8vh, 10vh)   /* Clock */
+      clamp(7vh, 8vh, 10vh)   /* Current */
+      clamp(7vh, 8vh, 10vh)   /* Next */
+      clamp(8vh,10vh,12vh)    /* Countdown */
+      1fr;                    /* Prayer list */
+    gap:clamp(8px,1vh,12px);
     height:100vh;
     overflow:hidden;
   }
 
-  #clockCard, #currentPrayerCard, #nextPrayerCard {
-    padding:1vh 0;
+  /* ✨ Reduce top 3 cards to 80% */
+  #clockCard,
+  #currentPrayerCard,
+  #nextPrayerCard {
+    scale: 0.80;                /* 80% size */
+    transform-origin: top center;
+    padding: 0.6vh 0;           /* reduce padding to stay compact */
   }
+}
    
    .clock-box {
   display:flex;
