@@ -138,7 +138,7 @@ html, body{
     grid-template-rows:
       clamp(14vh,16vh,20vh)  /* Clock */
       clamp(14vh,16vh,20vh)  /* Current prayer */
-      clamp(14vh,16vh,20vh)  /* Next prayer */
+      clamp(10vh,12vh,14vh)  /* Next prayer */
       clamp(14vh,16vh,20vh)  /* Countdown */
       1fr;                   /* Seven prayer list */
     gap:clamp(12px,1.6vh,20px);
