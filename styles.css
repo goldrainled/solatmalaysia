@@ -154,10 +154,10 @@ html, body{
   }
 
   .countdown-row{
-    gap:clamp(10px,3vw,24px);
+    gap:clamp(8px,3vw,12px);
   }
   .count-box{
-    min-width:clamp(48px,10vw,48px);
+    min-width:clamp(24px,5vw,24px);
     padding:clamp(8px,1.2vh,10px);
     border-radius:14px;
   }
