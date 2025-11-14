@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
 <title>Solat Malaysia Display</title>
 
-<!-- Optional favicon (avoids 404 error) -->
+<!-- Avoid favicon 404 -->
 <link rel="icon" href="favicon.ico" />
 
 <link rel="stylesheet" href="styles.css" />
@@ -25,7 +24,7 @@
 </div>
 
 <!-- ============================
-     MAIN GRID CONTAINER
+     MAIN GRID
 ============================ -->
 <div class="container-grid">
 
@@ -35,34 +34,40 @@
     <div class="top-row">
 
         <!-- CLOCK CARD -->
-        <div id="clockCard" class="card clock-box">
-            <div class="clock-title">Waktu Sekarang</div>
-            <div class="clock-time" id="currentTime">--:--:--</div>
+        <div id="clockCard" class="card">
+            <div class="card-scale">   <!-- ⭐ REQUIRED FIX -->
+                <div class="clock-box">
+                    <div class="clock-title">Waktu Sekarang</div>
+                    <div class="clock-time" id="currentTime">--:--:--</div>
+                </div>
+            </div>
         </div>
 
-        <!-- CURRENT PRAYER CARD -->
+        <!-- CURRENT PRAYER -->
         <div id="currentPrayerCard" class="card">
-            <div class="time-large" id="currentPrayerTime">--:--</div>
-            <div class="time-label" id="currentPrayerName">--</div>
+            <div class="card-scale">   <!-- ⭐ REQUIRED FIX -->
+                <div class="time-large" id="currentPrayerTime">--:--</div>
+                <div class="time-label" id="currentPrayerName">--</div>
+            </div>
         </div>
 
-    </div>
-    <!-- ✅ FIXED: Missing closing </div> added -->
+    </div> <!-- END top-row -->
 
 
     <!-- ============================
          NEXT PRAYER CARD
     ============================= -->
     <div id="nextPrayerCard" class="card">
-        <div class="time-label" id="nextLabel">Waktu Solat Seterusnya</div>
-        <div class="time-large" id="nextPrayerName">--</div>
+        <div class="card-scale">   <!-- ⭐ REQUIRED FIX -->
+            <div class="time-label" id="nextLabel">Waktu Solat Seterusnya</div>
+            <div class="time-large" id="nextPrayerName">--</div>
+        </div>
     </div>
 
 
     <!-- ============================
          BOTTOM SECTION
-         (COUNTDOWN + PRAYER LIST)
-    ============================= -->
+============================ -->
     <div class="bottom-row">
 
         <!-- COUNTDOWN CARD -->
@@ -87,7 +92,7 @@
             </div>
         </div>
 
-        <!-- PRAYER LIST (7 items) -->
+        <!-- PRAYER LIST -->
         <div class="prayer-list">
 
             <div class="card prayer-row" id="cardIsmak">
@@ -125,14 +130,15 @@
                 <div class="prayer-time" id="isyakTime">--:--</div>
             </div>
 
-        </div>
+        </div><!-- END prayer-list -->
 
-    </div>
+    </div><!-- END bottom-row -->
 
-</div>
+</div><!-- END container-grid -->
+
 
 <!-- ============================
-     OPTIONAL: SILENCE EXTENSION ERRORS
+     OPTIONAL: BLOCK EXTENSION ERRORS
 ============================ -->
 <script>
 window.addEventListener("error", (e) => {
@@ -145,7 +151,6 @@ window.addEventListener("error", (e) => {
 }, true);
 </script>
 
-<!-- MAIN JS -->
 <script src="main.js"></script>
 
 </body>
