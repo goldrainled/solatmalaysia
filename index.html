@@ -11,47 +11,66 @@
 <div class="page">
     <div class="main-grid">
 
-        <!-- HEADER -->
+        <!-- ==========================
+             HEADER (Date + Zone)
+        =========================== -->
         <div class="header">
             <div class="date" id="todayDate">Loading...</div>
-            <div class="zone">JHR02 – JOHOR BAHRU, KOTA TINGGI, MERSING</div>
+            <div class="zone">JHR02 — JOHOR, KOTA TINGGI, MERSING</div>
         </div>
 
-        <!-- MAIN CONTENT GRID -->
+
+        <!-- ==========================
+             GRID: LEFT (Next + Clock + Countdown)
+                 + RIGHT (Prayer List)
+        =========================== -->
         <div class="container-grid">
 
-            <!-- LEFT SIDE (Next Prayer + Current Time + Countdown) -->
+            <!-- LEFT SIDE -->
             <div class="left-column">
 
+                <!-- TOP ROW (Next Prayer + Current Time) -->
                 <div class="top-row">
 
-                    <!-- Next Prayer Card -->
+                    <!-- Next Prayer -->
                     <div class="card block-large" id="nextPrayerCard">
                         <div class="time-label" id="nextLabel">Menuju</div>
                         <div class="time-large" id="nextPrayerName">--</div>
                     </div>
 
-                    <!-- Current Time Card -->
+                    <!-- Current Time -->
                     <div class="card block-large">
-                        <div class="time-label">Waktu Sekarang</div>
+                        <div class="time-label">Sekarang</div>
                         <div class="time-large" id="currentTime">--:--:--</div>
                     </div>
-
                 </div>
 
                 <!-- Countdown -->
                 <div class="card">
-                    <div class="time-label">Menuju Solat Seterusnya</div>
+                    <div class="time-label">Kiraan Masa</div>
+
                     <div class="countdown-row">
-                        <div class="count-box"><span id="cdHour">00</span><label>JAM</label></div>
-                        <div class="count-box"><span id="cdMin">00</span><label>MINIT</label></div>
-                        <div class="count-box"><span id="cdSec">00</span><label>SAAT</label></div>
+                        <div class="count-box">
+                            <span id="cdHour">00</span>
+                            <label>JAM</label>
+                        </div>
+
+                        <div class="count-box">
+                            <span id="cdMin">00</span>
+                            <label>MINIT</label>
+                        </div>
+
+                        <div class="count-box">
+                            <span id="cdSec">00</span>
+                            <label>SAAT</label>
+                        </div>
                     </div>
                 </div>
 
-            </div>
+            </div> <!-- END LEFT COLUMN -->
 
-            <!-- PRAYER LIST -->
+
+            <!-- RIGHT SIDE: PRAYER TIMES LIST -->
             <div class="prayer-list">
 
                 <div class="card prayer-row" id="cardIsmak">
@@ -89,12 +108,14 @@
                     <span class="prayer-time" id="isyakTime">--:--</span>
                 </div>
 
-            </div>
+            </div> <!-- END PRAYER LIST -->
 
-        </div>
-    </div>
-</div>
+        </div> <!-- END container-grid -->
+
+    </div> <!-- END main-grid -->
+</div> <!-- END page -->
 
 <script src="main.js"></script>
+
 </body>
 </html>
