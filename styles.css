@@ -158,11 +158,11 @@ html, body{
   }
   .count-box{
     min-width:clamp(24px,5vw,24px);
-    padding:clamp(8px,1.2vh,10px);
-    border-radius:14px;
+    padding:clamp(6px,1vh,10px);
+    border-radius:12px;
   }
   .count-number{
-    font-size:clamp(2rem,3vh,4rem);
+    font-size:clamp(1.8rem,3vh,4rem);
     font-weight:800;
   }
   .count-label{
