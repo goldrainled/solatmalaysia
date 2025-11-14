@@ -248,7 +248,7 @@ html, body {
   }
 
   .countdown-row {
-    gap:clamp(4px,1vw,6px);    /* ⬅️ Reduced spacing between boxes */
+    gap:clamp(2px,0.6vw,4px);    /* ⬅️ Reduced spacing between boxes */
   }
 
   .count-box {
