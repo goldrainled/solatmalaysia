@@ -129,9 +129,9 @@ html, body{
 }
 
 /* ============================
-   PORTRAIT MODE (16/7)
+   PORTRAIT MODE (7/16)
 ============================ */
-@media (max-aspect-ratio:16/6){
+@media (max-aspect-ratio:7/16){
 
   .container-grid{
     grid-template-columns:1fr;
