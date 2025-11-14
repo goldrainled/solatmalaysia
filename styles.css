@@ -34,24 +34,24 @@ html, body {
   box-sizing:border-box;
 }
 
-.time-large { text-align:center; font-weight:800; }
-.time-label { text-align:center; opacity:.95; }
-
-/* CLOCK (Option A, 2-row layout) */
-.clock-box {
+/* Scale wrapper (portrait fix) */
+.card-scale {
+  width:100%;
+  height:100%;
   display:flex;
-  flex-direction:column;
   align-items:center;
   justify-content:center;
+  flex-direction:column;
 }
 
+/* Clock */
+.clock-box { display:flex; flex-direction:column; align-items:center; }
 .clock-title {
   font-size:clamp(1rem,2vh,1.4rem);
   font-weight:500;
   margin-bottom:4px;
   opacity:.95;
 }
-
 .clock-time {
   font-size:clamp(2rem,4vh,4rem);
   font-weight:800;
@@ -62,8 +62,7 @@ html, body {
    PRAYER ROWS
 ============================ */
 .prayer-row {
-  display:flex;
-  justify-content:space-between;
+  display:flex; justify-content:space-between;
   align-items:center;
   padding:.9rem 1.2rem;
   border-radius:8px;
@@ -71,7 +70,7 @@ html, body {
 .prayer-name { font-weight:500; }
 .prayer-time { font-weight:800; text-align:right; }
 
-/* Current prayer highlight */
+/* Highlight */
 .currentPrayer {
   background:rgba(255,215,0,.28)!important;
   border:2px solid #ffd700!important;
@@ -82,8 +81,7 @@ html, body {
    COUNTDOWN
 ============================ */
 .countdown-row {
-  display:flex; gap:1rem;
-  justify-content:center; align-items:center;
+  display:flex; gap:1rem; justify-content:center; align-items:center;
 }
 .count-box {
   display:flex; flex-direction:column;
@@ -130,15 +128,8 @@ html, body {
     gap:clamp(12px,1.2vw,24px);
   }
 
-  #clockCard, #currentPrayerCard {
-    display:flex;
-    flex-direction:column;
-  }
-
   #nextPrayerCard {
     grid-column:1/3;
-    display:flex;
-    flex-direction:column;
   }
 
   .bottom-row {
@@ -150,16 +141,6 @@ html, body {
     grid-template-rows:repeat(7,1fr);
     gap:clamp(6px,.7vh,10px);
   }
-
-  .time-large {
-    font-size:clamp(2rem,3.8vh,6.5vh);
-  }
-  .prayer-name, .prayer-time {
-    font-size:clamp(1rem,1.6vh,2.6vh);
-  }
-  .count-number {
-    font-size:clamp(2rem,4.2vh,7vh);
-  }
 }
 
 /* ============================
@@ -167,103 +148,47 @@ html, body {
 ============================ */
 @media (max-aspect-ratio:9/16) {
 
-  /* GRID HEIGHTS (balanced) */
   .container-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns:1fr;
     grid-template-rows:
-      11vh    /* Clock */
-      11vh    /* Current */
-      11vh    /* Next */
-      13vh    /* Countdown */
-      1fr;    /* Prayer list */
-    gap: clamp(4px, 0.6vh, 8px);
-    height: 100vh;
-    overflow: hidden;
+      11vh   /* clock */
+      11vh   /* current */
+      11vh   /* next */
+      13vh   /* countdown */
+      1fr;   /* prayer list */
+    gap:clamp(4px,0.6vh,8px);
+    height:100vh;
+    overflow:hidden;
   }
 
-  /* ============================
-     TOP 3 CARDS — Balanced Medium Size
-  ============================= */
-  #clockCard,
-  #currentPrayerCard,
-  #nextPrayerCard {
-    margin: 0;
-    padding: 0 !important;
-
-    height: 100%;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;   /* Center text vertically */
-    align-items: center;       /* Center text horizontally */
-
-    transform: scale(0.88);    /* Medium size (safe scaling) */
-    transform-origin: center;
+  /* Scale wrapper */
+  .card-scale {
+    transform:scale(0.88);
+    transform-origin:center;
   }
 
-  /* ============================
-     CLOCK — Clean & readable
-  ============================= */
-  .clock-title {
-    font-size: clamp(1rem, 1.8vh, 1.4rem);
-    margin-bottom: 2px !important;
-    line-height: 1;
-  }
+  /* Fix text sizes */
+  .clock-title { font-size:clamp(1rem,1.8vh,1.4rem); }
+  .clock-time  { font-size:clamp(1.9rem,3.4vh,3.2rem); }
 
-  .clock-time {
-    font-size: clamp(1.9rem, 3.4vh, 3.2rem);
-    font-weight: 800;
-    line-height: 1;
-  }
-
-  /* ============================
-     CURRENT + NEXT — tidy layout
-  ============================= */
   #currentPrayerCard .time-large,
   #nextPrayerCard .time-large {
-    font-size: clamp(1.5rem, 2.4vh, 2.7rem);
-    line-height: 1;
-    margin: 2px 0 !important;
+    font-size:clamp(1.5rem,2.4vh,2.7rem);
+    margin:2px 0 !important;
+    line-height:1;
   }
 
   #currentPrayerCard .time-label,
   #nextPrayerCard .time-label {
-    font-size: clamp(0.8rem, 1.3vh, 1.2rem);
-    margin: 0 !important;
-    opacity: 0.95;
+    font-size:clamp(0.8rem,1.3vh,1.2rem);
+    margin:0 !important;
   }
 
-  /* Fix long next prayer text wrapping */
-  #nextPrayerCard .time-label {
-    white-space: nowrap;
-  }
+  #nextPrayerCard .time-label { white-space:nowrap; }
 
-  /* ============================
-     COUNTDOWN
-  ============================= */
-  .countdown-row {
-    gap: clamp(4px, 1vw, 12px);
-  }
-
+  .countdown-row { gap:clamp(4px,1vw,12px); }
   .count-box {
-    min-width: clamp(30px, 7vw, 48px);
-    padding: clamp(4px, 0.9vh, 8px);
-  }
-
-  .count-number {
-    font-size: clamp(1.6rem, 2.6vh, 3rem);
-    font-weight: 900;
-  }
-
-  .count-label {
-    font-size: clamp(.7rem, 1.2vh, 1rem);
-  }
-
-  /* ============================
-     PRAYER LIST
-  ============================= */
-  .prayer-list {
-    grid-template-rows: repeat(7, 1fr);
-    gap: clamp(3px, 0.4vh, 6px);
+    min-width:clamp(30px,7vw,48px);
+    padding:clamp(4px,0.9vh,8px);
   }
 }
