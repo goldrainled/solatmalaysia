@@ -6,7 +6,7 @@
       content="width=device-width, initial-scale=1.0, user-scalable=no" />
 <title>Solat Malaysia Display</title>
 
-<!-- Optional: remove favicon error -->
+<!-- Optional favicon (avoids 404 error) -->
 <link rel="icon" href="favicon.ico" />
 
 <link rel="stylesheet" href="styles.css" />
@@ -25,26 +25,30 @@
 </div>
 
 <!-- ============================
-     MAIN CONTAINER (GRID)
+     MAIN GRID CONTAINER
 ============================ -->
 <div class="container-grid">
 
     <!-- ============================
-         TOP ROW (CLOCK + CURRENT PRAYER)
+         TOP ROW (CLOCK + CURRENT)
     ============================= -->
     <div class="top-row">
 
-          <!-- LIVE CLOCK CARD -->
-      <div id="clockCard" class="card clock-box">
-          <div class="clock-title">Waktu Sekarang</div>
-          <div class="clock-time" id="currentTime">--:--:--</div>
-      </div>
-          
+        <!-- CLOCK CARD -->
+        <div id="clockCard" class="card clock-box">
+            <div class="clock-title">Waktu Sekarang</div>
+            <div class="clock-time" id="currentTime">--:--:--</div>
+        </div>
+
         <!-- CURRENT PRAYER CARD -->
         <div id="currentPrayerCard" class="card">
             <div class="time-large" id="currentPrayerTime">--:--</div>
             <div class="time-label" id="currentPrayerName">--</div>
         </div>
+
+    </div>
+    <!-- ✅ FIXED: Missing closing </div> added -->
+
 
     <!-- ============================
          NEXT PRAYER CARD
@@ -54,30 +58,36 @@
         <div class="time-large" id="nextPrayerName">--</div>
     </div>
 
+
     <!-- ============================
-         BOTTOM ROW (COUNTDOWN + PRAYER LIST)
+         BOTTOM SECTION
+         (COUNTDOWN + PRAYER LIST)
     ============================= -->
     <div class="bottom-row">
 
         <!-- COUNTDOWN CARD -->
         <div class="countdown-card card">
             <div class="countdown-row">
+
                 <div class="count-box">
                     <div id="cdHour" class="count-number">00</div>
                     <div class="count-label">JAM</div>
                 </div>
+
                 <div class="count-box">
                     <div id="cdMin" class="count-number">00</div>
                     <div class="count-label">MINIT</div>
                 </div>
+
                 <div class="count-box">
                     <div id="cdSec" class="count-number">00</div>
                     <div class="count-label">SAAT</div>
                 </div>
+
             </div>
         </div>
 
-        <!-- PRAYER LIST (7 CARDS) -->
+        <!-- PRAYER LIST (7 items) -->
         <div class="prayer-list">
 
             <div class="card prayer-row" id="cardIsmak">
@@ -135,7 +145,7 @@ window.addEventListener("error", (e) => {
 }, true);
 </script>
 
-<!-- MAIN LOGIC -->
+<!-- MAIN JS -->
 <script src="main.js"></script>
 
 </body>
