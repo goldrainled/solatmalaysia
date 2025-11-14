@@ -154,7 +154,7 @@ html, body{
   }
 
   .countdown-row{
-    gap:clamp(18px,3vw,32px);
+    gap:clamp(18px,3vw,24px);
   }
   .count-box{
     min-width:clamp(48px,10vw,48px);
@@ -162,7 +162,7 @@ html, body{
     border-radius:14px;
   }
   .count-number{
-    font-size:clamp(2.4rem,5vh,6rem);
+    font-size:clamp(2rem,3vh,4rem);
     font-weight:800;
   }
   .count-label{
