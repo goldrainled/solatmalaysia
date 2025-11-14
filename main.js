@@ -62,7 +62,7 @@ function format(t) {
 function determineNextPrayer() {
     const now = new Date();
 
-    document.getElementById("nextLabel").innerText = "Menuju";
+    document.getElementById("nextLabel").innerText = "Waktu Solat Seterusnya";
 
     const list = Object.entries(prayerTimes);
 
@@ -87,7 +87,7 @@ function determineNextPrayer() {
 
     nextPrayerTime = tomorrow;
 
-    document.getElementById("nextLabel").innerText = "Menuju (Esok)";
+    document.getElementById("nextLabel").innerText = "Waktu Solat Seterusnya(Esok)";
     document.getElementById("nextPrayerName").innerText = "Subuh";
 }
 
