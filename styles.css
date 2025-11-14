@@ -1,6 +1,6 @@
-/* ===========================
-   GLOBAL
-   =========================== */
+/* =======================================
+   GLOBAL ROOT RESPONSIVE SETTINGS
+======================================= */
 :root {
     font-size: clamp(12px, 1.6vw, 22px);
     --card-padding: 1.25rem;
@@ -19,9 +19,9 @@ html, body {
     overflow-x: hidden;
 }
 
-/* ===========================
-   PAGE + GRID
-   =========================== */
+/* =======================================
+   PAGE GRID
+======================================= */
 .page {
     min-height: 100%;
     display: grid;
@@ -36,14 +36,14 @@ html, body {
     gap: 1rem;
 }
 
-/* ===========================
-   HEADER
-   =========================== */
+/* =======================================
+   HEADER 
+======================================= */
 .header {
     text-align: center;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: .25rem;
     margin-bottom: 1rem;
 }
 
@@ -57,9 +57,9 @@ html, body {
     opacity: 0.85;
 }
 
-/* ===========================
-   Layout Container
-   =========================== */
+/* =======================================
+   MAIN CONTENT GRID
+======================================= */
 .container-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -72,17 +72,14 @@ html, body {
     gap: 1rem;
 }
 
-/* ===========================
-   TOP ROW (Next Prayer + Clock)
-   =========================== */
 .top-row {
     display: grid;
     gap: 1rem;
 }
 
-/* ===========================
-   CARD BASE
-   =========================== */
+/* =======================================
+   CARD BASE STYLE
+======================================= */
 .card {
     background: var(--card-bg);
     border-radius: var(--card-radius);
@@ -93,9 +90,10 @@ html, body {
     flex-direction: column;
     justify-content: center;
     min-height: 7rem;
+    box-sizing: border-box;
 }
 
-/* LARGE BLOCKS */
+/* Large blocks: Next Prayer + Current Time */
 .block-large .time-label {
     font-size: clamp(1rem, 1.8vw, 1.8rem);
     margin-bottom: .5rem;
@@ -106,9 +104,9 @@ html, body {
     font-weight: 800;
 }
 
-/* ===========================
+/* =======================================
    COUNTDOWN
-   =========================== */
+======================================= */
 .countdown-row {
     display: flex;
     justify-content: center;
@@ -128,48 +126,60 @@ html, body {
 
 .count-box label {
     display: block;
-    font-size: 0.8rem;
-    opacity: 0.8;
+    font-size: .8rem;
+    opacity: .8;
 }
 
-/* ===============================
-   PRAYER LIST ROW STYLE
-   =============================== */
+/* =======================================
+   PRAYER LIST (SINGLE ROW)
+======================================= */
 .prayer-list {
     display: flex;
     flex-direction: column;
     gap: .6rem;
 }
 
+/* Single-row prayer card */
 .prayer-row {
     display: flex;
+    flex-direction: row;  
     justify-content: space-between;
     align-items: center;
-    padding: .8rem 1.2rem;
+    width: 100%;
+    padding: .9rem 1.4rem;
+    box-sizing: border-box;
+    white-space: nowrap;       
+    overflow: hidden;
 }
 
 .prayer-name {
-    font-size: clamp(1rem, 1.7vw, 1.5rem);
-    font-weight: 700;
+    font-size: clamp(1rem, 1.7vw, 1.6rem);
+    font-weight: 600;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .prayer-time {
     font-size: clamp(1rem, 1.8vw, 1.6rem);
     font-weight: 800;
+    white-space: nowrap;
 }
 
-/* HIGHLIGHT CURRENT PRAYER */
+/* =======================================
+   HIGHLIGHT CURRENT PRAYER
+======================================= */
 .currentPrayer {
     background: rgba(255,215,0,0.25) !important;
     border: 2px solid var(--accent-gold) !important;
     box-shadow: 0 0 30px rgba(255,215,0,0.6);
 }
 
-/* ===============================
-   RESPONSIVE LAYOUT RULES
-   =============================== */
+/* =======================================
+   RESPONSIVE TV / ULTRA-WIDE / MOBILE
+======================================= */
 
-/* TVs and wide screens (16:9+) */
+/* TV 16:9, desktop widescreen */
 @media (min-aspect-ratio: 16/9) and (min-width: 900px) {
     .container-grid {
         grid-template-columns: 1fr 420px;
@@ -186,12 +196,13 @@ html, body {
         min-height: 8rem;
     }
 
-    .prayer-name, .prayer-time {
+    .prayer-name,
+    .prayer-time {
         font-size: clamp(1.4rem, 2.2vw, 2rem);
     }
 }
 
-/* Tablets or Desktop mid-size */
+/* Tablet / Desktop mid width */
 @media (min-width: 700px) and (max-aspect-ratio: 16/9) {
     .container-grid {
         grid-template-columns: 1fr 420px;
@@ -201,19 +212,19 @@ html, body {
     }
 }
 
-/* Mobile Portrait */
+/* Mobile portrait */
 @media (max-width: 699px) {
     .card { min-height: 6rem; padding: .8rem; }
     .prayer-name { font-size: 1rem; }
     .prayer-time { font-size: 1rem; }
 }
 
-/* Tall screens (1:3, 1:2) */
+/* Tall screens (1:2, 1:3) */
 @media (max-aspect-ratio: 2/3) {
     .card { min-height: 6.8rem; }
 }
 
-/* Ultra-wide 2:1 */
+/* Ultra-wide (2:1) */
 @media (min-aspect-ratio: 2/1) and (min-width: 1000px) {
     :root { font-size: clamp(18px, 2vw, 30px); }
     .card { min-height: 9rem; }
