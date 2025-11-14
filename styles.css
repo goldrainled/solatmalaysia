@@ -200,11 +200,24 @@ html, body {
     line-height: 1;
   }
 
-  /* ============================
-       PRAYER LIST (unchanged)
-     ============================= */
-  .prayer-list {
-    grid-template-rows: repeat(7, 1fr);
-    gap: clamp(3px, 0.5vh, 6px);
-  }
+/* ============================
+   PRAYER LIST — Option C (BEST)
+   Shrink height + scale list
+============================ */
+.prayer-row {
+  padding: clamp(3px, 0.5vh, 6px) 0.8rem;
+  border-radius: 10px;
+}
+
+.prayer-name,
+.prayer-time {
+  font-size: clamp(0.9rem, 1.3vh, 1.3rem);
+  line-height: 1.1;
+}
+
+/* Scale the full list slightly */
+.prayer-list {
+  transform: scale(0.90);
+  transform-origin: top center;
+  margin-top: -1vh;   /* Pull list upward */
 }
