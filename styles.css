@@ -157,8 +157,8 @@ html, body{
     gap:clamp(18px,3vw,32px);
   }
   .count-box{
-    min-width:clamp(70px,10vw,80px);
-    padding:clamp(10px,1.6vh,18px);
+    min-width:clamp(48px,10vw,48px);
+    padding:clamp(10px,1.6vh,12px);
     border-radius:14px;
   }
   .count-number{
