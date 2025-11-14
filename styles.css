@@ -64,16 +64,19 @@ body::before{
     max-width: 420px;
     border: 1px solid rgba(255,255,255,0.35);
     box-shadow: 0 0 12px rgba(255,255,255,0.15);
-}
 
-/* FIX SIZE: NEXT PRAYER CARD */
-#nextPrayerCard {
+    /* NEW FIX → SAME HEIGHT FOR ALL CARDS */
     min-height: 150px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding-top: 35px;
-    padding-bottom: 35px;
+}
+
+/* REMOVE SPECIAL NEXT PRAYER SIZE */
+#nextPrayerCard {
+    padding-top: 25px;
+    padding-bottom: 25px;
+    /* removed min-height so it follows .card */
 }
 
 /* TEXT */
