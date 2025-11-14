@@ -183,6 +183,27 @@ html, body {
   #clockCard, #currentPrayerCard, #nextPrayerCard {
     padding:1vh 0;
   }
+   
+   .clock-box {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+.clock-title {
+  font-size:clamp(1rem,2vh,1.4rem);
+  font-weight:500;
+  margin-bottom:6px;
+  opacity:.95;
+}
+
+.clock-time {
+  font-size:clamp(2rem,4vh,4rem);
+  font-weight:800;
+  line-height:1.1;
+  margin:0;
+}
 
   .countdown-card {
     display:flex;
