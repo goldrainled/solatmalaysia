@@ -33,14 +33,14 @@ html, body{
   box-sizing:border-box;
 }
 
-.time-large{ text-align:center; font-weight:700; }
+.time-large{ text-align:center; font-weight:800; }
 .time-label{ text-align:center; opacity:.95; }
 
 .prayer-row{
   display:flex; justify-content:space-between; align-items:center;
   padding:.9rem 1.2rem; border-radius:8px;
 }
-.prayer-name{ font-weight:400; }
+.prayer-name{ font-weight:280; }
 .prayer-time{ font-weight:800; text-align:right; }
 
 /* HIGHLIGHT CURRENT PRAYER */
