@@ -65,7 +65,7 @@ html, body{
   border-radius:10px;
 }
 .count-number{ font-weight:900; }
-.count-label{ font-size:.50rem; opacity:.9; letter-spacing:.06em; }
+.count-label{ font-size:.68rem; opacity:.9; letter-spacing:.06em; }
 
 /* ============================
    GRID LAYOUT
@@ -139,7 +139,7 @@ html, body{
       clamp(10vh,12vh,14vh)  /* Clock */
       clamp(10vh,12vh,14vh)  /* Current prayer */
       clamp(10vh,12vh,14vh)  /* Next prayer */
-      clamp(12vh,14vh,16vh)  /* Countdown */
+      clamp(10vh,12vh,14vh)  /* Countdown */
       1fr;                   /* Seven prayer list */
     gap:clamp(12px,1.6vh,14px);
     height:100vh; overflow:hidden;
