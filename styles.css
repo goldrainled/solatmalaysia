@@ -217,7 +217,7 @@ html, body {
 
 /* Scale the full list slightly */
 .prayer-list {
-  transform: scale(0.90);
+  transform: scale(1.0);
   transform-origin: top center;
-  margin-top: -1vh;   /* Pull list upward */
+  margin-top: 1vh;   /* Pull list upward */
 }
