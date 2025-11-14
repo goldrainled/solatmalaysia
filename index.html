@@ -1,110 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta charset="UTF-8" />
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no" />
 <title>Solat Malaysia Display</title>
-<link rel="stylesheet" href="styles.css">
+
+<!-- Optional: remove favicon error -->
+<link rel="icon" href="favicon.ico" />
+
+<link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
 
-<!-- Background Slideshow -->
+<!-- ============================
+     BACKGROUND SLIDESHOW
+============================ -->
 <div class="slideshow-bg">
-    <img src="bg1.jpg">
-    <img src="bg2.jpg">
-    <img src="bg3.jpg">
-    <img src="bg4.jpg">
+    <img src="bg1.jpg" />
+    <img src="bg2.jpg" />
+    <img src="bg3.jpg" />
+    <img src="bg4.jpg" />
 </div>
 
-<!-- Main Layout Grid -->
+<!-- ============================
+     MAIN CONTAINER (GRID)
+============================ -->
 <div class="container-grid">
 
-    <!-- DATE & LOCATION -->
-    <div class="header-area">
-        <div id="todayDate" class="header-date">Loading...</div>
-        <div id="todayHijri" class="header-hijri"></div>
-        <div class="header-zone">JHR02 - JOHOR BAHRU, KOATA TINGGI, MERSING</div>
+    <!-- ============================
+         TOP ROW (CLOCK + CURRENT PRAYER)
+    ============================= -->
+    <div class="top-row">
+
+        <!-- CURRENT PRAYER CARD -->
+        <div id="currentPrayerCard" class="card">
+            <div class="time-large" id="currentPrayerTime">--:--</div>
+            <div class="time-label" id="currentPrayerName">--</div>
+        </div>
+
+        <!-- LIVE CLOCK CARD -->
+        <div id="clockCard" class="card">
+            <div class="time-label">Waktu Sekarang</div>
+            <div class="time-large" id="currentTime">--:--:--</div>
+        </div>
+
     </div>
 
-    <!-- ROW 1: CURRENT PRAYER (Landscape Left) / CLOCK (Portrait Top) -->
-
-    <div id="currentPrayerCard" class="card current-prayer-large">
-        <div class="time-large" id="currentPrayerTime">--:--</div>
-        <div class="time-label" id="currentPrayerName">--</div>
-    </div>
-
-    <div id="clockCard" class="card">
-        <div class="time-label">Waktu Sekarang</div>
-        <div class="time-large" id="currentTime">--:--:--</div>
-    </div>
-
-    <!-- ROW 2: NEXT PRAYER -->
+    <!-- ============================
+         NEXT PRAYER CARD
+    ============================= -->
     <div id="nextPrayerCard" class="card">
         <div class="time-label" id="nextLabel">Waktu Solat Seterusnya</div>
         <div class="time-large" id="nextPrayerName">--</div>
     </div>
 
-    <!-- ROW 3: COUNTDOWN + PRAYER LIST -->
-    <div class="countdown-card card">
-        <div class="countdown-row">
-            <div class="count-box">
-                <div id="cdHour" class="count-number">00</div>
-                <div class="count-label">JAM</div>
+    <!-- ============================
+         BOTTOM ROW (COUNTDOWN + PRAYER LIST)
+    ============================= -->
+    <div class="bottom-row">
+
+        <!-- COUNTDOWN CARD -->
+        <div class="countdown-card card">
+            <div class="countdown-row">
+                <div class="count-box">
+                    <div id="cdHour" class="count-number">00</div>
+                    <div class="count-label">JAM</div>
+                </div>
+                <div class="count-box">
+                    <div id="cdMin" class="count-number">00</div>
+                    <div class="count-label">MINIT</div>
+                </div>
+                <div class="count-box">
+                    <div id="cdSec" class="count-number">00</div>
+                    <div class="count-label">SAAT</div>
+                </div>
             </div>
-            <div class="count-box">
-                <div id="cdMin" class="count-number">00</div>
-                <div class="count-label">MINIT</div>
+        </div>
+
+        <!-- PRAYER LIST (7 CARDS) -->
+        <div class="prayer-list">
+
+            <div class="card prayer-row" id="cardIsmak">
+                <div class="prayer-name">Ismak</div>
+                <div class="prayer-time" id="ismakTime">--:--</div>
             </div>
-            <div class="count-box">
-                <div id="cdSec" class="count-number">00</div>
-                <div class="count-label">SAAT</div>
+
+            <div class="card prayer-row" id="cardSubuh">
+                <div class="prayer-name">Subuh</div>
+                <div class="prayer-time" id="subuhTime">--:--</div>
             </div>
-        </div>
-    </div>
 
-    <!-- PRAYER LIST (7 cards) -->
-    <div class="prayer-list">
+            <div class="card prayer-row" id="cardSyuruk">
+                <div class="prayer-name">Syuruk</div>
+                <div class="prayer-time" id="syurukTime">--:--</div>
+            </div>
 
-        <div class="card prayer-row" id="cardIsmak">
-            <div class="prayer-name">Ismak</div>
-            <div class="prayer-time" id="ismakTime">--:--</div>
-        </div>
+            <div class="card prayer-row" id="cardZohor">
+                <div class="prayer-name">Zohor</div>
+                <div class="prayer-time" id="zohorTime">--:--</div>
+            </div>
 
-        <div class="card prayer-row" id="cardSubuh">
-            <div class="prayer-name">Subuh</div>
-            <div class="prayer-time" id="subuhTime">--:--</div>
-        </div>
+            <div class="card prayer-row" id="cardAsar">
+                <div class="prayer-name">Asar</div>
+                <div class="prayer-time" id="asarTime">--:--</div>
+            </div>
 
-        <div class="card prayer-row" id="cardSyuruk">
-            <div class="prayer-name">Syuruk</div>
-            <div class="prayer-time" id="syurukTime">--:--</div>
-        </div>
+            <div class="card prayer-row" id="cardMaghrib">
+                <div class="prayer-name">Maghrib</div>
+                <div class="prayer-time" id="maghribTime">--:--</div>
+            </div>
 
-        <div class="card prayer-row" id="cardZohor">
-            <div class="prayer-name">Zohor</div>
-            <div class="prayer-time" id="zohorTime">--:--</div>
-        </div>
+            <div class="card prayer-row" id="cardIsyak">
+                <div class="prayer-name">Isyak</div>
+                <div class="prayer-time" id="isyakTime">--:--</div>
+            </div>
 
-        <div class="card prayer-row" id="cardAsar">
-            <div class="prayer-name">Asar</div>
-            <div class="prayer-time" id="asarTime">--:--</div>
-        </div>
-
-        <div class="card prayer-row" id="cardMaghrib">
-            <div class="prayer-name">Maghrib</div>
-            <div class="prayer-time" id="maghribTime">--:--</div>
-        </div>
-
-        <div class="card prayer-row" id="cardIsyak">
-            <div class="prayer-name">Isyak</div>
-            <div class="prayer-time" id="isyakTime">--:--</div>
         </div>
 
     </div>
 
 </div>
 
+<!-- ============================
+     OPTIONAL: SILENCE EXTENSION ERRORS
+============================ -->
+<script>
+window.addEventListener("error", (e) => {
+    if (
+      e.message?.includes("message channel closed") ||
+      e.message?.includes("runtime.lastError")
+    ) {
+        e.stopImmediatePropagation();
+    }
+}, true);
+</script>
+
+<!-- MAIN LOGIC -->
 <script src="main.js"></script>
+
 </body>
 </html>
