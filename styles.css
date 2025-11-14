@@ -81,7 +81,7 @@ body::before{
 
 /* TEXT */
 .time-label{
-    font-size: 22px;
+    font-size: 40px;
     opacity: 0.95;
     margin-bottom: 6px;
 }
