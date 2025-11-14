@@ -143,52 +143,66 @@ html, body {
   }
 }
 
-/* ============================
-   PORTRAIT MODE (9/16)
-============================ */
 @media (max-aspect-ratio:9/16) {
 
+  /* AUTO HEIGHT GRID — FIXES ALL ISSUES */
   .container-grid {
-    grid-template-columns:1fr;
+    grid-template-columns: 1fr;
     grid-template-rows:
-      11vh   /* clock */
-      11vh   /* current */
-      11vh   /* next */
-      13vh   /* countdown */
-      1fr;   /* prayer list */
-    gap:clamp(4px,0.6vh,8px);
-    height:100vh;
-    overflow:hidden;
+      auto   /* Clock */
+      auto   /* Current */
+      auto   /* Next */
+      auto   /* Countdown */
+      1fr;   /* Prayer list fills the rest */
+    gap: clamp(4px, 0.6vh, 8px);
+    padding-top: clamp(4px, 1vh, 10px);
+    height: 100vh;
+    overflow: hidden;
   }
 
-  /* Scale wrapper */
+  /* SCALE WRAPPER */
   .card-scale {
-    transform:scale(0.88);
-    transform-origin:center;
+    transform: scale(0.88);
+    transform-origin: top center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
 
-  /* Fix text sizes */
-  .clock-title { font-size:clamp(1rem,1.8vh,1.4rem); }
-  .clock-time  { font-size:clamp(1.9rem,3.4vh,3.2rem); }
+  /* CLOCK SIZES */
+  .clock-title {
+    font-size: clamp(1rem, 1.8vh, 1.4rem);
+  }
+  .clock-time {
+    font-size: clamp(2rem, 3.4vh, 3.2rem);
+    line-height: 1.0;
+  }
 
+  /* CURRENT & NEXT PRAYER */
   #currentPrayerCard .time-large,
   #nextPrayerCard .time-large {
-    font-size:clamp(1.5rem,2.4vh,2.7rem);
-    margin:2px 0 !important;
-    line-height:1;
+    font-size: clamp(1.6rem, 2.2vh, 2.8rem);
   }
-
   #currentPrayerCard .time-label,
   #nextPrayerCard .time-label {
-    font-size:clamp(0.8rem,1.3vh,1.2rem);
-    margin:0 !important;
+    font-size: clamp(0.8rem, 1.3vh, 1.2rem);
   }
 
-  #nextPrayerCard .time-label { white-space:nowrap; }
+  /* COUNTDOWN ADJUST */
+  .countdown-row {
+    gap: clamp(4px, 1vw, 12px);
+  }
 
-  .countdown-row { gap:clamp(4px,1vw,12px); }
   .count-box {
-    min-width:clamp(30px,7vw,48px);
-    padding:clamp(4px,0.9vh,8px);
+    padding: clamp(4px, 0.8vh, 8px);
+    min-width: clamp(28px, 7vw, 50px);
+  }
+
+  /* PRAYER LIST */
+  .prayer-list {
+    grid-template-rows: repeat(7, 1fr);
+    gap: clamp(3px, 0.5vh, 6px);
   }
 }
