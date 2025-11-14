@@ -40,22 +40,26 @@ async function loadPrayerTimes() {
 
     // Prepare date string (JAKIM uses uppercase month codes in many responses)
     const today = new Date();
-    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];  
-    const esDate = `${String(today.getDate()).padStart(2,'0')}-${months[today.getMonth()]}-${today.getFullYear()}`;
+const day = String(today.getDate()).padStart(2,'0');
+const year = today.getFullYear();
+const monthsTitle = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const monthsUpper = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
 
-    dbg("esDate used for lookup:", esDate);
+const esDate1 = `${day}-${monthsTitle[today.getMonth()]}-${year}`;
+const esDate2 = `${day}-${monthsUpper[today.getMonth()]}-${year}`;
+dbg("esDate try:", esDate1, esDate2);
 
-    // Defensive: ensure data.prayerTime exists & is an array
-    const list = Array.isArray(data.prayerTime) ? data.prayerTime : [];
-    dbg("prayerTime length:", list.length, "sample:", list.slice(0,3));
+const list = Array.isArray(data.prayerTime) ? data.prayerTime : [];
+let todayEntry = list.find(p => {
+  const d = (p.date||"").toString().trim();
+  return d === esDate1 || d === esDate2;
+});
 
-    const todayEntry = list.find(p => (p.date||"").toString().trim() === esDate);
-    if (!todayEntry) {
-      // If not found, log a helpful sample and bail
-      dbg("No matching entry for esDate. First items (if any):", list.slice(0,6));
-      showUiError("Tiada data (semak log)");
-      return;
-    }
+if (!todayEntry) {
+  dbg("No exact match for today. Trying fallback to last item.");
+  todayEntry = list[list.length - 1];
+}
+
 
     dbg("todayEntry found:", todayEntry);
 
