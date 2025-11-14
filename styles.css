@@ -176,7 +176,7 @@ html, body {
       clamp(7vh, 8vh, 10vh)   /* Next */
       clamp(8vh,10vh,12vh)    /* Countdown */
       1fr;                    /* Prayer list */
-    gap:clamp(8px,1vh,12px);
+    gap:clamp(4px,0.5vh,6px);   /* ⬅️ Reduce box-to-box spacing */
     height:100vh;
     overflow:hidden;
   }
@@ -218,14 +218,14 @@ html, body {
   }
 
   /* ============================
-     CURRENT + NEXT PRAYER (tighter spacing)
+     CURRENT + NEXT PRAYER (tighter spacing inside)
   ============================= */
   #currentPrayerCard .time-large,
   #currentPrayerCard .time-label,
   #nextPrayerCard .time-large,
   #nextPrayerCard .time-label {
     line-height:1.0 !important;
-    margin:2px 0 !important;
+    margin:1px 0 !important;     /* ⬅️ Reduced */
   }
 
   .time-large {
@@ -248,12 +248,12 @@ html, body {
   }
 
   .countdown-row {
-    gap:clamp(8px,3vw,12px);
+    gap:clamp(4px,1vw,6px);    /* ⬅️ Reduced spacing between boxes */
   }
 
   .count-box {
     min-width:clamp(28px,6vw,40px);
-    padding:clamp(4px,1vh,6px);
+    padding:clamp(3px,0.8vh,5px); /* ⬅️ Slightly smaller padding */
     border-radius:8px;
   }
 
@@ -262,7 +262,7 @@ html, body {
   ============================= */
   .prayer-list {
     grid-template-rows:repeat(7,1fr);
-    gap:clamp(6px,1.2vh,10px);
+    gap:clamp(4px,0.5vh,6px);  /* ⬅️ Reduced spacing between list items */
   }
 
 }
