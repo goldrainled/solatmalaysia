@@ -176,7 +176,7 @@ html, body{
   }
 
   .time-large{
-    font-size:clamp(2.4rem,4vh,6rem);
+    font-size:clamp(2.4rem,4vh,4rem);
   }
 
   .prayer-name,.prayer-time{
