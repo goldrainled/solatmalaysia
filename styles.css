@@ -136,7 +136,7 @@ html, body{
   .container-grid{
     grid-template-columns:1fr;
     grid-template-rows:
-      clamp(12vh,14vh,16vh)  /* Clock */
+      clamp(14vh,16vh,20vh)  /* Clock */
       clamp(12vh,14vh,16vh)  /* Current prayer */
       clamp(12vh,14vh,16vh)  /* Next prayer */
       clamp(12vh,14vh,16vh)  /* Countdown */
