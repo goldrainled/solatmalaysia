@@ -2,136 +2,202 @@
    CONFIG
 ============================ */
 const ZONE = "JHR02";
-let prayerTimes = {};
-let nextPrayerTime = null;
+let prayerTimes = {};        // { Ismak: "05:27", Subuh: "05:37", ... }
+let nextPrayerTime = null;   // Date object
+let nextPrayerName = "--";
 
 /* ============================
-   LOAD TODAY'S PRAYER TIMES
+   UTIL — format times & date
+============================ */
+function formatTo12h(t) {
+    if (!t) return "--:--";
+    // expect "HH:MM" or "HH:MM:SS"
+    const parts = t.split(":").map(Number);
+    let h = parts[0] ?? 0;
+    let m = parts[1] ?? 0;
+    const ampm = h >= 12 ? "AM" : "AM"; // user previously uses AM/PM but e-Solat returns 24h
+    // We'll compute real AM/PM below
+    const ampm2 = h >= 12 ? "PM" : "AM";
+    let h12 = (h % 12) || 12;
+    return `${h12}:${String(m).padStart(2, "0")} ${ampm2}`;
+}
+
+function formatDateLong(d) {
+    const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+/* ============================
+   LOAD PRAYER TIMES (e-Solat month endpoint)
 ============================ */
 async function loadPrayerTimes() {
+    try {
+        const url = `https://www.e-solat.gov.my/index.php?r=esolatApi/takwimsolat&period=month&zone=${ZONE}`;
+        const res = await fetch(url);
+        const data = await res.json();
 
-    const url = `https://www.e-solat.gov.my/index.php?r=esolatApi/takwimsolat&period=month&zone=${ZONE}`;
-    const res = await fetch(url);
-    const data = await res.json();
+        if (!data || !data.prayerTime || !Array.isArray(data.prayerTime)) {
+            console.warn("e-Solat returned unexpected data:", data);
+            return;
+        }
 
-    const today = new Date();
-    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    const esDate = `${String(today.getDate()).padStart(2,'0')}-${months[today.getMonth()]}-${today.getFullYear()}`;
+        // Prepare today's date string e-Solat uses (e.g. "14-Nov-2025")
+        const today = new Date();
+        document.getElementById("todayDate").innerText = formatDateLong(today);
 
-    const todayEntry = data.prayerTime.find(p => p.date === esDate);
-    if (!todayEntry) return;
+        const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        const esDate = `${String(today.getDate()).padStart(2,'0')}-${months[today.getMonth()]}-${today.getFullYear()}`;
 
-    prayerTimes = {
-        Ismak: todayEntry.imsak,
-        Subuh: todayEntry.fajr,
-        Syuruk: todayEntry.syuruk,
-        Zohor: todayEntry.dhuhr,
-        Asar: todayEntry.asr,
-        Maghrib: todayEntry.maghrib,
-        Isyak: todayEntry.isha
-    };
+        const todayEntry = data.prayerTime.find(p => p.date === esDate);
+        if (!todayEntry) {
+            console.warn("No prayer times found for today:", esDate);
+            return;
+        }
 
-    document.getElementById("ismakTime").innerText = format(prayerTimes.Ismak);
-    document.getElementById("subuhTime").innerText = format(prayerTimes.Subuh);
-    document.getElementById("syurukTime").innerText = format(prayerTimes.Syuruk);
-    document.getElementById("zohorTime").innerText = format(prayerTimes.Zohor);
-    document.getElementById("asarTime").innerText = format(prayerTimes.Asar);
-    document.getElementById("maghribTime").innerText = format(prayerTimes.Maghrib);
-    document.getElementById("isyakTime").innerText = format(prayerTimes.Isyak);
+        // Map times (expect "HH:MM" or "HH:MM:SS")
+        prayerTimes = {
+            Ismak: todayEntry.imsak,
+            Subuh: todayEntry.fajr,
+            Syuruk: todayEntry.syuruk,
+            Zohor: todayEntry.dhuhr,
+            Asar: todayEntry.asr,
+            Maghrib: todayEntry.maghrib,
+            Isyak: todayEntry.isha
+        };
 
-    determineNextPrayer();
-    highlightCurrentPrayer();
+        // Update UI times (12h format)
+        const idMap = {
+            Ismak: "ismakTime",
+            Subuh: "subuhTime",
+            Syuruk: "syurukTime",
+            Zohor: "zohorTime",
+            Asar: "asarTime",
+            Maghrib: "maghribTime",
+            Isyak: "isyakTime"
+        };
+
+        for (const [name, id] of Object.entries(idMap)) {
+            const el = document.getElementById(id);
+            if (el) el.innerText = formatTo12h(prayerTimes[name]);
+        }
+
+        // After loading times, determine next prayer & highlight
+        determineNextPrayer();
+        highlightCurrentPrayer();
+    }
+    catch (err) {
+        console.error("Error loading prayer times:", err);
+    }
 }
+
+// initial load + hourly refresh (keeps times up-to-date)
 loadPrayerTimes();
+setInterval(loadPrayerTimes, 60 * 60 * 1000);
 
 
 /* ============================
-   FORMAT 12H TIME
-============================ */
-function format(t) {
-    let [h, m] = t.split(":").map(Number);
-    let ampm = h >= 12 ? "PM" : "AM";
-    h = (h % 12) || 12;
-    return `${h}:${String(m).padStart(2,'0')} ${ampm}`;
-}
-
-
-/* ============================
-   DETERMINE NEXT PRAYER
+   DETERMINE NEXT PRAYER (today or tomorrow Subuh)
+   Sets nextPrayerTime (Date) and updates UI label/name
 ============================ */
 function determineNextPrayer() {
+    if (!prayerTimes || Object.keys(prayerTimes).length === 0) return;
+
     const now = new Date();
+    // Reset default label to "Menuju"
+    const nextLabelEl = document.getElementById("nextLabel");
+    if (nextLabelEl) nextLabelEl.innerText = "Menuju";
 
-    document.getElementById("nextLabel").innerText = "Waktu Solat Seterusnya";
+    const ordered = ["Ismak","Subuh","Syuruk","Zohor","Asar","Maghrib","Isyak"];
 
-    const list = Object.entries(prayerTimes);
-
-    for (let [name, time] of list) {
-        let [h, m] = time.split(":");
-        let t = new Date();
-        t.setHours(h, m, 0, 0);
-
+    // Try to find next prayer today
+    for (const name of ordered) {
+        const timeStr = prayerTimes[name];
+        if (!timeStr) continue;
+        const [hh, mm] = timeStr.split(":").map(Number);
+        const t = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh, mm, 0, 0);
         if (t > now) {
             nextPrayerTime = t;
-            document.getElementById("nextPrayerName").innerText = name;
+            nextPrayerName = name;
+            // update UI
+            const npEl = document.getElementById("nextPrayerName");
+            if (npEl) npEl.innerText = name;
             return;
         }
     }
 
-    // After Isyak → tomorrow Subuh
-    let tomorrow = new Date();
+    // If we reach here, all today's times are passed → next is tomorrow Subuh
+    // Calculate tomorrow date & use Subuh time
+    const subuhStr = prayerTimes.Subuh;
+    if (!subuhStr) {
+        console.warn("No Subuh time available for tomorrow fallback.");
+        return;
+    }
+    const [subuhH, subuhM] = subuhStr.split(":").map(Number);
+    const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-
-    let [h, m] = prayerTimes.Subuh.split(":");
-    tomorrow.setHours(h, m, 0, 0);
+    tomorrow.setHours(subuhH, subuhM, 0, 0);
 
     nextPrayerTime = tomorrow;
+    nextPrayerName = "Subuh";
 
-    document.getElementById("nextLabel").innerText = "Waktu Solat Seterusnya(Esok)";
-    document.getElementById("nextPrayerName").innerText = "Subuh";
+    // update UI: show Menuju (Esok)
+    if (nextLabelEl) nextLabelEl.innerText = "Menuju (Esok)";
+    const npEl = document.getElementById("nextPrayerName");
+    if (npEl) npEl.innerText = "Subuh";
 }
 
 
 /* ============================
-   COUNTDOWN
+   COUNTDOWN — updates every second
+   When countdown reaches zero, call determineNextPrayer() and continue.
 ============================ */
-setInterval(() => {
+function updateCountdownNow() {
+    if (!nextPrayerTime) {
+        // no next prayer set yet
+        document.getElementById("cdHour").innerText = "00";
+        document.getElementById("cdMin").innerText = "00";
+        document.getElementById("cdSec").innerText = "00";
+        return;
+    }
 
-    if (!nextPrayerTime) return;
-
-    let now = new Date();
+    const now = new Date();
     let diff = nextPrayerTime - now;
 
     if (diff <= 0) {
+        // time reached — move to next prayer (do not reload full day immediately)
         determineNextPrayer();
         return;
     }
 
-    let h = Math.floor(diff / (1000 * 60 * 60));
-    let m = Math.floor((diff / 1000 / 60) % 60);
-    let s = Math.floor((diff / 1000) % 60);
+    const hh = Math.floor(diff / (1000 * 60 * 60));
+    const mm = Math.floor((diff / (1000 * 60)) % 60);
+    const ss = Math.floor((diff / 1000) % 60);
 
-    document.getElementById("cdHour").innerText = String(h).padStart(2,'0');
-    document.getElementById("cdMin").innerText = String(m).padStart(2,'0');
-    document.getElementById("cdSec").innerText = String(s).padStart(2,'0');
+    document.getElementById("cdHour").innerText = String(hh).padStart(2,"0");
+    document.getElementById("cdMin").innerText = String(mm).padStart(2,"0");
+    document.getElementById("cdSec").innerText = String(ss).padStart(2,"0");
+}
 
-}, 1000);
+setInterval(updateCountdownNow, 1000);
+updateCountdownNow();
 
 
 /* ============================
-   LIVE CLOCK
+   LIVE CLOCK & helper to trigger highlight
 ============================ */
 function updateClock() {
-    let now = new Date();
+    const now = new Date();
     let h = now.getHours();
-    let m = String(now.getMinutes()).padStart(2,"0");
-    let s = String(now.getSeconds()).padStart(2,"0");
-    let ampm = h >= 12 ? "PM" : "AM";
+    let m = now.getMinutes();
+    let s = now.getSeconds();
     let h12 = (h % 12) || 12;
+    const ampm = h >= 12 ? "PM" : "AM";
+    const display = `${h12}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")} ${ampm}`;
+    const el = document.getElementById("currentTime");
+    if (el) el.innerText = display;
 
-    document.getElementById("currentTime").innerText =
-        `${h12}:${m}:${s} ${ampm}`;
-
+    // update countdown and highlight continuously
+    updateCountdownNow();
     highlightCurrentPrayer();
 }
 setInterval(updateClock, 1000);
@@ -139,24 +205,38 @@ updateClock();
 
 
 /* ============================
-   HIGHLIGHT CURRENT PRAYER
+   Highlight current prayer card
+   - determines which prayer was most-recent (<= now)
+   - highlights that card id="card<Name>"
 ============================ */
 function highlightCurrentPrayer() {
+    if (!prayerTimes || Object.keys(prayerTimes).length === 0) return;
+
     const now = new Date();
-    const list = Object.entries(prayerTimes);
-    let active = "Isyak";
+    const ordered = ["Ismak","Subuh","Syuruk","Zohor","Asar","Maghrib","Isyak"];
+    let active = "Isyak"; // default
 
-    for (let [name, time] of list) {
-        let [h, m] = time.split(":").map(Number);
-        let t = new Date();
-        t.setHours(h, m, 0, 0);
-
+    for (const name of ordered) {
+        const tstr = prayerTimes[name];
+        if (!tstr) continue;
+        const [hh, mm] = tstr.split(":").map(Number);
+        const t = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh, mm, 0, 0);
         if (t <= now) active = name;
     }
 
-    document.querySelectorAll(".card")
-        .forEach(c => c.classList.remove("currentPrayer"));
+    // remove existing highlights
+    document.querySelectorAll(".card").forEach(c => c.classList.remove("currentPrayer"));
 
     const activeCard = document.getElementById("card" + active);
     if (activeCard) activeCard.classList.add("currentPrayer");
 }
+
+/* ============================
+   Safety / initial guard
+============================ */
+// If the page opened before loadPrayerTimes finished, attempt again after short delay
+setTimeout(() => {
+    if (!prayerTimes || Object.keys(prayerTimes).length === 0) {
+        loadPrayerTimes();
+    }
+}, 2000);
