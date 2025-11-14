@@ -136,10 +136,10 @@ html, body{
   .container-grid{
     grid-template-columns:1fr;
     grid-template-rows:
-      clamp(10vh,12vh,14vh)  /* Clock */
-      clamp(12vh,14vh,16vh)  /* Current prayer */
-      clamp(12vh,14vh,16vh)  /* Next prayer */
-      clamp(12vh,14vh,16vh)  /* Countdown */
+      clamp(8vh,10vh,12vh)  /* Clock */
+      clamp(8vh,10vh,12vh)  /* Current prayer */
+      clamp(8vh,10vh,12vh)  /* Next prayer */
+      clamp(8vh,10vh,12vh)  /* Countdown */
       1fr;                   /* Seven prayer list */
     gap:clamp(10px,1vh,10px);
     height:100vh; overflow:hidden;
