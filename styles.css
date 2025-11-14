@@ -184,7 +184,3 @@ html, body{
   }
 }
 
-/* Extra wide displays safety */
-@media (min-aspect-ratio:2/1){
-  .time-large{ font-size:clamp(3rem,5.2vh,8vh); }
-}
