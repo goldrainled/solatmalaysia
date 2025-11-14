@@ -65,7 +65,7 @@ html, body{
   border-radius:10px;
 }
 .count-number{ font-weight:900; }
-.count-label{ font-size:.75rem; opacity:.9; letter-spacing:.06em; }
+.count-label{ font-size:.50rem; opacity:.9; letter-spacing:.06em; }
 
 /* ============================
    GRID LAYOUT
