@@ -145,15 +145,23 @@ html, body{
     height:100vh; overflow:hidden;
   }
 
+  #clockCard,
   #currentPrayerCard,
-  #clockCard {
+  #nextPrayerCard {
     padding: 2vh 0;
-}
-  #nextPrayerCard,
-  .countdown-card{
-    display:flex; flex-direction:column;
-    align-items:center; justify-content:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
   }
+
+  .countdown-card{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+  }
+
 
   .countdown-row{
     gap:clamp(8px,3vw,12px);
