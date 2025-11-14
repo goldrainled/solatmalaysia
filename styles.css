@@ -10,31 +10,32 @@
 }
 
 html, body {
+    width: 100%;
+    height: 100%;
     margin: 0;
     padding: 0;
-    height: 100%;
-    color: #fff;
-    font-family: Poppins, Arial, sans-serif;
-    background: #000;
-    overflow-x: hidden;
+    overflow: hidden;  /* no page scrolling */
 }
 
-/* =======================================
-   PAGE GRID
-======================================= */
 .page {
-    min-height: 100%;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
     display: grid;
-    place-items: start center;
-    padding: 2rem;
-    box-sizing: border-box;
 }
 
 .main-grid {
-    width: min(1200px, 96vw);
+    height: 100%;
+    width: 100%;
     display: grid;
-    gap: 1rem;
+    grid-auto-rows: min-content auto;
 }
+
+.container-grid {
+    overflow-y: auto;        /* content scrolls only inside, not the page */
+    padding-right: 5px;      /* avoid content touching the TV edge */
+}
+
 
 /* =======================================
    HEADER 
