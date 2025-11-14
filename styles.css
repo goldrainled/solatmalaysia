@@ -141,7 +141,7 @@ html, body{
       clamp(10vh,12vh,14vh)  /* Next prayer */
       clamp(14vh,16vh,20vh)  /* Countdown */
       1fr;                   /* Seven prayer list */
-    gap:clamp(12px,1.6vh,14px);
+    gap:clamp(12px,10vh,14px);
     height:100vh; overflow:hidden;
   }
 
