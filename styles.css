@@ -72,6 +72,26 @@ body::before{
     justify-content: center;
 }
 
+/* PRAYER CARD — SINGLE ROW LAYOUT */
+.prayer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 25px;       /* adjust spacing */
+}
+
+.prayer-name {
+    font-size: 26px;          /* adjust prayer name size */
+    font-weight: 600;
+    text-align: left;
+}
+
+.prayer-time {
+    font-size: 32px;          /* adjust prayer time size */
+    font-weight: 700;
+    text-align: right;
+}
+
 /* REMOVE SPECIAL NEXT PRAYER SIZE */
 #nextPrayerCard {
     padding-top: 25px;
