@@ -40,8 +40,9 @@ async function loadPrayerTimes() {
 
     // Prepare date string (JAKIM uses uppercase month codes in many responses)
     const today = new Date();
-    const months = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];  
     const esDate = `${String(today.getDate()).padStart(2,'0')}-${months[today.getMonth()]}-${today.getFullYear()}`;
+
     dbg("esDate used for lookup:", esDate);
 
     // Defensive: ensure data.prayerTime exists & is an array
