@@ -39,7 +39,6 @@ body::before{
     animation: fadeBG 40s infinite ease-in-out;
 }
 
-/* Fade Timing */
 .slideshow-bg img:nth-child(1){ animation-delay: 0s; }
 .slideshow-bg img:nth-child(2){ animation-delay: 10s; }
 .slideshow-bg img:nth-child(3){ animation-delay: 20s; }
@@ -53,7 +52,7 @@ body::before{
     100% { opacity: 0; }
 }
 
-/* CARD STYLE */
+/* ----------- CARD STYLE ----------- */
 .card{
     background: rgba(255,255,255,0.15);
     backdrop-filter: blur(20px);
@@ -64,42 +63,39 @@ body::before{
     max-width: 420px;
     border: 1px solid rgba(255,255,255,0.35);
     box-shadow: 0 0 12px rgba(255,255,255,0.15);
-
-    /* NEW FIX → SAME HEIGHT FOR ALL CARDS */
     min-height: 120px;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    align-items: center;
 }
 
-/* PRAYER CARD — SINGLE ROW LAYOUT */
+/* ----------- PRAYER CARD — SINGLE ROW ----------- */
 .prayer-row {
-    display: flex;
+    flex-direction: row !important;   /* override column */
     justify-content: space-between;
-    align-items: center;
-    padding: 18px 25px;       /* adjust spacing */
+    padding: 18px 25px;
 }
 
 .prayer-name {
-    font-size: 26px;          /* adjust prayer name size */
+    font-size: 26px;
     font-weight: 600;
     text-align: left;
 }
 
 .prayer-time {
-    font-size: 32px;          /* adjust prayer time size */
+    font-size: 32px;
     font-weight: 700;
     text-align: right;
 }
 
-/* REMOVE SPECIAL NEXT PRAYER SIZE */
+/* NEXT PRAYER CARD */
 #nextPrayerCard {
+    flex-direction: column !important;
+    justify-content: center;
     padding-top: 25px;
     padding-bottom: 25px;
-    /* removed min-height so it follows .card */
 }
 
-/* TEXT */
+/* TEXT (FOR CLOCK + NEXT PRAYER LABEL ONLY) */
 .time-label{
     font-size: 40px;
     opacity: 0.95;
@@ -138,6 +134,7 @@ body::before{
     transition: 0.25s ease;
 }
 
+/* COUNTDOWN LABELS */
 label{
     display: block;
     font-size: 14px;
