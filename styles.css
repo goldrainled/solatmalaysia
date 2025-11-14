@@ -139,7 +139,7 @@ html, body{
       clamp(14vh,16vh,20vh)  /* Clock */
       clamp(14vh,16vh,20vh)  /* Current prayer */
       clamp(14vh,16vh,20vh)  /* Next prayer */
-      clamp(15vh,18vh,20vh)  /* Countdown */
+      clamp(14vh,16vh,20vh)  /* Countdown */
       1fr;                   /* Seven prayer list */
     gap:clamp(12px,1.6vh,20px);
     height:100vh; overflow:hidden;
