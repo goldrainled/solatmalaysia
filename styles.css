@@ -103,7 +103,7 @@ html, body {
 .container-grid {
   position:absolute; inset:0;
   padding:clamp(10px,1.2vw,28px);
-  display:grid; gap:clamp(10px,1vw,20px);
+  display:grid; gap:clamp(4px,0.4vw,8px);
   box-sizing:border-box;
 }
 
@@ -184,13 +184,15 @@ html, body {
   /* ============================
      TOP 3 CARDS — 80% SIZE + TIGHT SPACING
   ============================= */
-  #clockCard,
-  #currentPrayerCard,
-  #nextPrayerCard {
-    scale: 0.70;                  
-    transform-origin: top center;
-    padding: 0.2vh 0 !important;  
-  }
+  /* TOP 3 CARDS — 70% SIZE + TIGHTER SPACING */
+#clockCard,
+#currentPrayerCard,
+#nextPrayerCard {
+  transform: scale(0.70);
+  transform-origin: top center;
+  margin: 0;                /* remove outer spacing */
+  padding: 0.2vh 0 !important;  /* reduce inner spacing */
+}
 
   /* ============================
      CLOCK (2-row layout)
