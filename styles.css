@@ -176,7 +176,7 @@ html, body {
       clamp(7vh, 8vh, 10vh)   /* Next */
       clamp(8vh,10vh,12vh)    /* Countdown */
       1fr;                    /* Prayer list */
-    gap:clamp(4px,0.5vh,6px);   /* ⬅️ Reduce box-to-box spacing */
+    gap:clamp(2px,0.3vh,4px);   /* ⬅️ Reduce box-to-box spacing */
     height:100vh;
     overflow:hidden;
   }
