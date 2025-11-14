@@ -33,7 +33,7 @@ html, body{
   box-sizing:border-box;
 }
 
-.time-large{ text-align:center; font-weight:800; }
+.time-large{ text-align:center; font-weight:700; }
 .time-label{ text-align:center; opacity:.95; }
 
 .prayer-row{
