@@ -1,144 +1,196 @@
-/* ---------------------------------------
-   Full updated responsive CSS (final)
-   --------------------------------------- */
-
-/* fullscreen base */
+/* ===========================
+   GLOBAL FULLSCREEN
+=========================== */
 html, body {
-  width: 100vw;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  font-family: Poppins, Arial, sans-serif;
-  background: #0b0500;
-  color: #fff;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #000;
+    font-family: Poppins, Arial, sans-serif;
+    color: #fff;
 }
 
-/* BACKGROUND SLIDESHOW */
+/* ===========================
+   BACKGROUND SLIDESHOW
+=========================== */
 .slideshow-bg {
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  overflow: hidden;
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    overflow: hidden;
 }
 .slideshow-bg img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  position: absolute;
-  left: 0; top: 0;
-  opacity: 0;
-  animation: fadeBG 40s infinite ease-in-out;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    opacity: 0;
+    animation: fadeBG 40s infinite ease-in-out;
 }
-.slideshow-bg img:nth-child(1){ animation-delay: 0s; }
-.slideshow-bg img:nth-child(2){ animation-delay: 10s; }
-.slideshow-bg img:nth-child(3){ animation-delay: 20s; }
-.slideshow-bg img:nth-child(4){ animation-delay: 30s; }
-@keyframes fadeBG { 0%{opacity:0}10%{opacity:1}40%{opacity:1}55%{opacity:0}100%{opacity:0} }
+.slideshow-bg img:nth-child(1){ animation-delay:0s; }
+.slideshow-bg img:nth-child(2){ animation-delay:10s; }
+.slideshow-bg img:nth-child(3){ animation-delay:20s; }
+.slideshow-bg img:nth-child(4){ animation-delay:30s; }
+@keyframes fadeBG{0%{opacity:0}10%{opacity:1}40%{opacity:1}55%{opacity:0}100%{opacity:0}}
 
-/* PAGE LAYOUT */
-.page{ width:100vw; height:100vh; display:flex; flex-direction:column; }
-.main-grid{ width:100%; height:100%; display:grid; grid-auto-rows: min-content 1fr; gap:1rem; padding:1rem; box-sizing:border-box; }
-
-/* header */
-.header{ text-align:center; margin-top:.5rem }
-.header .date{ font-size: clamp(1.2rem, 2vw, 2.2rem); font-weight:700; }
-.header .zone{ font-size: clamp(.8rem, 1.2vw, 1rem); opacity:.9; }
-
-/* container-grid uses a two-column layout for wide screens */
-.container-grid{ display:flex; gap:1rem; height: calc(100% - 4.5rem); box-sizing:border-box; }
-.left-column{ flex: 1.25; display:flex; flex-direction:column; gap:1rem; }
-.right-column{ flex: 1; display:flex; flex-direction:column; gap:1rem; overflow:hidden; }
-
-/* CARD base */
-.card{
-  background: rgba(255,255,255,0.12);
-  backdrop-filter: blur(14px);
-  border-radius: 14px;
-  padding: 1.25rem;
-  border: 1px solid rgba(255,255,255,0.2);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  box-sizing:border-box;
+/* ===========================
+   COMMON CARD STYLE
+=========================== */
+.card {
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 18px;
+    padding: 1.4rem;
+    box-shadow: 0 0 18px rgba(0,0,0,0.5);
 }
 
-/* big current prayer card style (top-left) */
-.current-prayer-large {
-  min-height: 120px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
+/* Common text */
+.time-label {
+    font-size: clamp(1rem, 1.6vw, 1.6rem);
+    text-align: center;
+    opacity: 0.9;
 }
-.current-prayer-large .time-large{
-  font-size: clamp(2.2rem, 5vw, 3.6rem);
-  font-weight:800;
-}
-.current-prayer-large .time-label.small{
-  font-size: clamp(1.1rem, 2.4vw, 1.6rem);
-  opacity:0.95;
-  margin-top:.25rem;
+.time-large {
+    font-size: clamp(1.8rem, 3.4vw, 3.4rem);
+    font-weight: 800;
+    text-align: center;
 }
 
-/* clock card (top-right) */
-.block-large .time-label{ font-size: clamp(1rem, 1.6vw, 1.6rem); margin-bottom:.3rem; text-align:center; }
-.block-large .time-large{ font-size: clamp(1.6rem, 3.4vw, 2.8rem); font-weight:800; text-align:center; }
-
-/* next prayer card (left column below current prayer) */
-#nextPrayerCard .time-label{ font-size: 1rem; text-align:center; }
-#nextPrayerCard .time-large{ font-size: clamp(1.4rem, 3vw, 2.4rem); font-weight:800; text-align:center; }
-
-/* countdown boxes (digit top, label bottom) */
-.countdown-card{ align-items:center; justify-content:center; min-height: 120px; display:flex; }
-.countdown-row{ display:flex; gap:.7rem; align-items:center; }
-.count-box{
-  background: rgba(0,0,0,0.25);
-  min-width: 64px;
-  padding: .45rem .6rem;
-  border-radius: .6rem;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  border: 1px solid rgba(255,255,255,0.12);
+/* Prayer List row */
+.prayer-row {
+    display: flex;
+    justify-content: space-between;
+    padding: .9rem 1.4rem;
 }
-.count-number{ font-size: clamp(1.6rem, 3.6vw, 2.6rem); font-weight:900; }
-.count-label{ font-size: .75rem; opacity:.9; margin-top:.15rem; letter-spacing:.06em; }
+.prayer-name { font-size: 1.4rem; font-weight: 700; }
+.prayer-time { font-size: 1.4rem; font-weight: 800; }
 
-/* prayer-list single row items */
-.prayer-list{ display:flex; flex-direction:column; gap:.6rem; overflow:auto; padding-right:8px; }
-.prayer-row{ display:flex; justify-content:space-between; align-items:center; padding:.9rem 1.2rem; white-space:nowrap; overflow:hidden; border-radius:8px; }
-.prayer-name{ font-size: clamp(1rem, 1.6vw, 1.4rem); font-weight:700; opacity:0.95; }
-.prayer-time{ font-size: clamp(1rem, 1.6vw, 1.4rem); font-weight:800; }
-
-/* highlight */
-.currentPrayer{
-  background: rgba(255,215,0,0.28) !important;
-  border: 2px solid #ffd700 !important;
-  box-shadow: 0 0 24px rgba(255,215,0,0.55);
+/* Highlight */
+.currentPrayer {
+    background: rgba(255,215,0,0.25) !important;
+    border: 2px solid #ffd700 !important;
+    box-shadow: 0 0 30px rgba(255,215,0,0.6);
 }
 
-/* responsive layout rules */
-@media (max-width: 699px){
-  .container-grid{ flex-direction: column; height: calc(100% - 6rem); overflow:auto; }
-  .left-column, .right-column{ width: 100%; }
-  .current-prayer-large .time-large{ font-size: clamp(1.6rem, 6.5vw, 2.4rem); }
-  .countdown-row{ gap:.5rem; }
-  .count-box{ min-width: 48px; padding:.45rem .5rem; }
-  .prayer-list{ padding: .4rem; }
+/* ===========================
+   COUNTDOWN
+=========================== */
+.countdown-row {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+.count-box {
+    background: rgba(0,0,0,0.3);
+    padding: .6rem 1rem;
+    border-radius: .6rem;
+    text-align: center;
+}
+.count-number {
+    font-size: 2.4rem;
+    font-weight: 900;
+}
+.count-label {
+    font-size: .8rem;
+    opacity: 0.8;
 }
 
-@media (min-aspect-ratio: 16/9){
-  .container-grid{ flex-direction:row; }
-  .current-prayer-large .time-large{ font-size: clamp(2.8rem, 4.8vw, 4.4rem); }
-  .block-large .time-large{ font-size: clamp(2rem, 4vw, 3rem); }
-  .prayer-list{ max-height: calc(100vh - 420px); } /* allow list to scroll on tall pages */
+/* ===========================
+   LANDSCAPE MODE (16:9)
+=========================== */
+@media (min-aspect-ratio: 16/10) {
+
+    .container-grid {
+        display: grid;
+        grid-template-columns: 1.3fr 1fr;
+        height: 100%;
+        gap: 1.2rem;
+        padding: 1.2rem;
+        box-sizing: border-box;
+    }
+
+    /* Left column (Current + Next) */
+    .left-column {
+        display: grid;
+        grid-template-rows: auto auto;
+        gap: 1.2rem;
+    }
+
+    .top-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.2rem;
+    }
+
+    /* Right column (Countdown + List) */
+    .right-column {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        gap: 1.2rem;
+        overflow: hidden;
+    }
+
+    .prayer-list {
+        overflow-y: auto;
+        padding-right: .8rem;
+    }
+
+    /* Bigger landscape scaling */
+    .current-prayer-large .time-large {
+        font-size: 3.8rem;
+    }
+    .block-large .time-large {
+        font-size: 3rem;
+    }
 }
 
-/* ultra-wide */
-@media (min-aspect-ratio: 2/1){
-  .current-prayer-large .time-large{ font-size: clamp(3rem, 6vw, 5rem); }
-  .prayer-row{ padding: 1rem 1.6rem; }
+/* ===========================
+   PORTRAIT MODE (9:16)
+=========================== */
+@media (max-aspect-ratio: 10/16) {
+
+    .container-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        height: 100%;
+        overflow-y: auto;
+        padding: 1.2rem;
+        box-sizing: border-box;
+    }
+
+    .top-row {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .left-column {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .right-column {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        overflow-y: auto;
+    }
+
+    .prayer-list {
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    /* Increase portrait readability */
+    .current-prayer-large .time-large {
+        font-size: 3rem;
+    }
+    .block-large .time-large {
+        font-size: 2.4rem;
+    }
 }
