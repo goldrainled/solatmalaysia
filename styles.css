@@ -182,7 +182,7 @@ html, body{
   }
 
   .time-large{
-    font-size:clamp(2.4rem,4vh,4rem);
+    font-size:clamp(1.8rem,3vh,3rem);
   }
 
   .prayer-name,.prayer-time{
