@@ -142,7 +142,7 @@ html, body{
       clamp(10vh,12vh,14vh)  /* Countdown */
       1fr;                   /* Seven prayer list */
     gap:clamp(12px,1.6vh,14px);
-    height:80vh; overflow:hidden;
+    height:0vh; overflow:hidden;
   }
 
   #currentPrayerCard,
