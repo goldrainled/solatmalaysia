@@ -1,20 +1,20 @@
-/* ===========================
-   GLOBAL FULLSCREEN
-=========================== */
+/* =========================================================
+   GLOBAL FULLSCREEN — NO SCROLL
+========================================================= */
 html, body {
-    width: 100vw;
-    height: 100vh;
     margin: 0;
     padding: 0;
-    overflow: hidden;
-    background: #000;
-    font-family: Poppins, Arial, sans-serif;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;      /* STOP scrolling */
+    background: black;
     color: #fff;
+    font-family: Poppins, Arial, sans-serif;
 }
 
-/* ===========================
-   BACKGROUND SLIDESHOW
-=========================== */
+/* =========================================================
+   BACKGROUND SLIDESHOW (unchanged)
+========================================================= */
 .slideshow-bg {
     position: fixed;
     inset: 0;
@@ -29,55 +29,50 @@ html, body {
     opacity: 0;
     animation: fadeBG 40s infinite ease-in-out;
 }
-.slideshow-bg img:nth-child(1){ animation-delay:0s; }
-.slideshow-bg img:nth-child(2){ animation-delay:10s; }
-.slideshow-bg img:nth-child(3){ animation-delay:20s; }
-.slideshow-bg img:nth-child(4){ animation-delay:30s; }
+.slideshow-bg img:nth-child(1){animation-delay:0s}
+.slideshow-bg img:nth-child(2){animation-delay:10s}
+.slideshow-bg img:nth-child(3){animation-delay:20s}
+.slideshow-bg img:nth-child(4){animation-delay:30s}
 @keyframes fadeBG{0%{opacity:0}10%{opacity:1}40%{opacity:1}55%{opacity:0}100%{opacity:0}}
 
-/* ===========================
+/* =========================================================
    COMMON CARD STYLE
-=========================== */
+========================================================= */
 .card {
     background: rgba(255,255,255,0.12);
-    backdrop-filter: blur(14px);
-    border: 1px solid rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.25);
     border-radius: 18px;
-    padding: 1.4rem;
-    box-shadow: 0 0 18px rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 18px rgba(0,0,0,0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-/* Common text */
-.time-label {
-    font-size: clamp(1rem, 1.6vw, 1.6rem);
-    text-align: center;
-    opacity: 0.9;
-}
-.time-large {
-    font-size: clamp(1.8rem, 3.4vw, 3.4rem);
-    font-weight: 800;
-    text-align: center;
-}
-
-/* Prayer List row */
+/* Single-row prayer list layout */
 .prayer-row {
     display: flex;
     justify-content: space-between;
-    padding: .9rem 1.4rem;
+    align-items: center;
+    padding: 0 1.2rem;
 }
-.prayer-name { font-size: 1.4rem; font-weight: 700; }
-.prayer-time { font-size: 1.4rem; font-weight: 800; }
 
-/* Highlight */
+/* text sizes auto-scale */
+.time-large { font-weight: 800; text-align: center; }
+.time-label { opacity: .9; text-align: center; }
+.prayer-name { font-weight: 700; }
+.prayer-time { font-weight: 800; }
+
+/* highlight */
 .currentPrayer {
-    background: rgba(255,215,0,0.25) !important;
+    background: rgba(255,215,0,0.28) !important;
     border: 2px solid #ffd700 !important;
-    box-shadow: 0 0 30px rgba(255,215,0,0.6);
+    box-shadow: 0 0 25px rgba(255,215,0,0.6);
 }
 
-/* ===========================
-   COUNTDOWN
-=========================== */
+/* =========================================================
+   COUNTDOWN BOXES
+========================================================= */
 .countdown-row {
     display: flex;
     justify-content: center;
@@ -85,112 +80,105 @@ html, body {
 }
 .count-box {
     background: rgba(0,0,0,0.3);
-    padding: .6rem 1rem;
+    padding: .4rem .7rem;
     border-radius: .6rem;
     text-align: center;
 }
-.count-number {
-    font-size: 2.4rem;
-    font-weight: 900;
-}
-.count-label {
-    font-size: .8rem;
-    opacity: 0.8;
-}
+.count-number { font-weight: 900; }
+.count-label { font-size: .7rem; opacity:.8 }
 
-/* ===========================
-   LANDSCAPE MODE (16:9)
-=========================== */
+/* =========================================================
+   MODE 1 — LANDSCAPE (16:9)
+========================================================= */
 @media (min-aspect-ratio: 16/10) {
 
     .container-grid {
+        position: absolute;
+        inset: 0;
         display: grid;
-        grid-template-columns: 1.3fr 1fr;
-        height: 100%;
-        gap: 1.2rem;
-        padding: 1.2rem;
-        box-sizing: border-box;
+        grid-template-columns: 1.2fr 1fr;
+        grid-template-rows: auto 1fr;
+        padding: 1rem;
+        gap: 1rem;
     }
 
-    /* Left column (Current + Next) */
-    .left-column {
-        display: grid;
-        grid-template-rows: auto auto;
-        gap: 1.2rem;
-    }
-
+    /* TOP ROW — fixed height */
     .top-row {
+        grid-column: 1 / span 2;
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 1.2rem;
+        gap: 1rem;
+        height: 18vh;  /* fits your screenshot */
     }
 
-    /* Right column (Countdown + List) */
-    .right-column {
-        display: grid;
-        grid-template-rows: auto 1fr;
-        gap: 1.2rem;
-        overflow: hidden;
+    #currentPrayerCard { font-size: 2.8vh; }
+    #clockCard { font-size: 2.5vh; }
+
+    /* NEXT ROW LEFT */
+    #nextPrayerCard {
+        height: 16vh;
+        font-size: 2.4vh;
     }
 
+    /* NEXT ROW RIGHT COUNTDOWN */
+    .countdown-card {
+        height: 16vh;
+    }
+
+    /* PRAYER LIST — auto fit 7 cards */
     .prayer-list {
-        overflow-y: auto;
-        padding-right: .8rem;
+        grid-column: 1 / span 2;
+        display: grid;
+        grid-template-rows: repeat(7, 1fr);
+        gap: .7vh;
+        height: calc(100vh - 18vh - 16vh - 3rem);
     }
 
-    /* Bigger landscape scaling */
-    .current-prayer-large .time-large {
-        font-size: 3.8rem;
+    /* AUTO RESIZE PRAYER CARDS */
+    .prayer-row {
+        font-size: 2.2vh;
     }
-    .block-large .time-large {
-        font-size: 3rem;
+
+    .prayer-name, .prayer-time {
+        font-size: 2.1vh;
     }
+
+    .time-large { font-size: 4vh; }
 }
 
-/* ===========================
-   PORTRAIT MODE (9:16)
-=========================== */
+/* =========================================================
+   MODE 2 — PORTRAIT (9:16)
+========================================================= */
 @media (max-aspect-ratio: 10/16) {
 
     .container-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-        height: 100%;
-        overflow-y: auto;
-        padding: 1.2rem;
-        box-sizing: border-box;
-    }
-
-    .top-row {
-        display: flex;
-        flex-direction: column;
+        position: absolute;
+        inset: 0;
+        display: grid;
+        grid-template-rows: 15vh 15vh 13vh 13vh 1fr;
+        padding: 1rem;
         gap: 1rem;
     }
 
-    .left-column {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
+    #currentPrayerCard { font-size: 3.2vh; }
+    #clockCard { font-size: 3vh; }
+    #nextPrayerCard { font-size: 2.6vh; }
+    .countdown-card { font-size: 2.8vh; }
 
-    .right-column {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-        overflow-y: auto;
-    }
-
+    /* PRAYER LIST — 7 equal rows, NO SCROLL */
     .prayer-list {
-        flex: 1;
-        overflow-y: auto;
+        display: grid;
+        grid-template-rows: repeat(7, 1fr);
+        gap: .5vh;
     }
 
-    /* Increase portrait readability */
-    .current-prayer-large .time-large {
-        font-size: 3rem;
+    .prayer-row {
+        font-size: 2.5vh;
     }
-    .block-large .time-large {
-        font-size: 2.4rem;
+
+    .prayer-name, .prayer-time {
+        font-size: 2.4vh;
     }
+
+    .time-large { font-size: 4vh; }
 }
