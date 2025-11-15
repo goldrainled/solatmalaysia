@@ -1,223 +1,116 @@
-/* ============================
-   GLOBAL RESET & BASE
-============================ */
-html, body {
-  width:100vw; height:100vh; margin:0; padding:0;
-  overflow:hidden; background:#0b0500;
-  color:#fff; font-family:Poppins,Arial,sans-serif;
+body {
+    margin:0;
+    padding:20px;
+    background:#181003;
+    font-family:Arial, sans-serif;
+    color:white;
+    text-align:center;
 }
 
-/* ============================
-   BACKGROUND SLIDESHOW
-============================ */
-.slideshow-bg {
-  position:fixed; inset:0; z-index:-2; overflow:hidden;
-}
-.slideshow-bg img {
-  position:absolute; inset:0; width:100%; height:100%;
-  object-fit:cover; opacity:0; animation:fadeBG 40s infinite;
-}
-@keyframes fadeBG {
-  0%{opacity:0} 10%{opacity:1} 40%{opacity:1} 55%{opacity:0} 100%{opacity:0}
+/* Top date area */
+.header-area {
+    margin-top:20px;
+    margin-bottom:30px;
 }
 
-/* ============================
-   CARD COMPONENTS
-============================ */
+#dateToday {
+    font-size:32px;
+    font-weight:700;
+}
+
+#zoneName {
+    font-size:22px;
+    margin-top:6px;
+    opacity:0.9;
+}
+
+/* Main cards */
 .card {
-  background:rgba(255,255,255,.12);
-  border:1px solid rgba(255,255,255,.18);
-  border-radius:14px;
-  display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
-  box-shadow:0 6px 20px rgba(0,0,0,.5);
-  box-sizing:border-box;
+    background:rgba(255,255,255,0.12);
+    padding:25px;
+    margin:18px auto;
+    border-radius:28px;
+    width:90%;
+    border:1px solid rgba(255,255,255,0.25);
+    box-shadow:0 0 12px rgba(0,0,0,0.6);
 }
 
-/* Scale wrapper (portrait fix) */
-.card-scale {
-  width:100%;
-  height:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
+.card-title {
+    font-size:32px;
+    font-weight:700;
+    margin-bottom:10px;
 }
 
-/* Clock */
-.clock-box { display:flex; flex-direction:column; align-items:center; }
-.clock-title {
-  font-size:clamp(1rem,2vh,1.4rem);
-  font-weight:500;
-  margin-bottom:4px;
-  opacity:.95;
-}
-.clock-time {
-  font-size:clamp(2rem,4vh,4rem);
-  font-weight:800;
-  line-height:1.1;
+/* Waktu Sekarang time */
+.time-big {
+    font-size:62px;
+    font-weight:800;
 }
 
-/* ============================
-   PRAYER ROWS
-============================ */
+/* Medium time (like 5:37 AM) */
+.time-medium {
+    font-size:58px;
+    font-weight:800;
+}
+
+/* Label under time (Subuh, etc.) */
+.time-label {
+    font-size:40px;
+    margin-top:5px;
+    opacity:0.95;
+}
+
+/* Section title */
+.section-title {
+    font-size:32px;
+    font-weight:800;
+    margin-top:40px;
+    margin-bottom:20px;
+}
+
+/* Countdown */
+.countdown-container {
+    display:flex;
+    justify-content:space-evenly;
+    width:90%;
+    margin:20px auto 30px;
+}
+
+.count-item {
+    background:rgba(255,255,255,0.12);
+    padding:20px 25px;
+    border-radius:18px;
+    border:1px solid rgba(255,255,255,0.2);
+}
+
+.count-number {
+    font-size:60px;
+    font-weight:900;
+}
+
+.count-text {
+    margin-top:8px;
+    font-size:20px;
+}
+
+/* Prayer list rows */
 .prayer-row {
-  display:flex; justify-content:space-between;
-  align-items:center;
-  padding:.9rem 1.2rem;
-  border-radius:8px;
-}
-.prayer-name { font-weight:500; }
-.prayer-time { font-weight:800; text-align:right; }
+    background:rgba(255,255,255,0.12);
+    border-radius:16px;
+    padding:18px 24px;
+    width:90%;
+    margin:10px auto;
+    font-size:32px;
+    font-weight:700;
 
-/* Highlight */
+    display:flex;
+    justify-content:space-between;
+}
+
+/* ACTIVE prayer highlight EXACT like screenshot */
 .currentPrayer {
-  background:rgba(255,215,0,.28)!important;
-  border:2px solid #ffd700!important;
-  box-shadow:0 0 24px rgba(255,215,0,.55);
-}
-
-/* ============================
-   COUNTDOWN
-============================ */
-.countdown-row {
-  display:flex; gap:1rem; justify-content:center; align-items:center;
-}
-.count-box {
-  display:flex; flex-direction:column;
-  justify-content:center; align-items:center;
-  min-width:48px;
-  padding:.5rem .6rem;
-  background:rgba(0,0,0,.3);
-  border-radius:10px;
-  border:1px solid rgba(255,255,255,.08);
-}
-.count-number { font-weight:900; font-size:clamp(1.4rem,3vh,3rem); }
-.count-label  { font-size:.7rem; opacity:.9; }
-
-/* ============================
-   GRID LAYOUT BASE
-============================ */
-.container-grid {
-  position:absolute; inset:0;
-  padding:clamp(10px,1.2vw,28px);
-  display:grid; gap:clamp(4px,0.4vw,8px);
-  box-sizing:border-box;
-}
-
-.bottom-row { display:grid; gap:clamp(10px,1vw,20px); }
-.prayer-list { display:grid; gap:8px; overflow:hidden; }
-
-/* ============================
-   LANDSCAPE MODE (16:9+)
-============================ */
-@media (min-aspect-ratio:16/9) {
-
-  .container-grid {
-    grid-template-columns:1.2fr 1fr;
-    grid-template-rows:
-      clamp(16vh,18vh,22vh)
-      clamp(14vh,16vh,18vh)
-      1fr;
-  }
-
-  .top-row {
-    grid-column:1/3;
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:clamp(12px,1.2vw,24px);
-  }
-
-  #nextPrayerCard {
-    grid-column:1/3;
-  }
-
-  .bottom-row {
-    grid-column:1/3;
-    grid-template-columns:.9fr 1.1fr;
-  }
-
-  .prayer-list {
-    grid-template-rows:repeat(7,1fr);
-    gap:clamp(6px,.7vh,10px);
-  }
-}
-
-@media (max-aspect-ratio:9/16) {
-
-  /* AUTO grid layout */
-  .container-grid {
-    grid-template-columns: 1fr;
-    grid-template-rows:
-      auto    /* clock */
-      auto    /* current */
-      auto    /* next */
-      auto    /* countdown */
-      1fr;    /* prayer list */
-    gap: clamp(4px, 0.6vh, 8px);
-    padding-top: clamp(4px, 1vh, 10px);
-    height: 100vh;
-    overflow: hidden;
-  }
-
-  /* Fix top 3 cards */
-  .card-scale {
-    transform: scale(0.88);
-    transform-origin: top center;
-    width: 100%;
-    height: auto;
-  }
-
-
-  /* ============================
-       COUNTDOWN FIX (MOST IMPORTANT)
-     ============================= */
-
-  .countdown-card {
-    height: auto !important;
-    padding: clamp(2px, 0.8vh, 4px) 0 !important;
-  }
-
-  .countdown-row {
-    gap: clamp(4px, 2vw, 16px);  /* LESS gap horizontally */
-    padding: 0 !important;
-  }
-
-  .count-box {
-    min-width: clamp(26px, 6vw, 40px);
-    padding: clamp(2px, 0.5vh, 5px);
-    border-radius: 8px;
-  }
-
-  .count-number {
-    font-size: clamp(1.2rem, 2vh, 2.2rem) !important;  /* Smaller number */
-    line-height: 1;
-  }
-
-  .count-label {
-    font-size: clamp(.55rem, 1vh, .9rem);
-    margin-top: 0;
-    line-height: 1;
-  }
-
-/* ============================
-   PRAYER LIST — Option C (BEST)
-   Shrink height + scale list
-============================ */
-.prayer-row {
-  padding: clamp(3px, 0.5vh, 6px) 0.8rem;
-  border-radius: 10px;
-}
-
-.prayer-name,
-.prayer-time {
-  font-size: clamp(0.9rem, 1.3vh, 1.3rem);
-  line-height: 1.1;
-}
-
-/* Scale the full list slightly */
-.prayer-list {
-  transform: scale(1.0);
-  transform-origin: top center;
-  margin-top: 1vh;   /* Pull list upward */
+    background:#c7a000 !important;
+    border:3px solid #ffe44c !important;
+    box-shadow:0 0 18px #ffea73;
+    color:black !important;
 }
