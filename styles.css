@@ -30,6 +30,7 @@ html, body {
     overflow:hidden; /* important */
 }
 
+/* ⭐ Scaled container — MUST NOT scroll */
 .app-root {
     transform-origin:center center;
     will-change:transform;
@@ -37,11 +38,22 @@ html, body {
 
     height:100%;
     width:100%;
+    overflow:hidden !important;   /* ⭐ IMPORTANT */
+}
+
+/* ⭐ NEW safe scrolling wrapper */
+.scroll-area {
+    width:100%;
+    height:100%;
     overflow-y:auto;
     overflow-x:hidden;
 
-    /* ⭐ Keeps layout stable & centered, no ghost margin */
-    scrollbar-gutter: stable;
+    /* Remove scrollbar visuals */
+    scrollbar-width:none;          /* Firefox */
+    -ms-overflow-style:none;       /* Edge */
+}
+.scroll-area::-webkit-scrollbar {
+    display:none;                  /* Chrome/Safari */
 }
 
 /* Typography + layout */
@@ -145,20 +157,8 @@ html, body {
     color:black !important;
 }
 
-/* Remove scrollbars */
+/* Legacy scrollbar removals (still safe to keep) */
 body::-webkit-scrollbar,
-.app-root::-webkit-scrollbar { display:none; }
-
-/* ⭐ FULL INVISIBLE SCROLLBAR FIX FOR ALL BROWSERS ⭐ */
-
-html, body, #viewportHost, .app-root {
-    scrollbar-width: none !important;       /* Firefox */
-    -ms-overflow-style: none !important;     /* IE/Edge */
-}
-
-html::-webkit-scrollbar,
-body::-webkit-scrollbar,
-#viewportHost::-webkit-scrollbar,
 .app-root::-webkit-scrollbar {
-    display: none !important;               /* Chrome/Safari */
+    display:none;
 }
