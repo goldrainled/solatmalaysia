@@ -1,90 +1,107 @@
 html, body {
-    margin:0;
-    padding:0;
-    background:#181003;
-    color:white;
-    font-family:Arial, sans-serif;
-    height:100%;
-    overflow:hidden;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    text-align:center; /* force centered text */
+    margin: 0;
+    padding: 0;
+    background: #181003;
+    color: white;
+    font-family: Arial, sans-serif;
+    height: 100%;
+    overflow: hidden;  /* no scroll */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 
-/* Main container: fills screen, no scaling needed */
-.app-root {
-    width:100vw;
-    height:100vh;
-    overflow-y:auto;
-    padding-bottom:40px;
-    box-sizing:border-box;
+#app {
+    transform-origin: top center;  /* important for scaling */
 }
 
-/* Center all content */
-.header-area,
-.card,
-.section-title,
-.prayer-row {
-    text-align:center;
+.header-area {
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
-/* Fix sizes using responsive units */
-#dateToday { font-size:4.5vw; font-weight:700; }
-#zoneName { font-size:3.5vw; opacity:0.85; }
+#dateToday {
+    font-size: 4.5vw;
+    font-weight: 700;
+}
+
+#zoneName {
+    font-size: 3.5vw;
+    opacity: 0.8;
+}
 
 .card {
-    width:92%;
-    margin:3vh auto;
-    padding:3vh 2vw;
-    border-radius:28px;
-    background:rgba(255,255,255,0.12);
-    border:1px solid rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.12);
+    padding: 25px;
+    margin: 18px auto;
+    width: 90%;
+    border-radius: 28px;
 }
 
 .card-title {
-    font-size:5vw;
-    font-weight:700;
-    margin-bottom:1vh;
+    font-size: 5vw;
+    font-weight: 700;
+    margin-bottom: 10px;
 }
 
-.time-big { font-size:10vw; font-weight:800; }
-.time-medium { font-size:8vw; font-weight:800; }
-.time-label { font-size:6vw; margin-top:8px; opacity:0.95; }
+.time-big {
+    font-size: 10vw;
+    font-weight: 800;
+}
 
-.section-title { font-size:6vw; margin-top:4vh; }
+.time-medium {
+    font-size: 8vw;
+    font-weight: 800;
+}
+
+.time-label {
+    font-size: 6vw;
+    opacity: 0.95;
+}
+
+.section-title {
+    font-size: 6vw;
+    font-weight: 800;
+    margin-top: 20px;
+}
 
 .countdown-container {
-    display:flex;
-    justify-content:space-evenly;
-    width:90%;
-    margin:2vh auto 3vh;
+    display: flex;
+    justify-content: space-evenly;
+    width: 90%;
+    margin: 20px auto;
 }
 
 .count-item {
-    padding:2vh 3vw;
-    border-radius:18px;
-    background:rgba(255,255,255,0.12);
+    padding: 20px;
+    border-radius: 15px;
+    background: rgba(255,255,255,0.12);
 }
 
-.count-number { font-size:8vw; font-weight:900; }
-.count-text { font-size:3.5vw; }
+.count-number {
+    font-size: 9vw;
+    font-weight: 800;
+}
+
+.count-text {
+    font-size: 3.5vw;
+    margin-top: 5px;
+}
 
 .prayer-row {
-    width:90%;
-    margin:1.5vh auto;
-    padding:2vh 3vw;
-    font-size:5vw;
-    font-weight:700;
-    border-radius:16px;
-    background:rgba(255,255,255,0.12);
-    display:flex;
-    justify-content:space-between;
+    background: rgba(255,255,255,0.12);
+    padding: 18px 24px;
+    border-radius: 16px;
+    width: 90%;
+    margin: 10px auto;
+    font-size: 5vw;
+    display: flex;
+    justify-content: space-between;
 }
 
-/* Highlight */
 .currentPrayer {
-    background:#c7a000 !important;
-    border:3px solid #ffe44c !important;
-    color:black !important;
+    background: #c7a000 !important;
+    border: 3px solid #ffe44c !important;
+    color: black !important;
 }
