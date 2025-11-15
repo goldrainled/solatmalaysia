@@ -1,27 +1,39 @@
 /* styles.css — Auto mode, clean, no toolbar */
+/* FIXED: Prevent Chrome dark-mode tint and keep full brightness */
 
 html, body {
     margin: 0;
     padding: 0;
     width: 100%;
-    height: auto;           /* ⭐ Allow page height to expand */
+    height: auto;
     min-height: 100vh;
-    overflow-y: auto;       /* ⭐ Enable scrolling */
-    overflow-x: hidden;     /* Keep horizontal locked */
-    background: #181003;
+
+    /* ⭐ Proper scrolling but without Chrome dark tint */
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    /* ⭐ SOLUTION: LOCK COLOR to stop Android Chrome darkening */
+    background-color: #181003 !important;
+    color-scheme: light !important;
+
     font-family: Arial, sans-serif;
     text-align: center;
 }
 
 
-/* Scaled UI container */
+/* Scaled UI container (wrapper for #app) */
 #viewportHost {
     width: 100%;
-    height: auto;           /* ⭐ Allow vertical growth */
+    height: auto;
+
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    padding-bottom: 100px;  /* ⭐ Prevent bottom clipping */
+
+    padding-bottom: 100px;  /* prevents clipping bottom area */
+
+    /* ⭐ Prevents Chrome from blending background with content */
+    background-color: #181003;
 }
 
 /* App root gets scaled by JS */
