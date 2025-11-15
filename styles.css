@@ -1,39 +1,33 @@
 /* styles.css — Auto mode, clean, no toolbar */
+/* 全面禁止滚动（背景 + 内容） */
 
-/* BACKGROUND scrolls, UI stays fixed */
+/* ROOT 层 */
 html, body {
     margin:0;
     padding:0;
     background:#181003;
     font-family:Arial, sans-serif;
     color:white;
-
-    height:200vh;                 /* ⭐ allow background to scroll */
+    height:100%;
+    width:100%;
     text-align:center;
 
-    overflow-y:scroll;            /* ⭐ scroll background only */
-    overflow-x:hidden;
-
-    overscroll-behavior-y:auto;
-
-    /* ⭐ Prevent Chrome Auto Dark Mode tint */
-    color-scheme: light !important;
+    overflow:hidden !important;            /* ⭐ 禁止滚动 */
+    overscroll-behavior:none !important;   /* ⭐ 禁止阴影 */
+    color-scheme: light !important;        /* ⭐ 禁止 Chrome 自动变暗 */
 }
 
-/* Scaled UI container stays FIXED */
+/* UI 外框（固定位置） */
 #viewportHost {
-    position:fixed;               /* ⭐ UI never moves */
+    position:fixed;
     left:0; top:0; right:0; bottom:0;
-
     display:flex;
     align-items:center;
     justify-content:center;
-
-    pointer-events:none;          /* UI is display-only (solves touch issues) */
-    overflow:hidden;
+    overflow:hidden !important;            /* ⭐ 禁止滚动 */
 }
 
-/* ⭐ Scaled container — must NOT scroll */
+/* app-root：缩放容器，不允许滚动 */
 .app-root {
     transform-origin:center center;
     will-change:transform;
@@ -41,14 +35,14 @@ html, body {
 
     height:100%;
     width:100%;
-    overflow:hidden !important;
+    overflow:hidden !important;            /* ⭐ 内容不可滚动 */
 }
 
-/* ⭐ scroll-area must also be fixed and not scroll */
+/* scroll-area：完全取消滚动作用 */
 .scroll-area {
     width:100%;
     height:100%;
-    overflow:hidden !important;
+    overflow:hidden !important;            /* ⭐ 禁止滚动 */
 }
 
 /* Typography + layout */
@@ -62,6 +56,7 @@ html, body {
     font-size:32px;
     font-weight:700;
 }
+
 #zoneName {
     font-size:22px;
     opacity:0.85;
@@ -89,10 +84,12 @@ html, body {
     font-size:62px;
     font-weight:800;
 }
+
 .time-medium {
     font-size:58px;
     font-weight:800;
 }
+
 .time-label {
     font-size:40px;
     margin-top:5px;
@@ -126,6 +123,7 @@ html, body {
     font-size:60px;
     font-weight:900;
 }
+
 .count-text {
     font-size:20px;
     margin-top:8px;
@@ -144,7 +142,6 @@ html, body {
     font-weight:700;
 }
 
-/* Active prayer highlight */
 .currentPrayer {
     background:#c7a000 !important;
     border:3px solid #ffe44c !important;
@@ -152,8 +149,11 @@ html, body {
     color:black !important;
 }
 
-/* Legacy scrollbar removals */
+/* 隐藏所有滚动条 */
+html::-webkit-scrollbar,
 body::-webkit-scrollbar,
-.app-root::-webkit-scrollbar {
-    display:none;
+#viewportHost::-webkit-scrollbar,
+.app-root::-webkit-scrollbar,
+.scroll-area::-webkit-scrollbar {
+    display:none !important;
 }
