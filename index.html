@@ -1,83 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Solat Display</title>
-<link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<title>Solat Display — Multi Mode</title>
+<link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-<div class="header-area">
-    <div id="dateToday">14 November 2025 , 23 Jamadilawal 1447H</div>
-    <div id="zoneName">JHR02 - JOHOR BAHRU, KOATA TINGGI, MERSING</div>
+<!-- Floating toolbar to select modes and custom resolution -->
+<div id="modeToolbar" class="mode-toolbar" aria-hidden="false">
+  <div class="mt-row">
+    <strong>Mode:</strong>
+    <button data-mode="mobile-land" class="mt-btn">Mobile ↔ (2700×1224)</button>
+    <button data-mode="mobile-port" class="mt-btn">Mobile ↑ (1224×2700)</button>
+    <button data-mode="tv-land" class="mt-btn">TV ↔ (1920×1080)</button>
+    <button data-mode="tv-port" class="mt-btn">TV ↑ (1080×1920)</button>
+    <button data-mode="auto" class="mt-btn active">Auto</button>
+  </div>
+
+  <div class="mt-row mt-custom">
+    <label>Custom W × H:</label>
+    <input id="customW" type="number" min="100" placeholder="width" />
+    <input id="customH" type="number" min="100" placeholder="height" />
+    <button id="applyCustom" class="mt-btn">Apply</button>
+  </div>
+
+  <div class="mt-row mt-info">
+    <small id="toolbarInfo">Viewport: — × — | Scale: 1.00</small>
+  </div>
+  <button id="toggleToolbar" class="mt-toggle" title="Hide/Show toolbar">⚙</button>
 </div>
 
-<!-- Waktu Sekarang -->
-<div class="card">
-    <div class="card-title">Waktu Sekarang</div>
-    <div id="currentTime" class="time-big">--:--:--</div>
-</div>
-
-<!-- Current Prayer (like your 5:37AM Subuh card) -->
-<div class="card">
-    <div id="currentPrayerTime" class="time-medium">--:-- AM</div>
-    <div id="currentPrayerName" class="time-label">--</div>
-</div>
-
-<!-- Menuju (Next) -->
-<div class="card">
-    <div class="card-title">Menuju</div>
-    <div id="nextPrayerNameLarge" class="time-big">--</div>
-</div>
-
-<!-- Countdown area -->
-<div class="section-title">Waktu Solat Seterusnya</div>
-
-<div class="countdown-container">
-    <div class="count-item">
-        <div id="cdHour" class="count-number">00</div>
-        <div class="count-text">JAM</div>
+<!-- Application wrapper that will be scaled to emulate target resolution -->
+<div id="viewportHost">
+  <div id="app" class="app-root">
+    <div class="header-area">
+        <div id="dateToday">14 November 2025 , 23 Jamadilawal 1447H</div>
+        <div id="zoneName">JHR02 - JOHOR BAHRU, KOATA TINGGI, MERSING</div>
     </div>
 
-    <div class="count-item">
-        <div id="cdMin" class="count-number">00</div>
-        <div class="count-text">MINIT</div>
+    <!-- Waktu Sekarang -->
+    <div class="card">
+        <div class="card-title">Waktu Sekarang</div>
+        <div id="currentTime" class="time-big">--:--:--</div>
     </div>
 
-    <div class="count-item">
-        <div id="cdSec" class="count-number">00</div>
-        <div class="count-text">SAAT</div>
+    <!-- Current Prayer (like your 5:37AM Subuh card) -->
+    <div class="card">
+        <div id="currentPrayerTime" class="time-medium">--:-- AM</div>
+        <div id="currentPrayerName" class="time-label">--</div>
     </div>
-</div>
 
-<!-- Prayer List -->
-<div id="cardIsmak" class="prayer-row">
-    <span>Ismak</span><span id="ismakTime">--:--</span>
-</div>
+    <!-- Menuju (Next) -->
+    <div class="card">
+        <div class="card-title">Menuju</div>
+        <div id="nextPrayerNameLarge" class="time-big">--</div>
+    </div>
 
-<div id="cardSubuh" class="prayer-row">
-    <span>Subuh</span><span id="subuhTime">--:--</span>
-</div>
+    <!-- Countdown area -->
+    <div class="section-title">Waktu Solat Seterusnya</div>
 
-<div id="cardSyuruk" class="prayer-row">
-    <span>Syuruk</span><span id="syurukTime">--:--</span>
-</div>
+    <div class="countdown-container">
+        <div class="count-item">
+            <div id="cdHour" class="count-number">00</div>
+            <div class="count-text">JAM</div>
+        </div>
 
-<div id="cardZohor" class="prayer-row">
-    <span>Zohor</span><span id="zohorTime">--:--</span>
-</div>
+        <div class="count-item">
+            <div id="cdMin" class="count-number">00</div>
+            <div class="count-text">MINIT</div>
+        </div>
 
-<div id="cardAsar" class="prayer-row">
-    <span>Asar</span><span id="asarTime">--:--</span>
-</div>
+        <div class="count-item">
+            <div id="cdSec" class="count-number">00</div>
+            <div class="count-text">SAAT</div>
+        </div>
+    </div>
 
-<div id="cardMaghrib" class="prayer-row">
-    <span>Maghrib</span><span id="maghribTime">--:--</span>
-</div>
+    <!-- Prayer List -->
+    <div id="cardIsmak" class="prayer-row">
+        <span>Ismak</span><span id="ismakTime">--:--</span>
+    </div>
 
-<div id="cardIsyak" class="prayer-row">
-    <span>Isyak</span><span id="isyakTime">--:--</span>
+    <div id="cardSubuh" class="prayer-row">
+        <span>Subuh</span><span id="subuhTime">--:--</span>
+    </div>
+
+    <div id="cardSyuruk" class="prayer-row">
+        <span>Syuruk</span><span id="syurukTime">--:--</span>
+    </div>
+
+    <div id="cardZohor" class="prayer-row">
+        <span>Zohor</span><span id="zohorTime">--:--</span>
+    </div>
+
+    <div id="cardAsar" class="prayer-row">
+        <span>Asar</span><span id="asarTime">--:--</span>
+    </div>
+
+    <div id="cardMaghrib" class="prayer-row">
+        <span>Maghrib</span><span id="maghribTime">--:--</span>
+    </div>
+
+    <div id="cardIsyak" class="prayer-row">
+        <span>Isyak</span><span id="isyakTime">--:--</span>
+    </div>
+  </div>
 </div>
 
 <script src="main.js"></script>
