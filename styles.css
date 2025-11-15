@@ -147,3 +147,17 @@ html, body {
 /* Remove scrollbars */
 body::-webkit-scrollbar,
 .app-root::-webkit-scrollbar { display:none; }
+
+/* ⭐ FULL INVISIBLE SCROLLBAR FIX FOR ALL BROWSERS ⭐ */
+
+html, body, #viewportHost, .app-root {
+    scrollbar-width: none !important;       /* Firefox */
+    -ms-overflow-style: none !important;     /* IE/Edge */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+#viewportHost::-webkit-scrollbar,
+.app-root::-webkit-scrollbar {
+    display: none !important;               /* Chrome/Safari */
+}
