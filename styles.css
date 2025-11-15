@@ -1,39 +1,33 @@
 /* styles.css — Auto mode, clean, no toolbar */
-/* FIXED: Prevent Chrome dark-mode tint and keep full brightness */
 
+/* Prevent browser scrolling but allow internal scroll */
 html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: auto;
-    min-height: 100vh;
+    margin:0;
+    padding:0;
+    background:#181003;
+    font-family:Arial, sans-serif;
+    color:white;
+    height:100%;
+    text-align:center;
 
-    /* ⭐ Proper scrolling but without Chrome dark tint */
-    overflow-y: auto;
-    overflow-x: hidden;
+    /* ⭐ LOCK body (so Chrome won't darken) */
+    overflow:hidden;
 
-    /* ⭐ SOLUTION: LOCK COLOR to stop Android Chrome darkening */
-    background-color: #181003 !important;
+    /* Allow pull-to-refresh only (does not break color) */
+    overscroll-behavior-y:auto;
+
+    /* ⭐ Prevent Chrome Auto Dark Mode tint */
     color-scheme: light !important;
-
-    font-family: Arial, sans-serif;
-    text-align: center;
 }
 
-
-/* Scaled UI container (wrapper for #app) */
+/* Scaled UI container */
 #viewportHost {
-    width: 100%;
-    height: auto;
-
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-
-    padding-bottom: 100px;  /* prevents clipping bottom area */
-
-    /* ⭐ Prevents Chrome from blending background with content */
-    background-color: #181003;
+    position:fixed;
+    left:0; top:0; right:0; bottom:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden; /* important */
 }
 
 /* App root gets scaled by JS */
@@ -41,6 +35,12 @@ html, body {
     transform-origin:center center;
     will-change:transform;
     box-sizing:border-box;
+
+    /* ⭐ INTERNAL SCROLL (safe) */
+    height:100%;
+    width:100%;
+    overflow-y:auto;
+    overflow-x:hidden;
 }
 
 /* Typography + layout */
@@ -145,4 +145,5 @@ html, body {
 }
 
 /* Remove scrollbars */
-body::-webkit-scrollbar { display:none; }
+body::-webkit-scrollbar,
+.app-root::-webkit-scrollbar { display:none; }
