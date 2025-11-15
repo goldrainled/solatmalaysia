@@ -40,8 +40,8 @@ html, body {
     overflow-y:auto;
     overflow-x:hidden;
 
-    /* ⭐ Keeps layout stable even when scrollbar exists */
-    scrollbar-gutter: stable both-edges;
+    /* ⭐ Keeps layout stable & centered, no ghost margin */
+    scrollbar-gutter: stable;
 }
 
 /* Typography + layout */
