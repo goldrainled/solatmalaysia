@@ -24,7 +24,7 @@ html, body {
     display:flex;
     align-items:center;
     justify-content:center;
-    overflow:hidden !important;            /* ⭐ 禁止滚动 */
+    overflow:hidden;            /* ⭐ 禁止滚动 */
 }
 
 /* app-root：缩放容器，不允许滚动 */
