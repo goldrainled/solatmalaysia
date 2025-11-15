@@ -1,21 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Solat Malaysia</title>
+<link rel="stylesheet" href="styles.css" />
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #181003;
+        display: block; /* ❗ IMPORTANT: do NOT use flex here */
+    }
+
+    /* viewportHost must take full screen without collapsing */
+    #viewportHost {
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        background: #181003;
+    }
+
+    #app {
+        transform-origin: top center;
+    }
+</style>
+</head>
+
 <body>
 
-<!-- REQUIRED FOR SCALING ENGINE -->
-<div id="viewportHost" style="
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-">
+<!-- FIXED STRUCTURE -->
+<div id="viewportHost">
+    <div id="app">
 
-    <div id="app" style="
-        transform-origin: top center;
-    ">
-
-        <!-- YOUR EXISTING PAGE BELOW (unchanged) -->
-
+        <!-- Your original content -->
         <div class="header-area">
             <div id="dateToday">Loading...</div>
             <div id="zoneName">Mengesan lokasi...</div>
@@ -61,9 +85,9 @@
         <div id="cardMaghrib" class="prayer-row"><span>Maghrib</span><span id="maghribTime">--:--</span></div>
         <div id="cardIsyak" class="prayer-row"><span>Isyak</span><span id="isyakTime">--:--</span></div>
 
-    </div> <!-- end app -->
-</div> <!-- end viewportHost -->
+    </div>
+</div>
 
 <script src="main.js"></script>
-
 </body>
+</html>
