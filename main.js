@@ -1,22 +1,33 @@
 /* ============================================================
-   main.js — PORTRAIT-ONLY VERSION (NO AUTO SCALE)
-   - Removes scaleToFit()
-   - Removes autoDetectMode()
-   - Removes landscape logic
-   - Keeps ALL solat logic intact
+   FULLSCREEN FIT ENGINE (NO SCROLL)
 ============================================================ */
 
-let zoneCode = "JHR02";
-let prayerTimes = {};
-let nextPrayerTime = null;
+function scaleApp() {
+    const app = document.getElementById("app");
+    if (!app) return;
 
-function dbg(...args){
-  const ENABLE_DBG = false;
-  if(ENABLE_DBG) console.log("DBG:", ...args);
+    const designW = 1080;     // virtual width
+    const designH = 2400;     // virtual height
+
+    const screenW = window.innerWidth;
+    const screenH = window.innerHeight;
+
+    const scale = Math.min(
+        screenW / designW,
+        screenH / designH
+    );
+
+    app.style.width = designW + "px";
+    app.style.height = designH + "px";
+    app.style.transform = `scale(${scale})`;
 }
 
+window.addEventListener("load", scaleApp);
+window.addEventListener("resize", scaleApp);
+setInterval(scaleApp, 500);
+
 /* ============================================================
-   FORCE PORTRAIT MODE (HIDE SCREEN IN LANDSCAPE)
+   PORTRAIT ONLY
 ============================================================ */
 function enforcePortrait() {
     if (window.innerWidth > window.innerHeight) {
@@ -25,31 +36,37 @@ function enforcePortrait() {
         document.body.style.display = "flex";
     }
 }
-window.addEventListener("orientationchange", () => setTimeout(enforcePortrait, 300));
 window.addEventListener("resize", enforcePortrait);
+window.addEventListener("orientationchange", enforcePortrait);
 enforcePortrait();
 
 /* ============================================================
-   DATE HANDLING (Hijri + Gregorian)
+   BELOW: ORIGINAL SOLAT LOGIC
 ============================================================ */
+
+let zoneCode = "JHR02";
+let prayerTimes = {};
+let nextPrayerTime = null;
+
+function dbg(){}
+
+/* ============================
+   DATE (HIJRI + GREGORIAN)
+============================ */
 async function setAutoDates(){
   try {
     const now = new Date();
     const dd = String(now.getDate()).padStart(2,'0');
     const mm = String(now.getMonth()+1).padStart(2,'0');
     const yyyy = now.getFullYear();
-    const dateStr = `${dd}-${mm}-${yyyy}`;
 
-    const res = await fetch(`https://api.aladhan.com/v1/gToH?date=${dateStr}`);
+    const res = await fetch(`https://api.aladhan.com/v1/gToH?date=${dd}-${mm}-${yyyy}`);
     const j = await res.json();
 
-    if(j?.data?.hijri){
+    if(j && j.data && j.data.hijri){
       const h = j.data.hijri;
-      const hijriMonth = h.month?.en || "";
-      const gMonthName = new Intl.DateTimeFormat('en-US',{month:'long'}).format(now);
-
-      const final = `${dd} ${gMonthName} ${yyyy} , ${h.day} ${hijriMonth} ${h.year}H`;
-      document.getElementById("dateToday").innerText = final;
+      document.getElementById("dateToday").innerText =
+        `${dd} ${now.toLocaleString('en', {month:'long'})} ${yyyy} , ${h.day} ${h.month.en} ${h.year}H`;
       return;
     }
   } catch(e){}
@@ -57,93 +74,72 @@ async function setAutoDates(){
   document.getElementById("dateToday").innerText = new Date().toLocaleDateString();
 }
 
-/* ============================================================
-   GEOLOCATION → ZONE DETECTION
-============================================================ */
+/* ============================
+   ZONE DETECTION
+============================ */
 const ZONE_MAP = {
-  "JHR01": ["pulau aur","pulau pemanggil"],
-  "JHR02": ["johor bahru","kota tinggi","mersing","jhr02","jb","johor bharu"],
-  "JHR03": ["kluang","pontian"],
-  "JHR04": ["batu pahat","muar","segamat","gemas"],
-  "KDH01": ["kota setar","kubang pasu","pokok sena"],
-  "KDH02": ["kuala muda","yan","pendang"],
-  "KDH03": ["padang terap","sik"],
-  "KDH04": ["baling"],
-  "KDH05": ["bandar baharu","kulim"],
-  "KDH06": ["langkawi"],
-  "KTN01": ["bachok","kota bharu","machang","pasir mas","pasir puteh","tanah merah","tumpat","kuala krai"],
-  "MLK01": ["alor gajah","melaka"],
-  "PLS01": ["perlis","kangar"],
-  "PNG01": ["pulau pinang","george town","penang","seberang perai"],
-  "PHG01": ["pahang","kuantan","cameron","pahang"],
-  "PHG02": ["temerloh","lipis","raub"],
-  "PRK01": ["ipoh","perak","kinta","manjung","taiping","kerian"],
-  "SGR01": ["selangor","shah alam","kajang","klang","petaling","gombak","kuala langat","kuala selangor","hulu selangor"],
-  "KUL01": ["kuala lumpur","wp kuala lumpur","wp kl"],
-  "SBH01": ["sabah","kota kinabalu","sandakan","tawau"],
-  "SRW01": ["sri aman","sarawak","kuching","sibu","miri"],
-  "TRG01": ["kuala terengganu","terengganu"],
-  "KEL01": ["kelantan"],
-  "SBH02": ["labuan"],
+  "JHR01":["pulau aur","pulau pemanggil"],
+  "JHR02":["johor bahru","kota tinggi","mersing","jb","johor bharu"],
+  "JHR03":["kluang","pontian"],
+  "JHR04":["batu pahat","muar","segamat","gemas"],
+  "KDH01":["kota setar","kubang pasu","pokok sena"],
+  "KDH02":["kuala muda","yan","pendang"],
+  "KDH03":["padang terap","sik"],
+  "KDH04":["baling"],
+  "KDH05":["bandar baharu","kulim"],
+  "KDH06":["langkawi"],
+  "MLK01":["alor gajah","melaka"],
+  "PLS01":["perlis","kangar"],
+  "PNG01":["pulau pinang","penang","george town"],
+  "PRK01":["ipoh","perak","manjung","kinta"],
+  "SGR01":["selangor","shah alam","kajang","klang","petaling"],
+  "KUL01":["kuala lumpur","wp kl"],
+  "SBH01":["sabah","kota kinabalu"],
+  "TRG01":["terengganu"],
+  "KEL01":["kelantan"],
 };
 
 const zoneKeywords = [];
 for(const [z,list] of Object.entries(ZONE_MAP)){
-  list.forEach(k => zoneKeywords.push({zone: z, key: k.toLowerCase()}));
+  list.forEach(k => zoneKeywords.push({zone:z, key:k.toLowerCase()}));
 }
 
 async function reverseGeocode(lat, lon){
   try{
-    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`;
-    const res = await fetch(url);
+    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`);
     const j = await res.json();
     const a = j.address || {};
-
     return [
-      a.city, a.town, a.village, a.county, a.state, a.region, a.country
+      a.city,a.town,a.village,a.state,a.country
     ].filter(Boolean).join(", ").toLowerCase();
-  } catch {
-    return "";
-  }
+  } catch(e){ return ""; }
 }
 
 async function ipGeolocate(){
   try{
     const res = await fetch("https://ipapi.co/json/");
     const j = await res.json();
-    return [j.city, j.region, j.country_name]
-      .filter(Boolean).join(", ").toLowerCase();
-  } catch {
-    return "";
-  }
+    return [j.city,j.region,j.country_name].filter(Boolean).join(", ").toLowerCase();
+  } catch(e){ return ""; }
 }
 
-function determineZone(place){
-  const clean = place.replace(/[^\w\s]/g," ").toLowerCase();
-  for(const row of zoneKeywords){
-    if(clean.includes(row.key)) return row.zone;
+function determineZone(str){
+  const clean = str.toLowerCase();
+  for(const z of zoneKeywords){
+    if(clean.includes(z.key)) return z.zone;
   }
   return null;
 }
 
-function capitalizePlace(s){
-  return s.split(",")[0]
-          .split(" ")
-          .map(w => w.charAt(0).toUpperCase()+w.slice(1))
-          .join(" ");
-}
-
 async function detectZoneAndLoad(){
   document.getElementById("zoneName").innerText = "Mengesan lokasi...";
+
   let place = "";
 
   if(navigator.geolocation){
     try{
       const pos = await new Promise((ok,fail)=>{
-        navigator.geolocation.getCurrentPosition(ok,fail,{
-          timeout:8000,
-          maximumAge:5*60*1000
-        });
+         navigator.geolocation.getCurrentPosition(ok,fail,{timeout:8000});
       });
       place = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
     } catch {
@@ -157,184 +153,171 @@ async function detectZoneAndLoad(){
   if(found){
     zoneCode = found;
     document.getElementById("zoneName").innerText =
-      `${zoneCode} - ${capitalizePlace(place)}`;
-  } else {
-    document.getElementById("zoneName").innerText =
-      `${zoneCode} - ${capitalizePlace(place || "Lokasi tidak dikesan")}`;
+      `${zoneCode.toUpperCase()} - ${place}`;
   }
 
   await loadPrayerTimesForZone(zoneCode);
 }
 
-/* ============================================================
-   FETCH PRAYER TIMES
-============================================================ */
+/* ============================
+   E-SOLAT API
+============================ */
 async function loadPrayerTimesForZone(Z){
-  try{
-    const url =
-      `https://www.e-solat.gov.my/index.php?r=esolatApi/takwimsolat&period=month&zone=${Z}`;
-    const res = await fetch(url, {cache:"no-store"});
-    const data = await res.json();
+  const url=`https://www.e-solat.gov.my/index.php?r=esolatApi/takwimsolat&period=month&zone=${Z}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  const list = data.prayerTime || [];
 
-    const list = data.prayerTime || [];
-    const today = new Date();
-    const d = String(today.getDate()).padStart(2,'0');
-    const y = today.getFullYear();
-    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    const d1 = `${d}-${months[today.getMonth()]}-${y}`;
-    const d2 = `${d}-${months[today.getMonth()].toUpperCase()}-${y}`;
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2,'0');
+  const yyyy=today.getFullYear();
+  const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
-    let row = list.find(x => x.date===d1 || x.date===d2) || list[list.length-1];
+  const d1 = `${dd}-${months[today.getMonth()]}-${yyyy}`;
+  const d2 = `${dd}-${months[today.getMonth()].toUpperCase()}-${yyyy}`;
 
-    const norm = t => t.toString().trim().padStart(4,'0');
-    prayerTimes = {
-      Ismak:  norm(row.imsak),
-      Subuh:  norm(row.fajr),
-      Syuruk: norm(row.syuruk),
-      Zohor:  norm(row.dhuhr),
-      Asar:   norm(row.asr),
-      Maghrib:norm(row.maghrib),
-      Isyak:  norm(row.isha)
-    };
+  let row = list.find(x => x.date===d1 || x.date===d2) || list[list.length-1];
 
-    updatePrayerUI();
-    determineNextPrayer();
-    updateHighlight();
-    updateCurrentPrayerCard();
+  const norm = t => (t||"0000").padStart(4,'0');
 
-  } catch(e){
-    document.getElementById("zoneName").innerText = `Gagal muat ${Z}`;
-  }
+  prayerTimes = {
+    Ismak:   norm(row.imsak),
+    Subuh:   norm(row.fajr),
+    Syuruk:  norm(row.syuruk),
+    Zohor:   norm(row.dhuhr),
+    Asar:    norm(row.asr),
+    Maghrib: norm(row.maghrib),
+    Isyak:   norm(row.isha)
+  };
+
+  document.getElementById("ismakTime").innerText   = fmt(prayerTimes.Ismak);
+  document.getElementById("subuhTime").innerText   = fmt(prayerTimes.Subuh);
+  document.getElementById("syurukTime").innerText  = fmt(prayerTimes.Syuruk);
+  document.getElementById("zohorTime").innerText   = fmt(prayerTimes.Zohor);
+  document.getElementById("asarTime").innerText    = fmt(prayerTimes.Asar);
+  document.getElementById("maghribTime").innerText = fmt(prayerTimes.Maghrib);
+  document.getElementById("isyakTime").innerText   = fmt(prayerTimes.Isyak);
+
+  determineNextPrayer();
+  updateCurrentPrayerCard();
+  updateHighlight();
 }
 
-function updatePrayerUI(){
-  const f = id => document.getElementById(id);
-  const fmt = t => formatTime(t);
-  f("ismakTime").innerText   = fmt(prayerTimes.Ismak);
-  f("subuhTime").innerText   = fmt(prayerTimes.Subuh);
-  f("syurukTime").innerText  = fmt(prayerTimes.Syuruk);
-  f("zohorTime").innerText   = fmt(prayerTimes.Zohor);
-  f("asarTime").innerText    = fmt(prayerTimes.Asar);
-  f("maghribTime").innerText = fmt(prayerTimes.Maghrib);
-  f("isyakTime").innerText   = fmt(prayerTimes.Isyak);
-}
-
-/* ============================================================
+/* ============================
    FORMAT TIME
-============================================================ */
-function formatTime(t){
-  if(!t) return "--:--";
-  t = t.toString();
-  if(!t.includes(":")) t = t.slice(0,2)+":"+t.slice(2);
-  let [h,m] = t.split(":").map(Number);
-  const ampm = h>=12 ? "PM" : "AM";
-  const h12 = (h%12) || 12;
+============================ */
+function fmt(t){
+  t=t.toString();
+  if(!t.includes(":")) t=t.slice(0,2)+":"+t.slice(2);
+  let [h,m]=t.split(":").map(Number);
+  const ampm = h>=12?"PM":"AM";
+  const h12=(h%12)||12;
   return `${h12}:${String(m).padStart(2,'0')} ${ampm}`;
 }
 
-/* ============================================================
-   DETERMINE NEXT PRAYER
-============================================================ */
+/* ============================
+   NEXT PRAYER LOGIC
+============================ */
 function determineNextPrayer(){
-  const now = new Date();
+  const now=new Date();
   for(const [name,time] of Object.entries(prayerTimes)){
-    const [h,m] = time.split(":").map(Number);
-    const t = new Date();
+    const [h,m]=time.split(":").map(Number);
+    const t=new Date();
     t.setHours(h,m,0,0);
-    if(t > now){
-      nextPrayerTime = t;
-      document.getElementById("nextPrayerNameLarge").innerText = name;
+    if(t>now){
+      nextPrayerTime=t;
+      document.getElementById("nextPrayerNameLarge").innerText=name;
       return;
     }
   }
 
   let t = new Date();
   t.setDate(t.getDate()+1);
-  const [h,m] = prayerTimes.Subuh.split(":").map(Number);
+  const [h,m]=prayerTimes.Subuh.split(":").map(Number);
   t.setHours(h,m,0,0);
   nextPrayerTime = t;
   document.getElementById("nextPrayerNameLarge").innerText = "Subuh";
 }
 
-/* ============================================================
+/* ============================
    COUNTDOWN
-============================================================ */
+============================ */
 setInterval(()=>{
   if(!nextPrayerTime) return;
-  const now = new Date();
-  let diff = nextPrayerTime - now;
+  const now=new Date();
+  let diff=nextPrayerTime-now;
 
-  if(diff <= 0){ determineNextPrayer(); return; }
+  if(diff<=0){ determineNextPrayer(); return; }
 
-  const h = Math.floor(diff/(1000*60*60));
-  const m = Math.floor((diff/1000/60)%60);
-  const s = Math.floor((diff/1000)%60);
+  const h=Math.floor(diff/(1000*60*60));
+  const m=Math.floor((diff/1000/60)%60);
+  const s=Math.floor((diff/1000)%60);
 
-  document.getElementById("cdHour").innerText = String(h).padStart(2,'0');
-  document.getElementById("cdMin").innerText  = String(m).padStart(2,'0');
-  document.getElementById("cdSec").innerText  = String(s).padStart(2,'0');
-}, 1000);
+  document.getElementById("cdHour").innerText=String(h).padStart(2,'0');
+  document.getElementById("cdMin").innerText =String(m).padStart(2,'0');
+  document.getElementById("cdSec").innerText =String(s).padStart(2,'0');
+},1000);
 
-/* ============================================================
-   CLOCK
-============================================================ */
+/* ============================
+   CLOCK UPDATE
+============================ */
 function updateClock(){
-  const now = new Date();
-  let h = now.getHours();
-  let m = String(now.getMinutes()).padStart(2,'0');
-  let s = String(now.getSeconds()).padStart(2,'0');
-  const ampm = h>=12 ? "PM" : "AM";
-  const h12 = (h%12) || 12;
+  const now=new Date();
+  let h=now.getHours();
+  let m=String(now.getMinutes()).padStart(2,'0');
+  let s=String(now.getSeconds()).padStart(2,'0');
+  const ampm=h>=12?"PM":"AM";
+  const h12=(h%12)||12;
 
   document.getElementById("currentTime").innerText =
     `${h12}:${m}:${s} ${ampm}`;
 
-  updateHighlight();
   updateCurrentPrayerCard();
+  updateHighlight();
 }
-setInterval(updateClock, 1000);
+setInterval(updateClock,1000);
 updateClock();
 
-/* ============================================================
-   HIGHLIGHT CURRENT PRAYER
-============================================================ */
+/* ============================
+   HIGHLIGHT CURRENT
+============================ */
 function updateHighlight(){
-  const now = new Date();
-  let active = "Isyak";
+  const now=new Date();
+  let active="Isyak";
 
   for(const [name,time] of Object.entries(prayerTimes)){
-    const [h,m] = time.split(":").map(Number);
-    const t = new Date();
+    const [h,m]=time.split(":").map(Number);
+    const t=new Date();
     t.setHours(h,m,0,0);
-    if(t <= now) active = name;
+    if(t<=now) active=name;
   }
 
   document.querySelectorAll(".prayer-row")
-    .forEach(el => el.classList.remove("currentPrayer"));
+    .forEach(el=>el.classList.remove("currentPrayer"));
 
-  const el = document.getElementById("card"+active);
-  if(el) el.classList.add("currentPrayer");
+  const card=document.getElementById("card"+active);
+  if(card) card.classList.add("currentPrayer");
 }
 
 function updateCurrentPrayerCard(){
-  const now = new Date();
-  let active = "Isyak";
+  const now=new Date();
+  let active="Isyak";
 
   for(const [name,time] of Object.entries(prayerTimes)){
-    const [h,m] = time.split(":").map(Number);
-    const t = new Date();
+    const [h,m]=time.split(":").map(Number);
+    const t=new Date();
     t.setHours(h,m,0,0);
-    if(t <= now) active = name;
+    if(t<=now) active=name;
   }
 
   document.getElementById("currentPrayerName").innerText = active;
   document.getElementById("currentPrayerTime").innerText =
-    formatTime(prayerTimes[active]);
+    fmt(prayerTimes[active]);
 }
 
-/* ============================================================
+/* ============================
    INIT
-============================================================ */
+============================ */
 (async function init(){
   await setAutoDates();
   await detectZoneAndLoad();
