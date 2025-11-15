@@ -8,6 +8,7 @@ html, body {
     font-family:Arial, sans-serif;
     color:white;
     height:100%;
+    text-align:center;
     overflow:hidden;
     overscroll-behavior-y:auto;
 }
@@ -96,6 +97,7 @@ html, body {
     padding:20px 25px;
     border-radius:18px;
     border:1px solid rgba(255,255,255,0.2);
+    text-align:center;
 }
 
 .count-number {
