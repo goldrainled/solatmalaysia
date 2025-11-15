@@ -10,6 +10,7 @@ html, body {
     height:100%;
     overflow:hidden;
     overscroll-behavior-y:auto;
+    text-align:center;         /* FIX: Global center */
 }
 
 /* Scaled UI container */
@@ -23,9 +24,11 @@ html, body {
 
 /* App root gets scaled by JS */
 .app-root {
-    transform-origin:center center;
+    transform-origin:top left;  /* FIX: Prevent side-shift when scaling */
     will-change:transform;
     box-sizing:border-box;
+    width:100%;                 /* FIX: Allows consistent centering */
+    text-align:center;          /* FIX: Ensures all children default to center */
 }
 
 /* Typography + layout */
@@ -53,6 +56,7 @@ html, body {
     width:90%;
     border:1px solid rgba(255,255,255,0.25);
     box-shadow:0 0 12px rgba(0,0,0,0.6);
+    text-align:center;          /* FIX: Center inside cards */
 }
 
 /* Titles & text */
@@ -60,6 +64,7 @@ html, body {
     font-size:32px;
     font-weight:700;
     margin-bottom:10px;
+    text-align:center;          /* FIX */
 }
 
 .time-big {
@@ -74,6 +79,7 @@ html, body {
     font-size:40px;
     margin-top:5px;
     opacity:0.95;
+    text-align:center;          /* FIX */
 }
 
 .section-title {
@@ -81,12 +87,14 @@ html, body {
     font-weight:800;
     margin-top:40px;
     margin-bottom:20px;
+    text-align:center;          /* FIX */
 }
 
 /* Countdown */
 .countdown-container {
     display:flex;
-    justify-content:space-evenly;
+    justify-content:center;     /* FIX: center items */
+    gap:25px;                   /* FIX: space even & symmetric */
     width:90%;
     margin:20px auto 30px;
 }
@@ -96,6 +104,7 @@ html, body {
     padding:20px 25px;
     border-radius:18px;
     border:1px solid rgba(255,255,255,0.2);
+    text-align:center;          /* FIX */
 }
 
 .count-number {
@@ -114,10 +123,15 @@ html, body {
     padding:18px 24px;
     width:90%;
     margin:10px auto;
+
     display:flex;
     justify-content:space-between;
+    align-items:center;
+
     font-size:32px;
     font-weight:700;
+
+    text-align:center;          /* FIX */
 }
 
 /* Active prayer highlight */
@@ -126,6 +140,7 @@ html, body {
     border:3px solid #ffe44c !important;
     box-shadow:0 0 18px #ffea73;
     color:black !important;
+    text-align:center !important;  /* FIX */
 }
 
 /* Remove scrollbars */
