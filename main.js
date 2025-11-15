@@ -1,173 +1,65 @@
-/* main.js — AUTO MODE ONLY (Portrait fixes for 1224x2700 & 1080x1920)
-   - Preserves your original solat logic (APIs, countdown, highlights)
-   - Adds robust auto-detect scaling that avoids over-shrinking on tall phones
-   - Listens to resize & orientationchange
-*/
+/* ============================================================
+   main.js — PORTRAIT-ONLY VERSION (NO AUTO SCALE)
+   - Removes scaleToFit()
+   - Removes autoDetectMode()
+   - Removes landscape logic
+   - Keeps ALL solat logic intact
+============================================================ */
 
 let zoneCode = "JHR02";
 let prayerTimes = {};
 let nextPrayerTime = null;
 
 function dbg(...args){
-  // Toggle this to true to get console logs for debugging
   const ENABLE_DBG = false;
-  if(ENABLE_DBG) console.debug("⭑ solat:", ...args);
+  if(ENABLE_DBG) console.log("DBG:", ...args);
 }
-
-/* -------------------------
-   Auto-detect / scaling
-   - Fixes portrait proportional issues, esp. for:
-     * 1224 x 2700
-     * 1080 x 1920
-   - Uses viewport-based target (not raw physical screen) to avoid large shrink
---------------------------*/
-
-let currentTarget = { w: 1920, h: 1080 }; // fallback
-
-function autoDetectMode() {
-  const winW = window.innerWidth;
-  const winH = window.innerHeight;
-  const scrW = screen.width;
-  const scrH = screen.height;
-  const dpr  = window.devicePixelRatio || 1;
-
-  const isPortrait = winH > winW;
-  const ua = navigator.userAgent || "";
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(ua) || scrW < 1280;
-
-  // Helper: produce a proportional virtual target that keeps the same aspect ratio
-  // as `refW` x `refH` but sized relative to the usable viewport (winW/winH).
-  function virtualTargetFromReference(refW, refH) {
-    // desired aspect ratio (height / width)
-    const ratio = refH / refW;
-    // Prefer to size based on available viewport width so UI fills horizontally
-    // but ensure resulting height is not much larger than viewport (avoid being small)
-    const baseW = Math.max(winW * 1.05, Math.min(refW, winW * 1.3));
-    const targetW = Math.round(baseW);
-    const targetH = Math.round(targetW * ratio);
-
-    // Ensure a minimum height so some elements don't collapse visually
-    const minH = Math.round(winH * 1.05);
-    return {
-      w: targetW,
-      h: Math.max(targetH, minH)
-    };
-  }
-
-  // Special-case handling for tall phones (common problematic ratios)
-  // If physical screen matches those exact tall resolutions or similar aspect ratio,
-  // we use the proportional virtual target based on those references.
-  const aspect1224x2700 = 2700 / 1224; // ~2.206
-  const aspect1080x1920 = 1920 / 1080; // ~1.777
-
-  // approximate aspect of current screen
-  const screenAspect = scrH / scrW;
-
-  // If device is mobile + portrait and either:
-  // - physical screen equals exactly the known tall sizes (or DPR-normalized)
-  // - OR screen aspect ratio is close to one of those tall aspect ratios
-  // then apply the proportional virtual target technique.
-  if (isMobile && isPortrait) {
-    // Normalize possible DPR differences for detection (some browsers report css px)
-    const physW = Math.round(scrW * dpr);
-    const physH = Math.round(scrH * dpr);
-
-    const is1224_2700 = ( (scrW === 1224 && scrH === 2700) || (physW === 1224 && physH === 2700) );
-    const is1080_1920 = ( (scrW === 1080 && scrH === 1920) || (physW === 1080 && physH === 1920) );
-
-    const aspectClose1224 = Math.abs(screenAspect - aspect1224x2700) < 0.12;
-    const aspectClose1080 = Math.abs(screenAspect - aspect1080x1920) < 0.12;
-
-    if (is1224_2700 || aspectClose1224) {
-      currentTarget = virtualTargetFromReference(1224, 2700);
-      dbg("portrait detected ≈1224x2700, virtualTarget:", currentTarget);
-      scaleToFit();
-      return;
-    }
-
-    if (is1080_1920 || aspectClose1080) {
-      currentTarget = virtualTargetFromReference(1080, 1920);
-      dbg("portrait detected ≈1080x1920, virtualTarget:", currentTarget);
-      scaleToFit();
-      return;
-    }
-
-    // Generic mobile portrait fallback: use a high-aspect reference but proportional
-    const genericRefW = 1224;
-    const genericRefH = 2700;
-    currentTarget = virtualTargetFromReference(genericRefW, genericRefH);
-    dbg("mobile portrait generic virtualTarget:", currentTarget);
-    scaleToFit();
-    return;
-  }
-
-  // Mobile landscape: keep previous behavior but make proportional to viewport
-  if (isMobile && !isPortrait) {
-    // Use the same reference rotated (2700x1224) but base on viewport height
-    const refW = 2700, refH = 1224;
-    const ratio = refH / refW;
-    // prefer base on viewport height so landscape fills vertically
-    const baseH = Math.max(winH * 1.05, Math.min(refH, winH * 1.25));
-    const targetH = Math.round(baseH);
-    const targetW = Math.round(targetH / ratio);
-    currentTarget = { w: targetW, h: targetH };
-    dbg("mobile landscape virtualTarget:", currentTarget);
-    scaleToFit();
-    return;
-  }
-
-  // TV detection (low DPR + large screen)
-  const isTV = scrW >= 1920 && dpr <= 1.25;
-  if (isTV) {
-    if (isPortrait) currentTarget = { w: 1080, h: 1920 };
-    else currentTarget = { w: 1920, h: 1080 };
-    dbg("tv detected target:", currentTarget);
-    scaleToFit();
-    return;
-  }
-
-  // Fall back to using screen CSS pixels (useful for big LED walls)
-  currentTarget = { w: Math.max(800, scrW), h: Math.max(600, scrH) };
-  dbg("fallback custom target:", currentTarget);
-  scaleToFit();
-}
-
-/* -------------------------
-   Scale engine (no scroll)
---------------------------*/
-function scaleToFit() {
-  const host = document.getElementById("viewportHost");
-  const app  = document.getElementById("app");
-  if(!app || !host) return;
-
-  // set app virtual design size
-  app.style.width  = currentTarget.w + "px";
-  app.style.height = currentTarget.h + "px";
-
-  // calculate scale to fit into browser viewport
-  const scale = Math.min(
-    window.innerWidth  / currentTarget.w,
-    window.innerHeight / currentTarget.h
-  );
-
-  app.style.transform = `scale(${scale})`;
-  host.style.alignItems = "center";
-  host.style.justifyContent = "center";
-}
-
-/* Re-run on resize & orientationchange */
-window.addEventListener("resize", autoDetectMode);
-window.addEventListener("orientationchange", () => {
-  // small timeout to allow viewport/browser chrome to settle on some devices
-  setTimeout(autoDetectMode, 220);
-});
 
 /* ============================================================
-   The rest of your original solat logic (unchanged)
-   I paste your functions verbatim but keep them intact.
-============================================================*/
+   FORCE PORTRAIT MODE (HIDE SCREEN IN LANDSCAPE)
+============================================================ */
+function enforcePortrait() {
+    if (window.innerWidth > window.innerHeight) {
+        document.body.style.display = "none";
+    } else {
+        document.body.style.display = "flex";
+    }
+}
+window.addEventListener("orientationchange", () => setTimeout(enforcePortrait, 300));
+window.addEventListener("resize", enforcePortrait);
+enforcePortrait();
 
-/* ZONE MAP */
+/* ============================================================
+   DATE HANDLING (Hijri + Gregorian)
+============================================================ */
+async function setAutoDates(){
+  try {
+    const now = new Date();
+    const dd = String(now.getDate()).padStart(2,'0');
+    const mm = String(now.getMonth()+1).padStart(2,'0');
+    const yyyy = now.getFullYear();
+    const dateStr = `${dd}-${mm}-${yyyy}`;
+
+    const res = await fetch(`https://api.aladhan.com/v1/gToH?date=${dateStr}`);
+    const j = await res.json();
+
+    if(j?.data?.hijri){
+      const h = j.data.hijri;
+      const hijriMonth = h.month?.en || "";
+      const gMonthName = new Intl.DateTimeFormat('en-US',{month:'long'}).format(now);
+
+      const final = `${dd} ${gMonthName} ${yyyy} , ${h.day} ${hijriMonth} ${h.year}H`;
+      document.getElementById("dateToday").innerText = final;
+      return;
+    }
+  } catch(e){}
+
+  document.getElementById("dateToday").innerText = new Date().toLocaleDateString();
+}
+
+/* ============================================================
+   GEOLOCATION → ZONE DETECTION
+============================================================ */
 const ZONE_MAP = {
   "JHR01": ["pulau aur","pulau pemanggil"],
   "JHR02": ["johor bahru","kota tinggi","mersing","jhr02","jb","johor bharu"],
@@ -183,335 +75,267 @@ const ZONE_MAP = {
   "MLK01": ["alor gajah","melaka"],
   "PLS01": ["perlis","kangar"],
   "PNG01": ["pulau pinang","george town","penang","seberang perai"],
-  "KDH07": ["gunung jerai"],
   "PHG01": ["pahang","kuantan","cameron","pahang"],
   "PHG02": ["temerloh","lipis","raub"],
   "PRK01": ["ipoh","perak","kinta","manjung","taiping","kerian"],
-  "SGR01": ["selangor","shah alam","kajang"," Klang","petaling","gombak","kuala langat","kuala selangor","hulu selangor"],
+  "SGR01": ["selangor","shah alam","kajang","klang","petaling","gombak","kuala langat","kuala selangor","hulu selangor"],
   "KUL01": ["kuala lumpur","wp kuala lumpur","wp kl"],
-  "PLS01": ["perlis","kangar"],
   "SBH01": ["sabah","kota kinabalu","sandakan","tawau"],
-  "SRW01": ["sri aman","sri aman region","sarawak","kuching","sibu","miri"],
+  "SRW01": ["sri aman","sarawak","kuching","sibu","miri"],
   "TRG01": ["kuala terengganu","terengganu"],
   "KEL01": ["kelantan"],
-  "JHR02_alias": ["johor", "johor bahru", "jb"],
   "SBH02": ["labuan"],
 };
 
 const zoneKeywords = [];
-for(const [zone,arr] of Object.entries(ZONE_MAP)){
-  if(!Array.isArray(arr)) continue;
-  arr.forEach(k => zoneKeywords.push({zone, key: k.toLowerCase()}));
+for(const [z,list] of Object.entries(ZONE_MAP)){
+  list.forEach(k => zoneKeywords.push({zone: z, key: k.toLowerCase()}));
 }
 
-function setText(id, txt){
-  const el = document.getElementById(id);
-  if(el) el.innerText = txt;
-}
-
-/* Hijri date */
-async function setAutoDates(){
-  try {
-    const now = new Date();
-    const dd = String(now.getDate()).padStart(2,'0');
-    const mm = String(now.getMonth()+1).padStart(2,'0');
-    const yyyy = now.getFullYear();
-    const dateStr = `${dd}-${mm}-${yyyy}`;
-
-    const res = await fetch(`https://api.aladhan.com/v1/gToH?date=${dateStr}`);
-    const j = await res.json();
-    if(j && j.data && j.data.hijri){
-      const h = j.data.hijri;
-      const hijriMonth = (h.month && (h.month.en || h.month.ar)) || "";
-      const hijriDay = h.day;
-      const hijriYear = h.year;
-      const gMonthName = new Intl.DateTimeFormat('en-US',{month:'long'}).format(now);
-      const final = `${dd} ${gMonthName} ${yyyy} , ${hijriDay} ${hijriMonth} ${hijriYear}H`;
-      setText("dateToday", final);
-      return;
-    }
-    setText("dateToday", new Date().toLocaleDateString());
-  } catch(err){
-    setText("dateToday", new Date().toLocaleDateString());
-  }
-}
-
-/* Reverse geocode */
 async function reverseGeocode(lat, lon){
-  try {
+  try{
     const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`;
-    const res = await fetch(url, {headers: {'User-Agent': 'solat-display/1.0 (your-email@example.com)'}});
-    if(!res.ok) throw new Error("revgeo HTTP " + res.status);
+    const res = await fetch(url);
     const j = await res.json();
-    const addr = j.address || {};
-    const parts = [
-      addr.city, addr.town, addr.village,
-      addr.county, addr.state, addr.region, addr.state_district,
-      addr.country
-    ].filter(Boolean).map(s => String(s).toLowerCase());
-    return parts.join(", ");
-  } catch(e){
+    const a = j.address || {};
+
+    return [
+      a.city, a.town, a.village, a.county, a.state, a.region, a.country
+    ].filter(Boolean).join(", ").toLowerCase();
+  } catch {
     return "";
   }
 }
 
-/* IP geolocation fallback (ipapi.co) */
 async function ipGeolocate(){
-  try {
+  try{
     const res = await fetch("https://ipapi.co/json/");
-    if(!res.ok) throw new Error("ipapi HTTP " + res.status);
     const j = await res.json();
-    const parts = [j.city, j.region, j.country_name].filter(Boolean).map(s => String(s).toLowerCase());
-    return parts.join(", ");
-  } catch(e){
+    return [j.city, j.region, j.country_name]
+      .filter(Boolean).join(", ").toLowerCase();
+  } catch {
     return "";
   }
 }
 
-/* Determine zone from place string */
-function determineZoneFromPlace(placeStr){
-  if(!placeStr) return null;
-  const s = placeStr.toLowerCase();
-  // exact wipe punctuation
-  const norm = s.replace(/[^\w\s]/g,' ');
-  // try to find exact keyword match, prefer exact zones (non "_alias")
-  for(const z of zoneKeywords){
-    if(z.zone.endsWith("_alias")) continue; // skip alias on first pass
-    if(norm.includes(z.key)) return z.zone;
-  }
-  // second pass include aliases
-  for(const z of zoneKeywords){
-    if(norm.includes(z.key)) return z.zone;
+function determineZone(place){
+  const clean = place.replace(/[^\w\s]/g," ").toLowerCase();
+  for(const row of zoneKeywords){
+    if(clean.includes(row.key)) return row.zone;
   }
   return null;
 }
 
 function capitalizePlace(s){
-  if(!s) return "";
-  return s.split(",")[0].split(" ").map(w => w.charAt(0).toUpperCase()+w.slice(1)).join(" ");
+  return s.split(",")[0]
+          .split(" ")
+          .map(w => w.charAt(0).toUpperCase()+w.slice(1))
+          .join(" ");
 }
 
-/* Detect zone and load */
 async function detectZoneAndLoad(){
-  setText("zoneName", "Mengesan lokasi...");
-  let placeStr = "";
+  document.getElementById("zoneName").innerText = "Mengesan lokasi...";
+  let place = "";
 
   if(navigator.geolocation){
-    try {
-      const pos = await new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {timeout:8000, maximumAge:5*60*1000});
+    try{
+      const pos = await new Promise((ok,fail)=>{
+        navigator.geolocation.getCurrentPosition(ok,fail,{
+          timeout:8000,
+          maximumAge:5*60*1000
+        });
       });
-      const lat = pos.coords.latitude;
-      const lon = pos.coords.longitude;
-      dbg("geo coords:", lat, lon);
-      placeStr = await reverseGeocode(lat, lon);
-    } catch(e){
-      dbg("geolocation failed:", e);
-      placeStr = await ipGeolocate();
+      place = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
+    } catch {
+      place = await ipGeolocate();
     }
   } else {
-    placeStr = await ipGeolocate();
+    place = await ipGeolocate();
   }
 
-  dbg("placeStr:", placeStr);
-  const foundZone = determineZoneFromPlace(placeStr);
-  if(foundZone){
-    const standardized = foundZone.replace(/_alias$/,'');
-    zoneCode = standardized;
-    setText("zoneName", `${zoneCode.toUpperCase()} - ${capitalizePlace(placeStr)}`);
-    dbg("zone determined:", zoneCode);
+  const found = determineZone(place);
+  if(found){
+    zoneCode = found;
+    document.getElementById("zoneName").innerText =
+      `${zoneCode} - ${capitalizePlace(place)}`;
   } else {
-    dbg("zone not found from place, falling back to default:", zoneCode);
-    setText("zoneName", `${zoneCode} - ${capitalizePlace(placeStr || "Lokasi tidak dikesan")}`);
+    document.getElementById("zoneName").innerText =
+      `${zoneCode} - ${capitalizePlace(place || "Lokasi tidak dikesan")}`;
   }
 
   await loadPrayerTimesForZone(zoneCode);
 }
 
-/* Load prayer times for zone */
+/* ============================================================
+   FETCH PRAYER TIMES
+============================================================ */
 async function loadPrayerTimesForZone(Z){
-  try {
-    const url = `https://www.e-solat.gov.my/index.php?r=esolatApi/takwimsolat&period=month&zone=${encodeURIComponent(Z)}`;
-    dbg("fetching e-solat url:", url);
-
-    const res = await fetch(url, {cache: "no-store"});
-    dbg("fetch response status:", res.status);
-    if(!res.ok) throw new Error("HTTP " + res.status);
-
+  try{
+    const url =
+      `https://www.e-solat.gov.my/index.php?r=esolatApi/takwimsolat&period=month&zone=${Z}`;
+    const res = await fetch(url, {cache:"no-store"});
     const data = await res.json();
-    dbg("esolat keys:", Object.keys(data || {}));
-    const list = Array.isArray(data.prayerTime) ? data.prayerTime : [];
-    // find today's entry by matching day-month-year with two month formats
+
+    const list = data.prayerTime || [];
     const today = new Date();
-    const day = String(today.getDate()).padStart(2,'0');
-    const year = today.getFullYear();
-    const monthsTitle = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    const monthsUpper = monthsTitle.map(m => m.toUpperCase());
-    const esDate1 = `${day}-${monthsTitle[today.getMonth()]}-${year}`;
-    const esDate2 = `${day}-${monthsUpper[today.getMonth()]}-${year}`;
+    const d = String(today.getDate()).padStart(2,'0');
+    const y = today.getFullYear();
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const d1 = `${d}-${months[today.getMonth()]}-${y}`;
+    const d2 = `${d}-${months[today.getMonth()].toUpperCase()}-${y}`;
 
-    let todayEntry = list.find(p => {
-      const d = (p.date||"").toString().trim();
-      return d === esDate1 || d === esDate2;
-    });
-    if(!todayEntry) todayEntry = list[list.length-1];
+    let row = list.find(x => x.date===d1 || x.date===d2) || list[list.length-1];
 
-    dbg("todayEntry:", todayEntry);
-    const norm = t => (t||"").toString().trim().padStart(4,"0");
+    const norm = t => t.toString().trim().padStart(4,'0');
     prayerTimes = {
-      Ismak: norm(todayEntry.imsak),
-      Subuh: norm(todayEntry.fajr),
-      Syuruk: norm(todayEntry.syuruk),
-      Zohor: norm(todayEntry.dhuhr),
-      Asar: norm(todayEntry.asr),
-      Maghrib: norm(todayEntry.maghrib),
-      Isyak: norm(todayEntry.isha)
+      Ismak:  norm(row.imsak),
+      Subuh:  norm(row.fajr),
+      Syuruk: norm(row.syuruk),
+      Zohor:  norm(row.dhuhr),
+      Asar:   norm(row.asr),
+      Maghrib:norm(row.maghrib),
+      Isyak:  norm(row.isha)
     };
 
-    // Update UI times safely
-    const safeSet = (id,val) => { const el = document.getElementById(id); if(el) el.innerText = val ? format(val) : "--:--"; };
-    safeSet("ismakTime", prayerTimes.Ismak);
-    safeSet("subuhTime", prayerTimes.Subuh);
-    safeSet("syurukTime", prayerTimes.Syuruk);
-    safeSet("zohorTime", prayerTimes.Zohor);
-    safeSet("asarTime", prayerTimes.Asar);
-    safeSet("maghribTime", prayerTimes.Maghrib);
-    safeSet("isyakTime", prayerTimes.Isyak);
-
-    // update current/prayer/next ui using existing functions
+    updatePrayerUI();
     determineNextPrayer();
     updateHighlight();
     updateCurrentPrayerCard();
 
-  } catch(err){
-    dbg("loadPrayerTimesForZone error:", err);
-    setText("zoneName", `Gagal muat masa solat (${zoneCode})`);
+  } catch(e){
+    document.getElementById("zoneName").innerText = `Gagal muat ${Z}`;
   }
 }
 
-/* time formatter */
-function format(t) {
-  if (!t) return "--:--";
-  if(typeof t === 'string' && !t.includes(':') && t.length === 4){
-    t = t.slice(0,2) + ":" + t.slice(2);
-  }
-  let [h, m] = (""+t).split(":").map(Number);
-  if (Number.isNaN(h)) h = 0;
-  if (Number.isNaN(m)) m = 0;
-  const ampm = h >= 12 ? "PM" : "AM";
-  const h12 = (h % 12) || 12;
-  return `${h12}:${String(m).padStart(2,"0")} ${ampm}`;
+function updatePrayerUI(){
+  const f = id => document.getElementById(id);
+  const fmt = t => formatTime(t);
+  f("ismakTime").innerText   = fmt(prayerTimes.Ismak);
+  f("subuhTime").innerText   = fmt(prayerTimes.Subuh);
+  f("syurukTime").innerText  = fmt(prayerTimes.Syuruk);
+  f("zohorTime").innerText   = fmt(prayerTimes.Zohor);
+  f("asarTime").innerText    = fmt(prayerTimes.Asar);
+  f("maghribTime").innerText = fmt(prayerTimes.Maghrib);
+  f("isyakTime").innerText   = fmt(prayerTimes.Isyak);
 }
 
-/* determineNextPrayer, countdown, clock, highlight, etc.
-   Copied & slightly adapted from prior main.js to use the dynamic prayerTimes variable.
-*/
+/* ============================================================
+   FORMAT TIME
+============================================================ */
+function formatTime(t){
+  if(!t) return "--:--";
+  t = t.toString();
+  if(!t.includes(":")) t = t.slice(0,2)+":"+t.slice(2);
+  let [h,m] = t.split(":").map(Number);
+  const ampm = h>=12 ? "PM" : "AM";
+  const h12 = (h%12) || 12;
+  return `${h12}:${String(m).padStart(2,'0')} ${ampm}`;
+}
 
-function determineNextPrayer() {
-  if (!Object.keys(prayerTimes).length) return;
+/* ============================================================
+   DETERMINE NEXT PRAYER
+============================================================ */
+function determineNextPrayer(){
   const now = new Date();
-  const list = Object.entries(prayerTimes);
-  // try to set label text if present
-  const nl = document.getElementById("nextLabel");
-  if(nl) nl.innerText = "Waktu Solat Seterusnya";
-
-  for (let [name,time] of list) {
-    if(!time) continue;
+  for(const [name,time] of Object.entries(prayerTimes)){
     const [h,m] = time.split(":").map(Number);
     const t = new Date();
-    t.setHours(h||0,m||0,0,0);
+    t.setHours(h,m,0,0);
     if(t > now){
       nextPrayerTime = t;
-      const np = document.getElementById("nextPrayerNameLarge");
-      if(np) np.innerText = name;
+      document.getElementById("nextPrayerNameLarge").innerText = name;
       return;
     }
   }
 
-  // after last prayer: set to tomorrow Subuh
-  let tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate()+1);
-  const [h,m] = (prayerTimes.Subuh || "05:00").split(":").map(Number);
-  tomorrow.setHours(h||5,m||0,0,0);
-  nextPrayerTime = tomorrow;
-  const np2 = document.getElementById("nextPrayerNameLarge"); if(np2) np2.innerText = "Subuh";
+  let t = new Date();
+  t.setDate(t.getDate()+1);
+  const [h,m] = prayerTimes.Subuh.split(":").map(Number);
+  t.setHours(h,m,0,0);
+  nextPrayerTime = t;
+  document.getElementById("nextPrayerNameLarge").innerText = "Subuh";
 }
 
-setInterval(() => {
-  if (!nextPrayerTime) return;
+/* ============================================================
+   COUNTDOWN
+============================================================ */
+setInterval(()=>{
+  if(!nextPrayerTime) return;
   const now = new Date();
   let diff = nextPrayerTime - now;
+
   if(diff <= 0){ determineNextPrayer(); return; }
+
   const h = Math.floor(diff/(1000*60*60));
   const m = Math.floor((diff/1000/60)%60);
   const s = Math.floor((diff/1000)%60);
-  const set = (id,v) => { const el = document.getElementById(id); if(el) el.innerText = String(v).padStart(2,"0"); };
-  set("cdHour", h); set("cdMin", m); set("cdSec", s);
+
+  document.getElementById("cdHour").innerText = String(h).padStart(2,'0');
+  document.getElementById("cdMin").innerText  = String(m).padStart(2,'0');
+  document.getElementById("cdSec").innerText  = String(s).padStart(2,'0');
 }, 1000);
 
-/* Clock (updates every second) */
+/* ============================================================
+   CLOCK
+============================================================ */
 function updateClock(){
   const now = new Date();
   let h = now.getHours();
-  let m = now.getMinutes().toString().padStart(2,"0");
-  let s = now.getSeconds().toString().padStart(2,"0");
-  const ampm = h >= 12 ? "PM" : "AM";
+  let m = String(now.getMinutes()).padStart(2,'0');
+  let s = String(now.getSeconds()).padStart(2,'0');
+  const ampm = h>=12 ? "PM" : "AM";
   const h12 = (h%12) || 12;
-  const el = document.getElementById("currentTime");
-  if(el) el.innerText = `${h12}:${m}:${s} ${ampm}`;
+
+  document.getElementById("currentTime").innerText =
+    `${h12}:${m}:${s} ${ampm}`;
+
   updateHighlight();
   updateCurrentPrayerCard();
 }
-setInterval(updateClock,1000);
+setInterval(updateClock, 1000);
 updateClock();
 
-function updateCurrentPrayerCard(){
-  if(!Object.keys(prayerTimes).length) return;
-  const now = new Date();
-  let active = "Isyak";
-  for(let [name,time] of Object.entries(prayerTimes)){
-    if(!time) continue;
-    const [h,m] = time.split(":").map(Number);
-    const t = new Date();
-    t.setHours(h||0,m||0,0,0);
-    if(t <= now) active = name;
-  }
-  const nameEl = document.getElementById("currentPrayerName");
-  const timeEl = document.getElementById("currentPrayerTime");
-  if(nameEl) nameEl.innerText = active;
-  if(timeEl) timeEl.innerText = format(prayerTimes[active]);
-}
-
+/* ============================================================
+   HIGHLIGHT CURRENT PRAYER
+============================================================ */
 function updateHighlight(){
-  if(!Object.keys(prayerTimes).length) return;
   const now = new Date();
   let active = "Isyak";
-  for(let [name,time] of Object.entries(prayerTimes)){
-    if(!time) continue;
+
+  for(const [name,time] of Object.entries(prayerTimes)){
     const [h,m] = time.split(":").map(Number);
     const t = new Date();
-    t.setHours(h||0,m||0,0,0);
+    t.setHours(h,m,0,0);
     if(t <= now) active = name;
   }
-  document.querySelectorAll(".prayer-row").forEach(c => c.classList.remove("currentPrayer"));
-  const activeCard = document.getElementById("card" + active);
-  if(activeCard) activeCard.classList.add("currentPrayer");
+
+  document.querySelectorAll(".prayer-row")
+    .forEach(el => el.classList.remove("currentPrayer"));
+
+  const el = document.getElementById("card"+active);
+  if(el) el.classList.add("currentPrayer");
 }
 
-/* debug helper to force a specific zone code at runtime:
-   window.setZoneAndReload("JHR02");
-*/
-window.setZoneAndReload = async function(z){
-  zoneCode = String(z).toUpperCase();
-  dbg("manually set zone:", zoneCode);
-  setText("zoneName", `${zoneCode} (manual)`);
-  await loadPrayerTimesForZone(zoneCode);
-};
+function updateCurrentPrayerCard(){
+  const now = new Date();
+  let active = "Isyak";
 
-/* Start: set dates then detect zone & load */
+  for(const [name,time] of Object.entries(prayerTimes)){
+    const [h,m] = time.split(":").map(Number);
+    const t = new Date();
+    t.setHours(h,m,0,0);
+    if(t <= now) active = name;
+  }
+
+  document.getElementById("currentPrayerName").innerText = active;
+  document.getElementById("currentPrayerTime").innerText =
+    formatTime(prayerTimes[active]);
+}
+
+/* ============================================================
+   INIT
+============================================================ */
 (async function init(){
   await setAutoDates();
-  autoDetectMode();
   await detectZoneAndLoad();
-  scaleToFit();
 })();
