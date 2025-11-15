@@ -1,30 +1,62 @@
-body {
+/* styles.css - updated for multi-mode scaling and toolbar */
+
+/* Base page - center the viewportHost and disallow native page scrollbars
+   but allow pull-to-refresh where supported (overscroll behavior not blocked) */
+html, body {
+    height:100%;
     margin:0;
-    padding:20px;
+    padding:0;
     background:#181003;
-    font-family:Arial, sans-serif;
-    color:white;
-    text-align:center;
+    font-family: Arial, sans-serif;
+    color: white;
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden; /* we will scale content inside viewportHost */
+    overscroll-behavior-y: auto; /* allow browser pull-to-refresh on mobile */
+    -webkit-overflow-scrolling: touch;
 }
 
-/* Top date area */
+/* The host defines the area we center in the browser window.
+   The #app inside will have a fixed "design resolution" (target) and we will scale it. */
+#viewportHost {
+    position:fixed;
+    left:0;
+    top:0;
+    right:0;
+    bottom:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    pointer-events:auto;
+}
+
+/* The app root uses a variable width/height (set via JS) and will be scaled using transform. */
+.app-root {
+    /* default design size; JS will set width/height inline to the target resolution */
+    transform-origin: center center;
+    will-change: transform;
+    box-sizing: border-box;
+}
+
+/* Keep your original styles but scoped inside .app-root so transform applies to whole UI */
+.app-root * { box-sizing: border-box; }
+
 .header-area {
     margin-top:20px;
     margin-bottom:30px;
+    text-align:center;
 }
 
 #dateToday {
     font-size:32px;
     font-weight:700;
+    line-height:1.1;
 }
-
 #zoneName {
     font-size:22px;
     margin-top:6px;
     opacity:0.9;
 }
 
-/* Main cards */
 .card {
     background:rgba(255,255,255,0.12);
     padding:25px;
@@ -33,6 +65,7 @@ body {
     width:90%;
     border:1px solid rgba(255,255,255,0.25);
     box-shadow:0 0 12px rgba(0,0,0,0.6);
+    text-align:center;
 }
 
 .card-title {
@@ -41,34 +74,30 @@ body {
     margin-bottom:10px;
 }
 
-/* Waktu Sekarang time */
 .time-big {
     font-size:62px;
     font-weight:800;
 }
 
-/* Medium time (like 5:37 AM) */
 .time-medium {
     font-size:58px;
     font-weight:800;
 }
 
-/* Label under time (Subuh, etc.) */
 .time-label {
     font-size:40px;
     margin-top:5px;
     opacity:0.95;
 }
 
-/* Section title */
 .section-title {
     font-size:32px;
     font-weight:800;
     margin-top:40px;
     margin-bottom:20px;
+    text-align:center;
 }
 
-/* Countdown */
 .countdown-container {
     display:flex;
     justify-content:space-evenly;
@@ -93,7 +122,6 @@ body {
     font-size:20px;
 }
 
-/* Prayer list rows */
 .prayer-row {
     background:rgba(255,255,255,0.12);
     border-radius:16px;
@@ -102,15 +130,86 @@ body {
     margin:10px auto;
     font-size:32px;
     font-weight:700;
-
     display:flex;
     justify-content:space-between;
 }
 
-/* ACTIVE prayer highlight EXACT like screenshot */
+/* ACTIVE prayer highlight */
 .currentPrayer {
     background:#c7a000 !important;
     border:3px solid #ffe44c !important;
     box-shadow:0 0 18px #ffea73;
     color:black !important;
 }
+
+/* ============================
+   Mode toolbar (floating UI to choose mode / custom resolution)
+   lightweight and unobtrusive
+   ============================ */
+.mode-toolbar {
+    position: fixed;
+    right: 18px;
+    top: 16px;
+    z-index: 9999;
+    background: rgba(0,0,0,0.55);
+    padding: 10px;
+    border-radius: 12px;
+    color: white;
+    border: 1px solid rgba(255,255,255,0.08);
+    max-width: 540px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+    font-size: 14px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.mode-toolbar .mt-row {
+    display:flex;
+    gap:8px;
+    align-items:center;
+    flex-wrap:wrap;
+}
+
+.mode-toolbar .mt-btn {
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.06);
+    padding:6px 10px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600;
+}
+.mode-toolbar .mt-btn:hover { background: rgba(255,255,255,0.12); }
+.mode-toolbar .mt-btn.active { background: #ffd54d; color:#000; border-color:#ffd54d; }
+
+.mode-toolbar input[type="number"] {
+    width:90px;
+    padding:6px 8px;
+    border-radius:6px;
+    border:1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.02);
+    color:#fff;
+}
+
+/* small info row */
+.mode-toolbar .mt-info { opacity:0.85; }
+.mode-toolbar .mt-toggle {
+    position:absolute;
+    left:8px;
+    bottom:8px;
+    background: transparent;
+    color:#fff;
+    border:1px solid rgba(255,255,255,0.06);
+    padding:4px 6px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+/* responsive toolbar collapses on small widths */
+@media (max-width:600px){
+    .mode-toolbar { right:8px; left:8px; max-width:unset; font-size:13px; }
+}
+
+/* ensure transformed app doesn't create page scrollbars */
+body::-webkit-scrollbar { display:none; }
