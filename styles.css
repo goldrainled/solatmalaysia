@@ -30,17 +30,18 @@ html, body {
     overflow:hidden; /* important */
 }
 
-/* App root gets scaled by JS */
 .app-root {
     transform-origin:center center;
     will-change:transform;
     box-sizing:border-box;
 
-    /* ⭐ INTERNAL SCROLL (safe) */
     height:100%;
     width:100%;
-    overflow-y:overlay;
+    overflow-y:auto;
     overflow-x:hidden;
+
+    /* ⭐ Keeps layout stable even when scrollbar exists */
+    scrollbar-gutter: stable both-edges;
 }
 
 /* Typography + layout */
