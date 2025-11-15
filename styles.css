@@ -1,45 +1,34 @@
-/* styles.css - updated for multi-mode scaling and toolbar */
+/* styles.css — Auto mode, clean, no toolbar */
 
-/* Base page - center the viewportHost and disallow native page scrollbars
-   but allow pull-to-refresh where supported (overscroll behavior not blocked) */
+/* Prevent browser scrolling but allow pull-to-refresh */
 html, body {
-    height:100%;
     margin:0;
     padding:0;
     background:#181003;
-    font-family: Arial, sans-serif;
-    color: white;
-    -webkit-font-smoothing:antialiased;
-    overflow:hidden; /* we will scale content inside viewportHost */
-    overscroll-behavior-y: auto; /* allow browser pull-to-refresh on mobile */
-    -webkit-overflow-scrolling: touch;
+    font-family:Arial, sans-serif;
+    color:white;
+    height:100%;
+    overflow:hidden;
+    overscroll-behavior-y:auto;
 }
 
-/* The host defines the area we center in the browser window.
-   The #app inside will have a fixed "design resolution" (target) and we will scale it. */
+/* Scaled UI container */
 #viewportHost {
     position:fixed;
-    left:0;
-    top:0;
-    right:0;
-    bottom:0;
+    left:0; top:0; right:0; bottom:0;
     display:flex;
     align-items:center;
     justify-content:center;
-    pointer-events:auto;
 }
 
-/* The app root uses a variable width/height (set via JS) and will be scaled using transform. */
+/* App root gets scaled by JS */
 .app-root {
-    /* default design size; JS will set width/height inline to the target resolution */
-    transform-origin: center center;
-    will-change: transform;
-    box-sizing: border-box;
+    transform-origin:center center;
+    will-change:transform;
+    box-sizing:border-box;
 }
 
-/* Keep your original styles but scoped inside .app-root so transform applies to whole UI */
-.app-root * { box-sizing: border-box; }
-
+/* Typography + layout */
 .header-area {
     margin-top:20px;
     margin-bottom:30px;
@@ -49,14 +38,13 @@ html, body {
 #dateToday {
     font-size:32px;
     font-weight:700;
-    line-height:1.1;
 }
 #zoneName {
     font-size:22px;
-    margin-top:6px;
-    opacity:0.9;
+    opacity:0.85;
 }
 
+/* Card style */
 .card {
     background:rgba(255,255,255,0.12);
     padding:25px;
@@ -65,9 +53,9 @@ html, body {
     width:90%;
     border:1px solid rgba(255,255,255,0.25);
     box-shadow:0 0 12px rgba(0,0,0,0.6);
-    text-align:center;
 }
 
+/* Titles & text */
 .card-title {
     font-size:32px;
     font-weight:700;
@@ -78,12 +66,10 @@ html, body {
     font-size:62px;
     font-weight:800;
 }
-
 .time-medium {
     font-size:58px;
     font-weight:800;
 }
-
 .time-label {
     font-size:40px;
     margin-top:5px;
@@ -95,9 +81,9 @@ html, body {
     font-weight:800;
     margin-top:40px;
     margin-bottom:20px;
-    text-align:center;
 }
 
+/* Countdown */
 .countdown-container {
     display:flex;
     justify-content:space-evenly;
@@ -116,25 +102,25 @@ html, body {
     font-size:60px;
     font-weight:900;
 }
-
 .count-text {
-    margin-top:8px;
     font-size:20px;
+    margin-top:8px;
 }
 
+/* Prayer rows */
 .prayer-row {
     background:rgba(255,255,255,0.12);
     border-radius:16px;
     padding:18px 24px;
     width:90%;
     margin:10px auto;
-    font-size:32px;
-    font-weight:700;
     display:flex;
     justify-content:space-between;
+    font-size:32px;
+    font-weight:700;
 }
 
-/* ACTIVE prayer highlight */
+/* Active prayer highlight */
 .currentPrayer {
     background:#c7a000 !important;
     border:3px solid #ffe44c !important;
@@ -142,74 +128,5 @@ html, body {
     color:black !important;
 }
 
-/* ============================
-   Mode toolbar (floating UI to choose mode / custom resolution)
-   lightweight and unobtrusive
-   ============================ */
-.mode-toolbar {
-    position: fixed;
-    right: 18px;
-    top: 16px;
-    z-index: 9999;
-    background: rgba(0,0,0,0.55);
-    padding: 10px;
-    border-radius: 12px;
-    color: white;
-    border: 1px solid rgba(255,255,255,0.08);
-    max-width: 540px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.6);
-    font-size: 14px;
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-}
-
-.mode-toolbar .mt-row {
-    display:flex;
-    gap:8px;
-    align-items:center;
-    flex-wrap:wrap;
-}
-
-.mode-toolbar .mt-btn {
-    background: rgba(255,255,255,0.06);
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.06);
-    padding:6px 10px;
-    border-radius:8px;
-    cursor:pointer;
-    font-weight:600;
-}
-.mode-toolbar .mt-btn:hover { background: rgba(255,255,255,0.12); }
-.mode-toolbar .mt-btn.active { background: #ffd54d; color:#000; border-color:#ffd54d; }
-
-.mode-toolbar input[type="number"] {
-    width:90px;
-    padding:6px 8px;
-    border-radius:6px;
-    border:1px solid rgba(255,255,255,0.12);
-    background: rgba(255,255,255,0.02);
-    color:#fff;
-}
-
-/* small info row */
-.mode-toolbar .mt-info { opacity:0.85; }
-.mode-toolbar .mt-toggle {
-    position:absolute;
-    left:8px;
-    bottom:8px;
-    background: transparent;
-    color:#fff;
-    border:1px solid rgba(255,255,255,0.06);
-    padding:4px 6px;
-    border-radius:6px;
-    cursor:pointer;
-}
-
-/* responsive toolbar collapses on small widths */
-@media (max-width:600px){
-    .mode-toolbar { right:8px; left:8px; max-width:unset; font-size:13px; }
-}
-
-/* ensure transformed app doesn't create page scrollbars */
+/* Remove scrollbars */
 body::-webkit-scrollbar { display:none; }
