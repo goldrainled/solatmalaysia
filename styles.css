@@ -1,36 +1,39 @@
 /* styles.css — Auto mode, clean, no toolbar */
 
-/* Prevent browser scrolling but allow internal scroll */
+/* BACKGROUND scrolls, UI stays fixed */
 html, body {
     margin:0;
     padding:0;
     background:#181003;
     font-family:Arial, sans-serif;
     color:white;
-    height:100%;
+
+    height:200vh;                 /* ⭐ allow background to scroll */
     text-align:center;
 
-    /* ⭐ LOCK body (so Chrome won't darken) */
-    overflow:hidden;
+    overflow-y:scroll;            /* ⭐ scroll background only */
+    overflow-x:hidden;
 
-    /* Allow pull-to-refresh only (does not break color) */
     overscroll-behavior-y:auto;
 
     /* ⭐ Prevent Chrome Auto Dark Mode tint */
     color-scheme: light !important;
 }
 
-/* Scaled UI container */
+/* Scaled UI container stays FIXED */
 #viewportHost {
-    position:fixed;
+    position:fixed;               /* ⭐ UI never moves */
     left:0; top:0; right:0; bottom:0;
+
     display:flex;
     align-items:center;
     justify-content:center;
-    overflow:hidden; /* important */
+
+    pointer-events:none;          /* UI is display-only (solves touch issues) */
+    overflow:hidden;
 }
 
-/* ⭐ Scaled container — MUST NOT scroll */
+/* ⭐ Scaled container — must NOT scroll */
 .app-root {
     transform-origin:center center;
     will-change:transform;
@@ -38,22 +41,14 @@ html, body {
 
     height:100%;
     width:100%;
-    overflow:hidden !important;   /* ⭐ IMPORTANT */
+    overflow:hidden !important;
 }
 
-/* ⭐ NEW safe scrolling wrapper */
+/* ⭐ scroll-area must also be fixed and not scroll */
 .scroll-area {
     width:100%;
     height:100%;
-    overflow-y:auto;
-    overflow-x:hidden;
-
-    /* Remove scrollbar visuals */
-    scrollbar-width:none;          /* Firefox */
-    -ms-overflow-style:none;       /* Edge */
-}
-.scroll-area::-webkit-scrollbar {
-    display:none;                  /* Chrome/Safari */
+    overflow:hidden !important;
 }
 
 /* Typography + layout */
@@ -157,7 +152,7 @@ html, body {
     color:black !important;
 }
 
-/* Legacy scrollbar removals (still safe to keep) */
+/* Legacy scrollbar removals */
 body::-webkit-scrollbar,
 .app-root::-webkit-scrollbar {
     display:none;
