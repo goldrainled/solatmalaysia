@@ -140,11 +140,10 @@ function scaleToFit() {
     const app  = document.getElementById("app");
     if (!app) return;
 
-    // Use physical screen size (correct)
-    const realW = screen.width;
-    const realH = screen.height;
+    // Use innerWidth/innerHeight only (best for mobile)
+    const realW = window.innerWidth;
+    const realH = window.innerHeight;
 
-    // Use target as-is
     const targetW = currentTarget.w;
     const targetH = currentTarget.h;
 
@@ -155,11 +154,13 @@ function scaleToFit() {
 
     app.style.width  = targetW + "px";
     app.style.height = targetH + "px";
+
     app.style.transform = `scale(${scale})`;
 
     host.style.alignItems = "center";
     host.style.justifyContent = "center";
 }
+
 
 
 /* Re-run on resize & orientationchange */
