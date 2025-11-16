@@ -93,6 +93,11 @@ html, body {
     line-height: 1.1;
 }
 
+#currentPrayerName {
+    font-size: clamp(42px, 6.8vw, 72px) !important;
+    font-weight: 900;
+    line-height: 1.1;
+}
 
 /* Card base */
 .card {
