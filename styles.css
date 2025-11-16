@@ -99,7 +99,7 @@ html, body {
 }
 
 #currentPrayerName {
-    margin-bottom: 12px;   /* adjust freely (8-20px recommended) */
+    margin-bottom: 8px;   /* adjust freely (8-20px recommended) */
 }
 
 #nextPrayerNameLarge {
