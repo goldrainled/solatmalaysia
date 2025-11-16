@@ -136,23 +136,27 @@ function autoDetectMode() {
    Scale engine (no scroll)
 --------------------------*/
 function scaleToFit() {
-  const host = document.getElementById("viewportHost");
-  const app  = document.getElementById("app");
-  if(!app || !host) return;
+    const host = document.getElementById("viewportHost");
+    const app  = document.getElementById("app");
+    if (!app) return;
 
-  // set app virtual design size
-  app.style.width  = currentTarget.w + "px";
-  app.style.height = currentTarget.h + "px";
+    // Make sure the target width NEVER exceeds screen width
+    const targetW = Math.min(currentTarget.w, window.innerWidth);
+    const targetH = Math.min(currentTarget.h, window.innerHeight);
 
-  // calculate scale to fit into browser viewport
-  const scale = Math.min(
-    window.innerWidth  / currentTarget.w,
-    window.innerHeight / currentTarget.h
-  );
+    app.style.width  = `${targetW}px`;
+    app.style.height = `${targetH}px`;
 
-  app.style.transform = `scale(${scale})`;
-  host.style.alignItems = "center";
-  host.style.justifyContent = "center";
+    const scaleX = window.innerWidth  / targetW;
+    const scaleY = window.innerHeight / targetH;
+
+    const scale = Math.min(scaleX, scaleY);
+
+    app.style.transform = `scale(${scale})`;
+
+    // Keep centered
+    host.style.alignItems = "center";
+    host.style.justifyContent = "center";
 }
 
 /* Re-run on resize & orientationchange */
