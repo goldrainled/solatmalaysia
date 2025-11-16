@@ -1,263 +1,241 @@
 /* ============================================================
    main.js — Option A (NO SCALING)
-   - 100% mobile-friendly
-   - UI always fits screen naturally
-   - No transform(), no virtual screen, no cut-offs
 ============================================================ */
 
-/* Dummy functions (scaling removed) */
-function autoDetectMode() {
-    /* no-op */
-}
+// no scaling needed
+function autoDetectMode() {}
 function scaleToFit() {
     const app = document.getElementById("app");
-    if (!app) return;
-    app.style.transform = "none";
-    app.style.width = "100%";
-    app.style.height = "auto";
+    if (app) {
+        app.style.transform = "none";
+        app.style.width = "100%";
+        app.style.height = "auto";
+    }
 }
 
-/* -------------------------
-   ORIGINAL USER LOGIC BELOW
---------------------------*/
+/* ----------------------------- */
 
 let zoneCode = "JHR02";
 let prayerTimes = {};
 let nextPrayerTime = null;
 
-function dbg(...args) {
-  const ENABLE_DBG = false;
-  if (ENABLE_DBG) console.debug("⭑ solat:", ...args);
-}
-
 function setText(id, txt){
-  const el = document.getElementById(id);
-  if(el) el.innerText = txt;
+    const el = document.getElementById(id);
+    if(el) el.innerText = txt;
 }
 
 /* ============================================================
-   DATE HANDLING (GREGORIAN + HIJRI)
+   DATE HANDLING
 ============================================================ */
 async function setAutoDates(){
-  try {
-    const now = new Date();
-    const dd = String(now.getDate()).padStart(2,'0');
-    const mm = String(now.getMonth()+1).padStart(2,'0');
-    const yyyy = now.getFullYear();
-    const dateStr = `${dd}-${mm}-${yyyy}`;
+    try{
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2,'0');
+        const mm = String(now.getMonth()+1).padStart(2,'0');
+        const yyyy = now.getFullYear();
 
-    const res = await fetch(`https://api.aladhan.com/v1/gToH?date=${dateStr}`);
-    const j = await res.json();
+        const res = await fetch(`https://api.aladhan.com/v1/gToH?date=${dd}-${mm}-${yyyy}`);
+        const j = await res.json();
 
-    if (j && j.data && j.data.hijri) {
-      const h = j.data.hijri;
+        if(j?.data?.hijri){
+            const h = j.data.hijri;
 
-      // Gregorian
-      const gMonthName = new Intl.DateTimeFormat('en-US',{month:'long'}).format(now);
-      const gregorianString = `${dd} ${gMonthName} ${yyyy}`;
-      setText("dateTodayG", gregorianString);
+            const gMonth = new Intl.DateTimeFormat('en-US',{month:'long'}).format(now);
+            setText("dateTodayG", `${dd} ${gMonth} ${yyyy}`);
 
-      // Hijri
-      const hijriMonth = (h.month && (h.month.en || h.month.ar)) || "";
-      const hijriDay   = h.day;
-      const hijriYear  = h.year;
-      const hijriString = `${hijriDay} ${hijriMonth} ${hijriYear}H`;
-      setText("dateTodayH", hijriString);
+            setText("dateTodayH", `${h.day} ${h.month.en} ${h.year}H`);
+            return;
+        }
 
-      return;
+        setText("dateTodayG", now.toLocaleDateString());
+    }catch(e){
+        setText("dateTodayG", new Date().toLocaleDateString());
     }
-
-    // fallback
-    setText("dateTodayG", now.toLocaleDateString());
-    setText("dateTodayH", "");
-  } catch (err) {
-    const fallback = new Date().toLocaleDateString();
-    setText("dateTodayG", fallback);
-    setText("dateTodayH", "");
-  }
 }
 
 /* ============================================================
-   REVERSE GEOCODING + IP fallback
+   GEO LOOKUP
 ============================================================ */
 async function reverseGeocode(lat, lon){
-  try {
-    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`;
-    const res = await fetch(url, {headers: {'User-Agent': 'solat-display/1.0'}});
-    const j = await res.json();
-    const addr = j.address || {};
-    const parts = [
-      addr.city, addr.town, addr.village,
-      addr.county, addr.state, addr.region, addr.state_district,
-      addr.country
-    ].filter(Boolean).map(s => String(s).toLowerCase());
-    return parts.join(", ");
-  } catch(e){
-    return "";
-  }
+    try{
+        const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`;
+        const res = await fetch(url);
+        const j = await res.json();
+        const a = j.address || {};
+
+        const parts = [
+            a.city, a.town, a.village, a.county,
+            a.state, a.region, a.country
+        ].filter(Boolean).map(s=>s.toLowerCase());
+
+        return parts.join(", ");
+    }catch(e){
+        return "";
+    }
 }
 
 async function ipGeolocate(){
-  try {
-    const res = await fetch("https://ipapi.co/json/");
-    const j = await res.json();
-    const parts = [j.city, j.region, j.country_name]
-      .filter(Boolean).map(s => s.toLowerCase());
-    return parts.join(", ");
-  } catch(e){
-    return "";
-  }
+    try{
+        const res = await fetch("https://ipapi.co/json/");
+        const j = await res.json();
+        return [j.city, j.region, j.country_name]
+            .filter(Boolean)
+            .map(v=>v.toLowerCase())
+            .join(", ");
+    }catch(e){
+        return "";
+    }
 }
 
 /* ============================================================
-   TITLE CASE FIX FOR LOCATION
+   TITLE CASE FOR LOCATION
 ============================================================ */
 function capitalizePlace(s){
-  if (!s) return "";
-  return s
-    .split(",")
-    .map(part =>
-      part.trim()
-          .split(" ")
-          .map(w => w ? w.charAt(0).toUpperCase() + w.slice(1) : "")
-          .join(" ")
-    )
-    .join(", ");
+    if(!s) return "";
+    return s.split(",")
+        .map(p => p.trim().split(" ")
+            .map(w => w.charAt(0).toUpperCase()+w.slice(1))
+            .join(" ")
+        )
+        .join(", ");
 }
 
 /* ============================================================
-   ZONE DETECTION LOGIC
+   ZONE DETECTION
 ============================================================ */
 const ZONE_MAP = {
-  "JHR01": ["pulau aur","pulau pemanggil"],
-  "JHR02": ["johor bahru","kota tinggi","mersing","jhr02","jb","johor bharu"],
-  "JHR03": ["kluang","pontian"],
-  "JHR04": ["batu pahat","muar","segamat","gemas"],
-  "KDH01": ["kota setar","kubang pasu","pokok sena"],
-  "KDH02": ["kuala muda","yan","pendang"],
-  "KDH03": ["padang terap","sik"],
-  "KDH04": ["baling"],
-  "KDH05": ["bandar baharu","kulim"],
-  "KDH06": ["langkawi"],
-  "KTN01": ["bachok","kota bharu","machang","pasir mas","pasir puteh","tanah merah","tumpat","kuala krai"],
-  "MLK01": ["alor gajah","melaka"],
-  "PLS01": ["perlis","kangar"],
-  "PNG01": ["pulau pinang","george town","penang","seberang perai"],
-  "KDH07": ["gunung jerai"],
-  "PHG01": ["pahang","kuantan","cameron"],
-  "PHG02": ["temerloh","lipis","raub"],
-  "PRK01": ["ipoh","perak","kinta","manjung","taiping","kerian"],
-  "SGR01": ["selangor","shah alam","kajang","klang","petaling","gombak","kuala langat","kuala selangor","hulu selangor"],
-  "KUL01": ["kuala lumpur","wp kuala lumpur","wp kl"],
-  "SBH01": ["sabah","kota kinabalu","sandakan","tawau"],
-  "SRW01": ["sri aman","sarawak","kuching","sibu","miri"],
-  "TRG01": ["kuala terengganu"],
-  "KEL01": ["kelantan"],
-  "JHR02_alias": ["johor", "johor bahru", "jb"],
-  "SBH02": ["labuan"],
+    "JHR01":["pulau aur","pulau pemanggil"],
+    "JHR02":["johor bahru","kota tinggi","mersing","jhr02","jb","johor bharu"],
+    "JHR03":["kluang","pontian"],
+    "JHR04":["batu pahat","muar","segamat","gemas"],
+    "KDH01":["kota setar","kubang pasu","pokok sena"],
+    "KDH02":["kuala muda","yan","pendang"],
+    "KDH03":["padang terap","sik"],
+    "KDH04":["baling"],
+    "KDH05":["bandar baharu","kulim"],
+    "KDH06":["langkawi"],
+    "KTN01":["bachok","kota bharu","machang","pasir mas","pasir puteh","tanah merah","tumpat","kuala krai"],
+    "MLK01":["alor gajah","melaka"],
+    "PLS01":["perlis","kangar"],
+    "PNG01":["pulau pinang","george town","penang","seberang perai"],
+    "KDH07":["gunung jerai"],
+    "PHG01":["pahang","kuantan","cameron"],
+    "PHG02":["temerloh","lipis","raub"],
+    "PRK01":["ipoh","perak","kinta","manjung","taiping","kerian"],
+    "SGR01":["selangor","shah alam","kajang","klang","petaling","gombak","kuala langat","kuala selangor","hulu selangor"],
+    "KUL01":["kuala lumpur","wp kuala lumpur","wp kl"],
+    "SBH01":["sabah","kota kinabalu","sandakan","tawau"],
+    "SRW01":["sri aman","sarawak","kuching","sibu","miri"],
+    "TRG01":["kuala terengganu"],
+    "KEL01":["kelantan"],
+    "JHR02_alias":["johor","johor bahru","jb"],
+    "SBH02":["labuan"]
 };
 
 const zoneKeywords = [];
 for(const [zone,arr] of Object.entries(ZONE_MAP)){
-  if(!Array.isArray(arr)) continue;
-  arr.forEach(k => zoneKeywords.push({zone, key: k.toLowerCase()}));
+    arr.forEach(k => zoneKeywords.push({
+        zone,
+        key: k.toLowerCase()
+    }));
 }
 
-function determineZoneFromPlace(placeStr){
-  if(!placeStr) return null;
-  const norm = placeStr.toLowerCase().replace(/[^\w\s]/g,' ');
+function determineZoneFromPlace(place){
+    if(!place) return null;
+    const norm = place.toLowerCase();
 
-  for(const z of zoneKeywords){
-    if(z.zone.endsWith("_alias")) continue;
-    if(norm.includes(z.key)) return z.zone;
-  }
-
-  for(const z of zoneKeywords){
-    if(norm.includes(z.key)) return z.zone;
-  }
-
-  return null;
+    // Pass 1: exact zones
+    for(const z of zoneKeywords){
+        if(z.zone.endsWith("_alias")) continue;
+        if(norm.includes(z.key)) return z.zone;
+    }
+    // Pass 2: alias
+    for(const z of zoneKeywords){
+        if(norm.includes(z.key)) return z.zone;
+    }
+    return null;
 }
 
 /* ============================================================
-   DETECT ZONE + FORMAT LOCATION (TITLE CASE)
+   DETECT LOCATION + APPLY TITLE CASE
 ============================================================ */
 async function detectZoneAndLoad(){
-  setText("zoneName", "Mengesan lokasi...");
-  let placeStr = "";
+    setText("zoneName","Mengesan lokasi...");
 
-  if (navigator.geolocation){
-    try {
-      const pos = await new Promise((resolve, reject) =>{
-        navigator.geolocation.getCurrentPosition(resolve, reject, {timeout:8000});
-      });
-      placeStr = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
-    } catch(e){
-      placeStr = await ipGeolocate();
+    let placeStr = "";
+
+    if(navigator.geolocation){
+        try{
+            const pos = await new Promise((resolve,reject)=>{
+                navigator.geolocation.getCurrentPosition(resolve,reject,{timeout:8000});
+            });
+            placeStr = await reverseGeocode(pos.coords.latitude,pos.coords.longitude);
+        }catch(e){
+            placeStr = await ipGeolocate();
+        }
+    } else {
+        placeStr = await ipGeolocate();
     }
-  } else {
-    placeStr = await ipGeolocate();
-  }
 
-  const foundZone = determineZoneFromPlace(placeStr);
-  const placeCap = capitalizePlace(placeStr);
+    const foundZone = determineZoneFromPlace(placeStr);
+    const placeCap = capitalizePlace(placeStr);
 
-  if(foundZone){
-    zoneCode = foundZone.replace(/_alias$/,'');
-    setText("zoneName", `${zoneCode.toUpperCase()} - ${placeCap}`);
-  } else {
-    setText("zoneName", `${zoneCode} - ${placeCap || "Lokasi tidak dikesan"}`);
-  }
+    if(foundZone){
+        zoneCode = foundZone.replace(/_alias$/,'');
+        setText("zoneName", `${zoneCode.toUpperCase()} - ${placeCap}`);
+    } else {
+        setText("zoneName", `${zoneCode} - ${placeCap || "Lokasi tidak dikesan"}`);
+    }
 
-  await loadPrayerTimesForZone(zoneCode);
+    await loadPrayerTimesForZone(zoneCode);
 }
 
 /* ============================================================
-   LOAD PRAYER TIMES
+   PRAYER TIME LOADING
 ============================================================ */
 async function loadPrayerTimesForZone(Z){
-  try {
-    const url = `https://www.e-solat.gov.my/index.php?r=esolatApi/takwimsolat&period=month&zone=${encodeURIComponent(Z)}`;
-    const res = await fetch(url,{cache:"no-store"});
-    const data = await res.json();
+    try{
+        const url = `https://www.e-solat.gov.my/index.php?r=esolatApi/takwimsolat&period=month&zone=${Z}`;
+        const res = await fetch(url,{cache:"no-store"});
+        const data = await res.json();
 
-    const list = Array.isArray(data.prayerTime) ? data.prayerTime : [];
-    const today = new Date();
-    const dd = String(today.getDate()).padStart(2,'0');
-    const yyyy = today.getFullYear();
-    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        const list = data?.prayerTime || [];
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2,'0');
+        const yyyy = now.getFullYear();
+        const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
-    const es1 = `${dd}-${months[today.getMonth()]}-${yyyy}`;
-    const es2 = `${dd}-${months[today.getMonth()].toUpperCase()}-${yyyy}`;
+        const es1 = `${dd}-${months[now.getMonth()]}-${yyyy}`;
+        const es2 = `${dd}-${months[now.getMonth()].toUpperCase()}-${yyyy}`;
 
-    let todayEntry = list.find(x => x.date===es1 || x.date===es2) || list[list.length-1];
+        const todayEntry = list.find(p => p.date===es1 || p.date===es2) || list[list.length-1];
 
-    prayerTimes = {
-      Ismak: (todayEntry.imsak||"").padStart(4,"0"),
-      Subuh: (todayEntry.fajr||"").padStart(4,"0"),
-      Syuruk: (todayEntry.syuruk||"").padStart(4,"0"),
-      Zohor: (todayEntry.dhuhr||"").padStart(4,"0"),
-      Asar: (todayEntry.asr||"").padStart(4,"0"),
-      Maghrib: (todayEntry.maghrib||"").padStart(4,"0"),
-      Isyak: (todayEntry.isha||"").padStart(4,"0")
-    };
+        prayerTimes = {
+            Ismak: todayEntry.imsak,
+            Subuh: todayEntry.fajr,
+            Syuruk: todayEntry.syuruk,
+            Zohor: todayEntry.dhuhr,
+            Asar: todayEntry.asr,
+            Maghrib: todayEntry.maghrib,
+            Isyak: todayEntry.isha
+        };
 
-    const set = (id,v)=>{ const el=document.getElementById(id); if(el) el.innerText = format(v); };
-    set("ismakTime", prayerTimes.Ismak);
-    set("subuhTime", prayerTimes.Subuh);
-    set("syurukTime", prayerTimes.Syuruk);
-    set("zohorTime", prayerTimes.Zohor);
-    set("asarTime", prayerTimes.Asar);
-    set("maghribTime", prayerTimes.Maghrib);
-    set("isyakTime", prayerTimes.Isyak);
+        const set = (id,v)=>{ const el=document.getElementById(id); if(el) el.innerText=v; };
+        set("ismakTime", todayEntry.imsak);
+        set("subuhTime", todayEntry.fajr);
+        set("syurukTime", todayEntry.syuruk);
+        set("zohorTime", todayEntry.dhuhr);
+        set("asarTime", todayEntry.asr);
+        set("maghribTime", todayEntry.maghrib);
+        set("isyakTime", todayEntry.isha);
 
-    determineNextPrayer();
-    updateHighlight();
-    updateCurrentPrayerCard();
+        determineNextPrayer();
+        updateHighlight();
+        updateCurrentPrayerCard();
 
-  } catch(e){
-    setText("zoneName", `Gagal muat masa solat (${zoneCode})`);
-  }
+    }catch(e){
+        setText("zoneName", `Gagal muat masa solat (${Z})`);
+    }
 }
 
 /* ============================================================
