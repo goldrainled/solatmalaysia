@@ -98,6 +98,10 @@ html, body {
     font-weight: 900;
 }
 
+#currentPrayerName {
+    margin-bottom: 12px;   /* adjust freely (8-20px recommended) */
+}
+
 #nextPrayerNameLarge {
     font-size: clamp(36px, 5vw, 60px) !important;
     font-weight: 900;
