@@ -171,9 +171,9 @@ async function detectZoneAndLoad(){
     placeStr = await ipGeolocate();
   }
 
-  const placeCap = capitalizePlace(placeStr);
-
   const foundZone = determineZoneFromPlace(placeStr);
+   
+  const placeCap = capitalizePlace(placeStr);
   if(foundZone){
     zoneCode = foundZone.replace(/_alias$/,'');
     setText("zoneName", `${zoneCode.toUpperCase()} - ${placeCap}`);
