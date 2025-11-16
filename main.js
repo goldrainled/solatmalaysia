@@ -260,24 +260,39 @@ function format(t) {
   return `${h12}:${String(m).padStart(2,"0")} ${ampm}`;
 }
 
-function determineNextPrayer(){
-  const now = new Date();
-  for(let [name,time] of Object.entries(prayerTimes)){
-    const [h,m] = time.split(":").map(Number);
-    const t = new Date(); t.setHours(h,m,0,0);
-    if(t > now){
-      nextPrayerTime = t;
-      const el = document.getElementById("nextPrayerNameLarge");
-      if(el) el.innerText = name;
-      return;
+function determineNextPrayer() {
+    const now = new Date();
+    let next = null;
+    let nextName = null;
+
+    for (let [name, t] of Object.entries(prayerTimes)) {
+        if (!t) continue;
+
+        const [h, m] = t.split(":").map(Number);
+        const when = new Date();
+        when.setHours(h, m, 0, 0);
+
+        if (when > now) {
+            next = when;
+            nextName = name;
+            break;
+        }
     }
-  }
-  let t = new Date();
-  t.setDate(t.getDate()+1);
-  const [h,m] = prayerTimes.Subuh.split(":").map(Number);
-  t.setHours(h,m,0,0);
-  nextPrayerTime = t;
+
+    // If NONE found → next Subuh tomorrow
+    if (!next) {
+        const [h, m] = prayerTimes.Subuh.split(":").map(Number);
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(h, m, 0, 0);
+        next = tomorrow;
+        nextName = "Subuh";
+    }
+
+    nextPrayerTime = next;
+    setText("nextPrayerNameLarge", nextName);
 }
+
 
 setInterval(()=>{
   if(!nextPrayerTime) return;
