@@ -102,6 +102,10 @@ html, body {
     margin-bottom: 8px;   /* adjust freely (8-20px recommended) */
 }
 
+#currentPrayerTime {
+    margin-top: 0;
+}
+
 #nextPrayerNameLarge {
     font-size: clamp(36px, 5vw, 60px) !important;
     font-weight: 900;
