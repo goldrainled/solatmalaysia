@@ -170,11 +170,11 @@ async function detectZoneAndLoad(){
   } else {
     placeStr = await ipGeolocate();
   }
-
-  const foundZone = determineZoneFromPlace(placeStr);
    
-  const placeCap = capitalizePlace(placeStr);
-  if(foundZone){
+   const foundZone = determineZoneFromPlace(placeStr); 
+
+   const placeCap = capitalizePlace(placeStr);     
+   if(foundZone){
     zoneCode = foundZone.replace(/_alias$/,'');
     setText("zoneName", `${zoneCode.toUpperCase()} - ${placeCap}`);
   } else {
