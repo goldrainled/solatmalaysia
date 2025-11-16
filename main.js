@@ -35,7 +35,6 @@ function setText(id, txt){
   if(el) el.innerText = txt;
 }
 
-/* Hijri date */
 async function setAutoDates(){
   try {
     const now = new Date();
@@ -46,19 +45,32 @@ async function setAutoDates(){
 
     const res = await fetch(`https://api.aladhan.com/v1/gToH?date=${dateStr}`);
     const j = await res.json();
-    if(j && j.data && j.data.hijri){
+
+    if (j && j.data && j.data.hijri) {
       const h = j.data.hijri;
-      const hijriMonth = (h.month && (h.month.en || h.month.ar)) || "";
-      const hijriDay = h.day;
-      const hijriYear = h.year;
+
+      // Gregorian
       const gMonthName = new Intl.DateTimeFormat('en-US',{month:'long'}).format(now);
-      const final = `${dd} ${gMonthName} ${yyyy} , ${hijriDay} ${hijriMonth} ${hijriYear}H`;
-      setText("dateToday", final);
+      const gregorianString = `${dd} ${gMonthName} ${yyyy}`;
+      setText("dateTodayG", gregorianString);
+
+      // Hijri
+      const hijriMonth = (h.month && (h.month.en || h.month.ar)) || "";
+      const hijriDay   = h.day;
+      const hijriYear  = h.year;
+      const hijriString = `${hijriDay} ${hijriMonth} ${hijriYear}H`;
+      setText("dateTodayH", hijriString);
+
       return;
     }
-    setText("dateToday", new Date().toLocaleDateString());
-  } catch(err){
-    setText("dateToday", new Date().toLocaleDateString());
+
+    // fallback
+    setText("dateTodayG", now.toLocaleDateString());
+    setText("dateTodayH", "");
+  } catch (err) {
+    const fallback = new Date().toLocaleDateString();
+    setText("dateTodayG", fallback);
+    setText("dateTodayH", "");
   }
 }
 
