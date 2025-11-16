@@ -171,12 +171,14 @@ async function detectZoneAndLoad(){
     placeStr = await ipGeolocate();
   }
 
+  const placeCap = capitalizePlace(placeStr);
+
   const foundZone = determineZoneFromPlace(placeStr);
   if(foundZone){
     zoneCode = foundZone.replace(/_alias$/,'');
-    setText("zoneName", `${zoneCode.toUpperCase()} - ${placeStr}`);
+    setText("zoneName", `${zoneCode.toUpperCase()} - ${placeCap}`);
   } else {
-    setText("zoneName", `${zoneCode} - ${placeStr || "Lokasi tidak dikesan"}`);
+    setText("zoneName", `${zoneCode} - ${placeCap || "Lokasi tidak dikesan"}`);
   }
 
   await loadPrayerTimesForZone(zoneCode);
