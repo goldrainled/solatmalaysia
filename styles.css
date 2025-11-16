@@ -60,37 +60,37 @@ html, body {
 
 /* HEADER AREA 3 ROWS */
 .header-area {
-    margin-top:20px;
-    margin-bottom:25px;
+    margin-top:4px;
+    margin-bottom:18px;
+    text-align:center;
+    padding-left:8px;
+    padding-right:8px;
     display:flex;
     flex-direction:column;
-    gap:6px;
+    gap:4px;
 }
 
-.header-row {
-    font-weight:700;
-    text-align:center;
-    line-height:1.2;
-    font-size:clamp(16px, 4vw, 32px);
+/* Row 1 — Gregorian date (same as old #dateToday size) */
+#dateTodayG {
+    font-size: clamp(20px, 3.6vw, 36px);
+    font-weight: 700;
+    line-height: 1.05;
 }
 
-/* Hijri font slightly softer */
+/* Row 2 — Hijri date (slightly smaller but still big) */
 #dateTodayH {
-    opacity:0.9;
-    font-weight:600;
-    font-size:clamp(14px, 3.6vw, 28px);
+    font-size: clamp(18px, 3.2vw, 32px);
+    font-weight: 650;
+    opacity: 0.95;
+    line-height: 1.05;
 }
 
-/* Location row */
-.location-row {
-    opacity:0.85;
-    font-size:clamp(14px, 3.4vw, 26px);
-}
-
+/* Row 3 — Location (same size as before #zoneName) */
 #zoneName {
-    font-size: clamp(14px, 2.2vw, 20px);
-    opacity: 0.9;
-    margin-top: 6px;
+    font-size: clamp(18px, 3.2vw, 32px);
+    font-weight: 700;
+    opacity: 0.85;
+    line-height: 1.05;
 }
 
 /* Card base */
