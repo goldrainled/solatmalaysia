@@ -252,13 +252,19 @@ prayerTimes = {
 ============================================================ */
 
 function format(t) {
+  if (!t) return "--:--";       // <-- Prevents crash
+
   t = t.toString();
-  if(t.length===4) t = t.slice(0,2)+":"+t.slice(2);
-  let [h,m] = t.split(":").map(Number);
-  const ampm = h>=12 ? "PM" : "AM";
-  const h12 = (h%12)||12;
-  return `${h12}:${String(m).padStart(2,"0")} ${ampm}`;
+  if (t.length === 4) t = t.slice(0,2) + ":" + t.slice(2);
+
+  let [h, m] = t.split(":").map(Number);
+  if (isNaN(h) || isNaN(m)) return "--:--";  // <-- extra safety
+
+  const ampm = h >= 12 ? "PM" : "AM";
+  const h12 = (h % 12) || 12;
+  return `${h12}:${String(m).padStart(2, "0")} ${ampm}`;
 }
+
 
 function determineNextPrayer() {
     const now = new Date();
