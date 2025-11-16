@@ -58,21 +58,35 @@ html, body {
 }
 .app-root::-webkit-scrollbar { display: none; } /* Chrome, Safari */
 
-/* Basic layout pieces */
+/* HEADER AREA 3 ROWS */
 .header-area {
-    margin-top: 4px;
-    margin-bottom: 18px;
-    text-align: center;
-    padding-left: 8px;
-    padding-right: 8px;
+    margin-top:20px;
+    margin-bottom:25px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
 }
 
-/* Responsive typography using clamp() for fluid scaling */
-#dateToday {
-    font-size: clamp(20px, 3.6vw, 36px);
-    font-weight: 700;
-    line-height: 1.05;
+.header-row {
+    font-weight:700;
+    text-align:center;
+    line-height:1.2;
+    font-size:clamp(16px, 4vw, 32px);
 }
+
+/* Hijri font slightly softer */
+#dateTodayH {
+    opacity:0.9;
+    font-weight:600;
+    font-size:clamp(14px, 3.6vw, 28px);
+}
+
+/* Location row */
+.location-row {
+    opacity:0.85;
+    font-size:clamp(14px, 3.4vw, 26px);
+}
+
 #zoneName {
     font-size: clamp(14px, 2.2vw, 20px);
     opacity: 0.9;
