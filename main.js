@@ -214,24 +214,29 @@ async function loadPrayerTimesForZone(Z){
 
         const todayEntry = list.find(p => p.date===es1 || p.date===es2) || list[list.length-1];
 
-        prayerTimes = {
-            Ismak: todayEntry.imsak,
-            Subuh: todayEntry.fajr,
-            Syuruk: todayEntry.syuruk,
-            Zohor: todayEntry.dhuhr,
-            Asar: todayEntry.asr,
-            Maghrib: todayEntry.maghrib,
-            Isyak: todayEntry.isha
-        };
+        function fixTime(t){
+    t = String(t || "0000").padStart(4, "0");
+    return t.slice(0,2) + ":" + t.slice(2);
+}
+
+prayerTimes = {
+    Ismak  : fixTime(todayEntry.imsak),
+    Subuh  : fixTime(todayEntry.fajr),
+    Syuruk : fixTime(todayEntry.syuruk),
+    Zohor  : fixTime(todayEntry.dhuhr),
+    Asar   : fixTime(todayEntry.asr),
+    Maghrib: fixTime(todayEntry.maghrib),
+    Isyak  : fixTime(todayEntry.isha)
+};
 
         const set = (id,v)=>{ const el=document.getElementById(id); if(el) el.innerText=v; };
-        set("ismakTime", todayEntry.imsak);
-        set("subuhTime", todayEntry.fajr);
-        set("syurukTime", todayEntry.syuruk);
-        set("zohorTime", todayEntry.dhuhr);
-        set("asarTime", todayEntry.asr);
-        set("maghribTime", todayEntry.maghrib);
-        set("isyakTime", todayEntry.isha);
+       set("ismakTime", format(prayerTimes.Ismak));
+       set("subuhTime", format(prayerTimes.Subuh));
+       set("syurukTime", format(prayerTimes.Syuruk));
+       set("zohorTime", format(prayerTimes.Zohor));
+       set("asarTime", format(prayerTimes.Asar));
+       set("maghribTime", format(prayerTimes.Maghrib));
+       set("isyakTime", format(prayerTimes.Isyak));
 
         determineNextPrayer();
         updateHighlight();
