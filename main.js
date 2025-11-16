@@ -153,14 +153,16 @@ function determineZoneFromPlace(placeStr){
   return null;
 }
 
-/* Detect zone and load */
+/* ============================================================
+   DETECT ZONE + FORMAT LOCATION (TITLE CASE)
+============================================================ */
 async function detectZoneAndLoad(){
   setText("zoneName", "Mengesan lokasi...");
   let placeStr = "";
 
-  if(navigator.geolocation){
+  if (navigator.geolocation){
     try {
-      const pos = await new Promise((resolve, reject) => {
+      const pos = await new Promise((resolve, reject) =>{
         navigator.geolocation.getCurrentPosition(resolve, reject, {timeout:8000});
       });
       placeStr = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
@@ -170,11 +172,11 @@ async function detectZoneAndLoad(){
   } else {
     placeStr = await ipGeolocate();
   }
-   
-   const foundZone = determineZoneFromPlace(placeStr); 
 
-   const placeCap = capitalizePlace(placeStr);     
-   if(foundZone){
+  const foundZone = determineZoneFromPlace(placeStr);
+  const placeCap = capitalizePlace(placeStr);
+
+  if(foundZone){
     zoneCode = foundZone.replace(/_alias$/,'');
     setText("zoneName", `${zoneCode.toUpperCase()} - ${placeCap}`);
   } else {
