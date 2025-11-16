@@ -1,194 +1,133 @@
-/* styles.css — Optimized for Option A (NO JS scaling)
-   - Mobile-first responsive
-   - No transform()/scale() required
-   - Constrained max-width so UI doesn't blow up on desktop/TV
-   - Invisible scrollbars, smooth touch scrolling
-   - Prevent Chrome auto-dark tint and overscroll glow
-*/
-
-/* reset & base */
-* { box-sizing: border-box; }
+/* -------- GLOBAL -------- */
 html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    width: 100%;
-    background: #181003;             /* background color */
-    color: #fff;
-    font-family: Arial, Helvetica, sans-serif;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-
-    /* prevent Chrome auto-dark tint and overscroll glow */
-    color-scheme: light !important;
-    overscroll-behavior: none;
-    -webkit-overflow-scrolling: touch;
+    margin:0;
+    padding:0;
+    background:#181003;
+    font-family:Arial, sans-serif;
+    color:white;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    overscroll-behavior:none;
 }
 
-/* viewportHost: fixed layer that centers the app */
+/* container */
 #viewportHost {
-    position: fixed;
-    inset: 0;                         /* top/right/bottom/left = 0 */
-    display: flex;
-    align-items: center;              /* vertical center */
-    justify-content: center;          /* horizontal center */
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-    overflow: hidden;                 /* host never scrolls */
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
 }
 
-/* app-root: responsive container that can scroll vertically if content taller than viewport */
+/* content scroll (not scaled) */
 .app-root {
-    width: 100%;
-    max-width: 1224px;                /* design constraint — prevents huge scaling on desktop */
-    min-width: 320px;                 /* ensure small phones are handled */
-    height: 100%;
-    overflow-y: auto;                 /* allow vertical scrolling when needed */
-    overflow-x: hidden;
-    padding: 22px 16px;               /* page padding */
-    display: block;
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
+    width:100%;
+    height:100dvh;               /* mobile safe height */
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding-bottom:30px;
+    box-sizing:border-box;
 }
 
-/* hide scrollbars visually but keep scrolling functional */
-.app-root {
-    scrollbar-width: none;            /* Firefox */
-    -ms-overflow-style: none;         /* IE/Edge */
-}
-.app-root::-webkit-scrollbar { display: none; } /* Chrome, Safari */
-
-/* Basic layout pieces */
+/* -------- HEADER -------- */
 .header-area {
-    margin-top: 4px;
-    margin-bottom: 18px;
-    text-align: center;
-    padding-left: 8px;
-    padding-right: 8px;
+    margin-top:20px;
+    margin-bottom:25px;
 }
 
-/* Responsive typography using clamp() for fluid scaling */
 #dateToday {
-    font-size: clamp(20px, 3.6vw, 36px);
-    font-weight: 700;
-    line-height: 1.05;
+    font-size:clamp(18px, 4vw, 32px);
+    font-weight:700;
 }
 #zoneName {
-    font-size: clamp(14px, 2.2vw, 20px);
-    opacity: 0.9;
-    margin-top: 6px;
+    font-size:clamp(14px, 3.2vw, 22px);
+    opacity:0.85;
 }
 
-/* Card base */
+/* -------- CARD -------- */
 .card {
-    background: rgba(255,255,255,0.12);
-    padding: clamp(14px, 2.8vw, 28px);
-    margin: 14px auto;
-    border-radius: 20px;
-    width: 100%;
-    border: 1px solid rgba(255,255,255,0.12);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.45);
-    text-align: center;
+    background:rgba(255,255,255,0.12);
+    padding:clamp(14px, 3vw, 25px);
+    margin:clamp(12px, 3vw, 20px) auto;
+    border-radius:28px;
+    width:92%;
+    border:1px solid rgba(255,255,255,0.25);
 }
 
-/* Titles & sizes — use clamp to adapt to screen widths */
+/* Titles & fonts */
 .card-title {
-    font-size: clamp(18px, 3.2vw, 32px);
-    font-weight: 700;
-    margin-bottom: 8px;
+    font-size:clamp(16px, 4vw, 32px);
+    font-weight:700;
+    margin-bottom:10px;
 }
 
-/* Clock and large numbers */
 .time-big {
-    font-size: clamp(36px, 10vw, 72px);
-    font-weight: 800;
-    line-height: 0.95;
+    font-size:clamp(30px, 9vw, 62px);
+    font-weight:800;
 }
-
 .time-medium {
-    font-size: clamp(28px, 8vw, 58px);
-    font-weight: 800;
-    line-height: 1;
+    font-size:clamp(26px, 8vw, 58px);
+    font-weight:800;
 }
-
 .time-label {
-    font-size: clamp(16px, 3.2vw, 40px);
-    margin-top: 6px;
-    opacity: 0.95;
+    font-size:clamp(20px, 6vw, 40px);
+    margin-top:5px;
 }
 
 /* Section title */
 .section-title {
-    font-size: clamp(18px, 3.5vw, 32px);
-    font-weight: 800;
-    margin-top: 26px;
-    margin-bottom: 14px;
-    text-align: center;
+    font-size:clamp(18px, 4.5vw, 32px);
+    font-weight:800;
+    margin-top:35px;
 }
 
-/* Countdown container */
+/* -------- COUNTDOWN -------- */
 .countdown-container {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    width: 100%;
-    margin: 12px auto 24px;
-    flex-wrap: nowrap;
-    align-items: stretch;
+    display:flex;
+    justify-content:space-evenly;
+    width:92%;
+    margin:20px auto 30px;
 }
+
 .count-item {
-    background: rgba(255,255,255,0.12);
-    padding: 12px 14px;
-    border-radius: 12px;
-    border:1px solid rgba(255,255,255,0.12);
-    min-width: 78px;
-    text-align: center;
+    background:rgba(255,255,255,0.12);
+    padding:clamp(10px, 2.5vw, 20px) clamp(12px, 3vw, 25px);
+    border-radius:18px;
+    border:1px solid rgba(255,255,255,0.2);
+    text-align:center;
 }
-.count-number { font-size: clamp(20px, 6vw, 60px); font-weight: 900; }
-.count-text { font-size: clamp(12px, 2.8vw, 18px); margin-top: 6px; }
 
-/* Prayer rows (list) */
+.count-number {
+    font-size:clamp(28px, 8vw, 60px);
+    font-weight:900;
+}
+.count-text {
+    font-size:clamp(12px, 3vw, 20px);
+    margin-top:8px;
+}
+
+/* -------- PRAYER ROW -------- */
 .prayer-row {
-    background: rgba(255,255,255,0.12);
-    border-radius: 14px;
-    padding: clamp(12px, 3vw, 18px) clamp(16px, 4vw, 24px);
-    width: 100%;
-    margin: 8px auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: clamp(16px, 3.2vw, 32px);
-    font-weight: 700;
+    background:rgba(255,255,255,0.12);
+    border-radius:16px;
+    padding:clamp(10px, 2.6vw, 18px) 24px;
+    width:92%;
+    margin:10px auto;
+    display:flex;
+    justify-content:space-between;
+    font-size:clamp(18px, 4.5vw, 32px);
+    font-weight:700;
 }
 
-/* Active prayer highlight */
+/* highlight */
 .currentPrayer {
-    background: #c7a000 !important;
-    border: 3px solid #ffe44c !important;
-    box-shadow: 0 0 18px #ffea73;
-    color: #000 !important;
+    background:#c7a000 !important;
+    border:3px solid #ffe44c !important;
+    box-shadow:0 0 18px #ffea73;
+    color:black !important;
 }
 
-/* Utility: keep text centered blocks consistent on small screens */
-.card, .prayer-row, .count-item { word-break: keep-all; }
-
-/* Prevent content from touching the very top/ bottom on small screens */
-@media (max-height: 700px) {
-    .app-root { padding-top: 12px; padding-bottom: 12px; }
-}
-
-/* On very wide screens (desktop/TV) increase spacing slightly */
-@media (min-width: 1400px) {
-    .app-root { padding-left: 48px; padding-right: 48px; }
-    .card { max-width: 1100px; margin-left: auto; margin-right: auto; }
-}
-
-/* Accessibility: increase font sizes with user preference */
-@media (prefers-reduced-motion: reduce) {
-    * { scroll-behavior: auto; transition: none !important; animation: none !important; }
-}
-
-/* Small helper to ensure cards never overflow horizontally */
-.card, .prayer-row { box-sizing: border-box; max-width: 100%; }
-
-/* End of styles */
+/* hide scrollbar */
+.app-root::-webkit-scrollbar { display:none; }
