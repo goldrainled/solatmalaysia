@@ -105,7 +105,7 @@ function scaleToFit() {
     // screen.height / dpr gives CSS px equivalent of physical screen height in many browsers
     const physicalCssH = Math.round(screen.height / dpr);
     // height fallback: prefer the larger of innerHeight and physicalCssH to avoid URL-bar shrinkage
-    const realH = Math.max(window.innerHeight, physicalCssH);
+    const realH = window.visualViewport ? window.visualViewport.height : window.innerHeight;
 
     let targetW = Number(currentTarget.w) || 1920;
     let targetH = Number(currentTarget.h) || 1080;
