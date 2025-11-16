@@ -14,15 +14,7 @@ function dbg(...args){
   if(ENABLE_DBG) console.debug("⭑ solat:", ...args);
 }
 
-/* -------------------------
-   Auto-detect / scaling
-   - Fixes portrait proportional issues, esp. for:
-     * 1224 x 2700
-     * 1080 x 1920
-   - Uses viewport-based target (not raw physical screen) to avoid large shrink
---------------------------*/
-
-let currentTarget = { w: 1920, h: 1080 }; // fallback
+/* REPLACE autoDetectMode() and scaleToFit() WITH THIS SAFE VERSION */
 
 function autoDetectMode() {
   const winW = window.innerWidth;
@@ -35,130 +27,114 @@ function autoDetectMode() {
   const ua = navigator.userAgent || "";
   const isMobile = /Android|iPhone|iPad|iPod/i.test(ua) || scrW < 1280;
 
-  // Helper: produce a proportional virtual target that keeps the same aspect ratio
-  // as `refW` x `refH` but sized relative to the usable viewport (winW/winH).
-  function virtualTargetFromReference(refW, refH) {
-    // desired aspect ratio (height / width)
+  // Helper to produce a target that keeps the ref aspect but never exceeds viewport width
+  function safeVirtualTarget(refW, refH) {
     const ratio = refH / refW;
-    // Prefer to size based on available viewport width so UI fills horizontally
-    // but ensure resulting height is not much larger than viewport (avoid being small)
-    const baseW = Math.max(winW * 1.05, Math.min(refW, winW * 1.3));
-    const targetW = Math.round(baseW);
+    // choose targetW so it does NOT exceed usable viewport width (slight margin)
+    const maxAllowedW = Math.round(winW * 0.98); // keep small margin to avoid rounding issues
+    const targetW = Math.min(refW, maxAllowedW);
     const targetH = Math.round(targetW * ratio);
 
-    // Ensure a minimum height so some elements don't collapse visually
-    const minH = Math.round(winH * 1.05);
-    return {
-      w: targetW,
-      h: Math.max(targetH, minH)
-    };
+    // Ensure targetH is not ridiculously small — but don't exceed viewport height
+    const minH = Math.round(winH * 0.6); // allow tall designs but avoid collapse
+    const h = Math.max(Math.min(targetH, Math.round(winH * 1.0)), minH);
+    return { w: Math.max(320, targetW), h: Math.max(480, h) };
   }
 
-  // Special-case handling for tall phones (common problematic ratios)
-  // If physical screen matches those exact tall resolutions or similar aspect ratio,
-  // we use the proportional virtual target based on those references.
-  const aspect1224x2700 = 2700 / 1224; // ~2.206
-  const aspect1080x1920 = 1920 / 1080; // ~1.777
-
-  // approximate aspect of current screen
-  const screenAspect = scrH / scrW;
-
-  // If device is mobile + portrait and either:
-  // - physical screen equals exactly the known tall sizes (or DPR-normalized)
-  // - OR screen aspect ratio is close to one of those tall aspect ratios
-  // then apply the proportional virtual target technique.
+  // If mobile portrait, prefer portrait references but keep them clamped to viewport
   if (isMobile && isPortrait) {
-    // Normalize possible DPR differences for detection (some browsers report css px)
-    const physW = Math.round(scrW * dpr);
-    const physH = Math.round(scrH * dpr);
+    // try known references by similarity first
+    const screenAspect = scrH / scrW;
+    const a1224 = 2700 / 1224;
+    const a1080 = 1920 / 1080;
 
-    const is1224_2700 = ( (scrW === 1224 && scrH === 2700) || (physW === 1224 && physH === 2700) );
-    const is1080_1920 = ( (scrW === 1080 && scrH === 1920) || (physW === 1080 && physH === 1920) );
-
-    const aspectClose1224 = Math.abs(screenAspect - aspect1224x2700) < 0.12;
-    const aspectClose1080 = Math.abs(screenAspect - aspect1080x1920) < 0.12;
-
-    if (is1224_2700 || aspectClose1224) {
-      currentTarget = virtualTargetFromReference(1224, 2700);
-      dbg("portrait detected ≈1224x2700, virtualTarget:", currentTarget);
+    if (Math.abs(screenAspect - a1224) < 0.15) {
+      currentTarget = safeVirtualTarget(1224, 2700);
+      dbg("mobile portrait ~1224x2700 ->", currentTarget);
       scaleToFit();
       return;
     }
 
-    if (is1080_1920 || aspectClose1080) {
-      currentTarget = virtualTargetFromReference(1080, 1920);
-      dbg("portrait detected ≈1080x1920, virtualTarget:", currentTarget);
+    if (Math.abs(screenAspect - a1080) < 0.15) {
+      currentTarget = safeVirtualTarget(1080, 1920);
+      dbg("mobile portrait ~1080x1920 ->", currentTarget);
       scaleToFit();
       return;
     }
 
-    // Generic mobile portrait fallback: use a high-aspect reference but proportional
-    const genericRefW = 1224;
-    const genericRefH = 2700;
-    currentTarget = virtualTargetFromReference(genericRefW, genericRefH);
-    dbg("mobile portrait generic virtualTarget:", currentTarget);
+    // generic mobile portrait: use a reasonable ref but clamped to viewport width
+    currentTarget = safeVirtualTarget(1224, 2700);
+    dbg("mobile portrait generic virtualTarget ->", currentTarget);
     scaleToFit();
     return;
   }
 
-  // Mobile landscape: keep previous behavior but make proportional to viewport
+  // Mobile landscape: pick a landscape reference but clamp similarly
   if (isMobile && !isPortrait) {
-    // Use the same reference rotated (2700x1224) but base on viewport height
+    // use rotated reference but clamp by viewport height
     const refW = 2700, refH = 1224;
     const ratio = refH / refW;
-    // prefer base on viewport height so landscape fills vertically
-    const baseH = Math.max(winH * 1.05, Math.min(refH, winH * 1.25));
-    const targetH = Math.round(baseH);
+    const maxAllowedH = Math.round(winH * 0.98);
+    const targetH = Math.min(refH, maxAllowedH);
     const targetW = Math.round(targetH / ratio);
-    currentTarget = { w: targetW, h: targetH };
-    dbg("mobile landscape virtualTarget:", currentTarget);
+    // ensure we don't exceed viewport width
+    currentTarget = { w: Math.min(targetW, Math.round(winW * 0.98)), h: targetH };
+    dbg("mobile landscape virtualTarget ->", currentTarget);
     scaleToFit();
     return;
   }
 
-  // TV detection (low DPR + large screen)
-  const isTV = scrW >= 1920 && dpr <= 1.25;
-  if (isTV) {
-    if (isPortrait) currentTarget = { w: 1080, h: 1920 };
-    else currentTarget = { w: 1920, h: 1080 };
-    dbg("tv detected target:", currentTarget);
-    scaleToFit();
-    return;
-  }
-
-  // Fall back to using screen CSS pixels (useful for big LED walls)
-  currentTarget = { w: Math.max(800, scrW), h: Math.max(600, scrH) };
-  dbg("fallback custom target:", currentTarget);
+  // TV or desktop fallback: use screen CSS pixels but clamp them to the viewport
+  const fallbackW = Math.min(Math.max(800, scrW), Math.round(winW));
+  const fallbackH = Math.min(Math.max(600, scrH), Math.round(winH));
+  currentTarget = { w: fallbackW, h: fallbackH };
+  dbg("fallback target ->", currentTarget);
   scaleToFit();
 }
 
-/* -------------------------
-   Scale engine (no scroll)
---------------------------*/
+/* scaleToFit: robust, uses DPR-aware screen height fallback and clamps scale <= 1 */
 function scaleToFit() {
     const host = document.getElementById("viewportHost");
     const app  = document.getElementById("app");
     if (!app) return;
 
-    // Get the REAL height (ignoring Chrome URL bars)
-    const realW = window.innerWidth;            // width always correct
-    const realH = Math.max(window.innerHeight, screen.height);
+    const dpr = window.devicePixelRatio || 1;
 
-    const targetW = currentTarget.w;
-    const targetH = currentTarget.h;
+    // Use usable CSS pixels for width, and choose a robust height
+    const realW = window.innerWidth;
+    // screen.height / dpr gives CSS px equivalent of physical screen height in many browsers
+    const physicalCssH = Math.round(screen.height / dpr);
+    // height fallback: prefer the larger of innerHeight and physicalCssH to avoid URL-bar shrinkage
+    const realH = Math.max(window.innerHeight, physicalCssH);
+
+    let targetW = Number(currentTarget.w) || 1920;
+    let targetH = Number(currentTarget.h) || 1080;
+
+    // Ensure targetW is never larger than the usable viewport width (prevents horizontal overflow)
+    if (targetW > Math.round(realW * 0.98)) {
+      const scaleAdjust = Math.round(realW * 0.98);
+      // recompute targetH preserving aspect ratio
+      const ratio = targetH / targetW;
+      targetW = Math.max(320, scaleAdjust);
+      targetH = Math.max(480, Math.round(targetW * ratio));
+      dbg("clamped target to viewport:", targetW, targetH);
+    }
 
     const scaleX = realW / targetW;
     const scaleY = realH / targetH;
 
-    const scale = Math.min(scaleX, scaleY);
+    // pick the smallest scale, but do not let scale exceed 1 (no zoom-in)
+    const scale = Math.min(scaleX, scaleY, 1);
 
     app.style.width  = `${targetW}px`;
     app.style.height = `${targetH}px`;
     app.style.transform = `scale(${scale})`;
+    app.style.transformOrigin = "center center";
 
     host.style.alignItems = "center";
     host.style.justifyContent = "center";
 }
+
 
 
 
