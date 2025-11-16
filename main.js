@@ -159,35 +159,39 @@ function determineZoneFromPlace(place){
 /* ============================================================
    DETECT LOCATION + APPLY TITLE CASE
 ============================================================ */
+function shortenCountry(placeStr){
+    if (!placeStr) return placeStr;
+    return placeStr.replace(/malaysia/gi, "MY");
+}
+
 async function detectZoneAndLoad(){
-    setText("zoneName","Mengesan lokasi...");
+  setText("zoneName", "Mengesan lokasi...");
+  let placeStr = "";
 
-    let placeStr = "";
-
-    if(navigator.geolocation){
-        try{
-            const pos = await new Promise((resolve,reject)=>{
-                navigator.geolocation.getCurrentPosition(resolve,reject,{timeout:8000});
-            });
-            placeStr = await reverseGeocode(pos.coords.latitude,pos.coords.longitude);
-        }catch(e){
-            placeStr = await ipGeolocate();
-        }
-    } else {
-        placeStr = await ipGeolocate();
+  if(navigator.geolocation){
+    try {
+      const pos = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {timeout:8000});
+      });
+      placeStr = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
+    } catch(e){
+      placeStr = await ipGeolocate();
     }
+  } else {
+    placeStr = await ipGeolocate();
+  }
 
-    const foundZone = determineZoneFromPlace(placeStr);
-    const placeCap = capitalizePlace(placeStr);
+  const foundZone = determineZoneFromPlace(placeStr); 
+  const placeCap = shortenCountry(capitalizePlace(placeStr));
 
-    if(foundZone){
-        zoneCode = foundZone.replace(/_alias$/,'');
-        setText("zoneName", `${zoneCode.toUpperCase()} - ${placeCap}`);
-    } else {
-        setText("zoneName", `${zoneCode} - ${placeCap || "Lokasi tidak dikesan"}`);
-    }
+  if(foundZone){
+    zoneCode = foundZone.replace(/_alias$/,'');
+    setText("zoneName", `${zoneCode.toUpperCase()} - ${placeCap}`);
+  } else {
+    setText("zoneName", `${zoneCode} - ${placeCap || "Lokasi tidak dikesan"}`);
+  }
 
-    await loadPrayerTimesForZone(zoneCode);
+  await loadPrayerTimesForZone(zoneCode);
 }
 
 /* ============================================================
