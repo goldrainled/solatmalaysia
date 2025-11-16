@@ -161,7 +161,7 @@ function determineZoneFromPlace(place){
 ============================================================ */
 function shortenCountry(placeStr){
     if (!placeStr) return placeStr;
-    return placeStr.replace(/malaysia/gi, "MYS");
+    return placeStr.replace(/malaysia/gi, "MY");
 }
 
 async function detectZoneAndLoad(){
