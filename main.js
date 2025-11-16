@@ -140,9 +140,9 @@ function scaleToFit() {
     const app  = document.getElementById("app");
     if (!app) return;
 
-    // Use innerWidth/innerHeight only (best for mobile)
-    const realW = window.innerWidth;
-    const realH = window.innerHeight;
+    // Get the REAL height (ignoring Chrome URL bars)
+    const realW = window.innerWidth;            // width always correct
+    const realH = Math.max(window.innerHeight, screen.height);
 
     const targetW = currentTarget.w;
     const targetH = currentTarget.h;
@@ -152,14 +152,14 @@ function scaleToFit() {
 
     const scale = Math.min(scaleX, scaleY);
 
-    app.style.width  = targetW + "px";
-    app.style.height = targetH + "px";
-
+    app.style.width  = `${targetW}px`;
+    app.style.height = `${targetH}px`;
     app.style.transform = `scale(${scale})`;
 
     host.style.alignItems = "center";
     host.style.justifyContent = "center";
 }
+
 
 
 
