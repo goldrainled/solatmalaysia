@@ -35,6 +35,9 @@ function setText(id, txt){
   if(el) el.innerText = txt;
 }
 
+/* ============================================================
+   DATE HANDLING (GREGORIAN + HIJRI)
+============================================================ */
 async function setAutoDates(){
   try {
     const now = new Date();
@@ -74,7 +77,9 @@ async function setAutoDates(){
   }
 }
 
-/* Reverse geocode */
+/* ============================================================
+   REVERSE GEOCODING + IP fallback
+============================================================ */
 async function reverseGeocode(lat, lon){
   try {
     const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`;
@@ -92,19 +97,37 @@ async function reverseGeocode(lat, lon){
   }
 }
 
-/* IP geolocation fallback (ipapi.co) */
 async function ipGeolocate(){
   try {
     const res = await fetch("https://ipapi.co/json/");
     const j = await res.json();
-    const parts = [j.city, j.region, j.country_name].filter(Boolean).map(s => s.toLowerCase());
+    const parts = [j.city, j.region, j.country_name]
+      .filter(Boolean).map(s => s.toLowerCase());
     return parts.join(", ");
   } catch(e){
     return "";
   }
 }
 
-/* ZONE MAP */
+/* ============================================================
+   TITLE CASE FIX FOR LOCATION
+============================================================ */
+function capitalizePlace(s){
+  if (!s) return "";
+  return s
+    .split(",")
+    .map(part =>
+      part.trim()
+          .split(" ")
+          .map(w => w ? w.charAt(0).toUpperCase() + w.slice(1) : "")
+          .join(" ")
+    )
+    .join(", ");
+}
+
+/* ============================================================
+   ZONE DETECTION LOGIC
+============================================================ */
 const ZONE_MAP = {
   "JHR01": ["pulau aur","pulau pemanggil"],
   "JHR02": ["johor bahru","kota tinggi","mersing","jhr02","jb","johor bharu"],
@@ -143,13 +166,16 @@ for(const [zone,arr] of Object.entries(ZONE_MAP)){
 function determineZoneFromPlace(placeStr){
   if(!placeStr) return null;
   const norm = placeStr.toLowerCase().replace(/[^\w\s]/g,' ');
+
   for(const z of zoneKeywords){
     if(z.zone.endsWith("_alias")) continue;
     if(norm.includes(z.key)) return z.zone;
   }
+
   for(const z of zoneKeywords){
     if(norm.includes(z.key)) return z.zone;
   }
+
   return null;
 }
 
@@ -186,7 +212,9 @@ async function detectZoneAndLoad(){
   await loadPrayerTimesForZone(zoneCode);
 }
 
-/* Load prayer times for zone */
+/* ============================================================
+   LOAD PRAYER TIMES
+============================================================ */
 async function loadPrayerTimesForZone(Z){
   try {
     const url = `https://www.e-solat.gov.my/index.php?r=esolatApi/takwimsolat&period=month&zone=${encodeURIComponent(Z)}`;
@@ -198,6 +226,7 @@ async function loadPrayerTimesForZone(Z){
     const dd = String(today.getDate()).padStart(2,'0');
     const yyyy = today.getFullYear();
     const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
     const es1 = `${dd}-${months[today.getMonth()]}-${yyyy}`;
     const es2 = `${dd}-${months[today.getMonth()].toUpperCase()}-${yyyy}`;
 
@@ -213,7 +242,6 @@ async function loadPrayerTimesForZone(Z){
       Isyak: (todayEntry.isha||"").padStart(4,"0")
     };
 
-    // Update UI
     const set = (id,v)=>{ const el=document.getElementById(id); if(el) el.innerText = format(v); };
     set("ismakTime", prayerTimes.Ismak);
     set("subuhTime", prayerTimes.Subuh);
@@ -231,6 +259,10 @@ async function loadPrayerTimesForZone(Z){
     setText("zoneName", `Gagal muat masa solat (${zoneCode})`);
   }
 }
+
+/* ============================================================
+   PRAYER TIME FORMAT + NEXT PRAYER + UI UPDATES
+============================================================ */
 
 function format(t) {
   t = t.toString();
@@ -310,9 +342,11 @@ function updateHighlight(){
   if(el) el.classList.add("currentPrayer");
 }
 
-/* Start */
+/* ============================================================
+   START
+============================================================ */
 (async function init(){
   await setAutoDates();
-  scaleToFit();
+  scaleToFit();          // Important for Option A
   await detectZoneAndLoad();
 })();
