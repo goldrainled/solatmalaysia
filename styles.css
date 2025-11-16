@@ -1,16 +1,16 @@
-/* BODY cannot scroll */
 html, body {
     margin:0;
     padding:0;
-    height:100%;
-    color:white;
     background:#181003;
     font-family:Arial, sans-serif;
-    overflow:hidden;                 /* prevent background scroll */
-    overscroll-behavior:none;        /* prevent glow */
+    color:white;
+    height:100%;
+    text-align:center;
+    overflow:hidden;
+    overscroll-behavior-y:auto;
 }
 
-/* Viewport container fixed */
+/* Scaled UI container */
 #viewportHost {
     position:fixed;
     left:0; top:0; right:0; bottom:0;
