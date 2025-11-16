@@ -12,12 +12,15 @@ html, body {
 /* Viewport container fixed */
 #viewportHost {
     position:fixed;
-    left:0; top:0; right:0; bottom:0;
+    inset:0;
+    height:100dvh;     /* ⭐ NEW – real full height, not Chrome shrink height */
+    width:100dvw;      /* ⭐ NEW */
     display:flex;
     align-items:center;
     justify-content:center;
-    overflow:hidden;                 /* host never scrolls */
+    overflow:hidden;
 }
+
 
 /* app-root handles scrolling */
 .app-root {
