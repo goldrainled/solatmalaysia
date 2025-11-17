@@ -245,7 +245,7 @@ async function loadPrayerTimesForZone(Z){
 
     // Normalise internal times (HH:MM) or null if not available
     prayerTimes = {
-      Ismak   : fixTime(todayEntry.imsak),
+      Imsak   : fixTime(todayEntry.imsak),
       Subuh   : fixTime(todayEntry.fajr),
       Syuruk  : fixTime(todayEntry.syuruk),
       Zohor   : fixTime(todayEntry.dhuhr),
@@ -261,7 +261,7 @@ async function loadPrayerTimesForZone(Z){
       el.innerText = value ? format(value) : "--:--";
     };
 
-    uiSet("ismakTime", prayerTimes.Ismak);
+    uiSet("imsakTime", prayerTimes.Imsak);
     uiSet("subuhTime", prayerTimes.Subuh);
     uiSet("syurukTime", prayerTimes.Syuruk);
     uiSet("zohorTime", prayerTimes.Zohor);
@@ -311,7 +311,7 @@ function determineNextPrayer(){
   let found = null;
   let foundName = null;
 
-  // Iterate in object order (Ismak, Subuh, Syuruk, Zohor, Asar, Maghrib, Isyak)
+  // Iterate in object order (Imsak, Subuh, Syuruk, Zohor, Asar, Maghrib, Isyak)
   for(const [name, raw] of Object.entries(prayerTimes)){
     if(!raw) continue;
     const [h,m] = raw.split(":").map(Number);
