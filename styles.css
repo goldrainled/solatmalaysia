@@ -35,7 +35,7 @@ html, body {
     inset: 0;
     width: 100vw;
     height: 100vh;
-    z-index: -2;              /* behind content */
+    z-index: 0;
     overflow: hidden;
 }
 
@@ -49,13 +49,12 @@ html, body {
     animation: fadeBG 40s infinite ease-in-out;
 }
 
-/* Stagger the fading sequence */
-.slideshow-bg img:nth-child(1) { animation-delay: 0s; }
-.slideshow-bg img:nth-child(2) { animation-delay: 10s; }
-.slideshow-bg img:nth-child(3) { animation-delay: 20s; }
-.slideshow-bg img:nth-child(4) { animation-delay: 30s; }
+/* For 4 images */
+.slideshow-bg img:nth-child(1){ animation-delay: 0s; }
+.slideshow-bg img:nth-child(2){ animation-delay: 10s; }
+.slideshow-bg img:nth-child(3){ animation-delay: 20s; }
+.slideshow-bg img:nth-child(4){ animation-delay: 30s; }
 
-/* Fade cycle for each image */
 @keyframes fadeBG {
     0%   { opacity: 0; }
     10%  { opacity: 1; }
@@ -64,6 +63,20 @@ html, body {
     100% { opacity: 0; }
 }
 
+/* =============================================================
+   FIX: Always show slideshow behind content
+============================================================= */
+#viewportHost,
+.app-root,
+.scroll-area {
+    background: transparent !important;
+}
+
+#viewportHost,
+.app-root {
+    position: relative;
+    z-index: 2;
+}
 
 /* viewportHost: fixed layer that centers the app */
 #viewportHost {
