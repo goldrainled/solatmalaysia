@@ -5,6 +5,7 @@
    - Safe guards for undefined API fields
    - Title-case location + "Malaysia" -> "MY"
    - Correct next-prayer logic (after Isyak -> Subuh tomorrow)
+   - Countdown numbers turn gold + soft glow when <= 10 minutes
 ============================================================ */
 
 /* ----- NO SCALING (Option A) ----- */
@@ -215,7 +216,7 @@ function fixTime(t){
   let s = String(t).trim();
   // If already contains ":", try to normalise
   if(s.includes(":")){
-    const [hh,mm] = s.split(":").map(p => p.replace(/\D/g,''));
+    const [hh,mm] = s.split(":").map(p => p.replace(/\D/g,'')); 
     if(!hh) return null;
     return hh.padStart(2,"0") + ":" + (String(mm||"0").padStart(2,"0"));
   }
@@ -254,6 +255,17 @@ async function loadPrayerTimesForZone(Z){
       Isyak   : fixTime(todayEntry.isha)
     };
 
+    // If all times missing, show error and bail
+    if(Object.values(prayerTimes).every(v => v === null)){
+      dbg("No prayer times available for zone:", Z);
+      setText("zoneName", `Gagal muat masa solat (${Z})`);
+      nextPrayerTime = null;
+      // Clear UI to indicate missing times
+      ["imsakTime","subuhTime","syurukTime","zohorTime","asarTime","maghribTime","isyakTime"].forEach(id => setText(id,"--:--"));
+      setText("nextPrayerNameLarge","--");
+      return;
+    }
+
     // Update UI (display in AM/PM) or --:-- if unavailable
     const uiSet = (id, value) => {
       const el = document.getElementById(id);
@@ -276,6 +288,7 @@ async function loadPrayerTimesForZone(Z){
   } catch(err){
     dbg("loadPrayerTimesForZone error:", err);
     setText("zoneName", `Gagal muat masa solat (${Z})`);
+    nextPrayerTime = null;
   }
 }
 
@@ -349,6 +362,7 @@ function determineNextPrayer(){
 
 /* Countdown updater */
 setInterval(()=>{
+    // If nextPrayerTime not set, nothing to do (silent)
     if (!nextPrayerTime) return;
 
     const now = new Date();
@@ -373,19 +387,22 @@ setInterval(()=>{
     set("cdSec",s);
 
     /* -------------------------------
-   NEW: Gold text when <10 minutes
---------------------------------*/
-const nums = [
-    document.getElementById("cdHour"),
-    document.getElementById("cdMin"),
-    document.getElementById("cdSec")
-];
+       NEW: Gold numbers + soft glow when <= 10 minutes
+    --------------------------------*/
+    const nums = [
+        document.getElementById("cdHour"),
+        document.getElementById("cdMin"),
+        document.getElementById("cdSec")
+    ];
 
-if (h === 0 && m <= 10) {
-    nums.forEach(n => n.classList.add("count-gold"));
-} else {
-    nums.forEach(n => n.classList.remove("count-gold"));
-}
+    // Apply gold when less than or equal to 10 minutes remaining
+    if (h === 0 && m <= 10) {
+        nums.forEach(n => n && n.classList.add("count-gold"));
+    } else {
+        nums.forEach(n => n && n.classList.remove("count-gold"));
+    }
+
+}, 1000); // <-- properly closed
 
 /* ============================================================
    CLOCK / CURRENT PRAYER CARD / HIGHLIGHT
