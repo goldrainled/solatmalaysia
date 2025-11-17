@@ -37,7 +37,7 @@ html, body {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    animation: bgFade 32s infinite;
+    animation: bgFade 32s infinite ease-in-out;
 }
 
 /* Fade animation for 4 background images */
