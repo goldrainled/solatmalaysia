@@ -232,10 +232,10 @@ html, body {
 
 .count-item {
     background: rgba(0,0,0,0.40);
-    padding: 24px 28px;            /* BIGGER padding */
-    min-width: 80px;              /* BIGGER width */
+    padding: 14px 16px;            /* BIGGER padding */
+    min-width: 70px;              /* BIGGER width */
     border-radius: 20px;           /* BIGGER rounding */
-    border: 2px solid rgba(255,255,255,0.35);
+    border: 1px solid rgba(255,255,255,0.35);
     text-align: center;
     box-shadow: 0 0 20px rgba(0,0,0,0.45);
 }
