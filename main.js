@@ -373,18 +373,19 @@ setInterval(()=>{
     set("cdSec",s);
 
     /* -------------------------------
-       Highlight countdown when <10 min
-    --------------------------------*/
-    const items = document.querySelectorAll(".count-item");
+   NEW: Gold text when <10 minutes
+--------------------------------*/
+const nums = [
+    document.getElementById("cdHour"),
+    document.getElementById("cdMin"),
+    document.getElementById("cdSec")
+];
 
-    if (h === 0 && m <= 10) {
-        items.forEach(box => box.classList.add("count-urgent"));
-    } else {
-        items.forEach(box => box.classList.remove("count-urgent"));
-    }
-
-}, 1000);
-
+if (h === 0 && m <= 10) {
+    nums.forEach(n => n.classList.add("count-gold"));
+} else {
+    nums.forEach(n => n.classList.remove("count-gold"));
+}
 
 /* ============================================================
    CLOCK / CURRENT PRAYER CARD / HIGHLIGHT
