@@ -218,26 +218,40 @@ html, body {
     text-align: center;
 }
 
-/* Countdown container */
+/* =============================================================
+   COUNTDOWN (BIGGER VERSION)
+============================================================= */
+
 .countdown-container {
     display: flex;
     justify-content: center;
-    gap: 12px;
-    width: 100%;
-    margin: 12px auto 24px;
+    gap: 22px;                     /* bigger gap */
+    margin: 22px auto 32px;
     flex-wrap: nowrap;
-    align-items: stretch;
 }
+
 .count-item {
-    background: rgba(255,255,255,0.12);
-    padding: 12px 14px;
-    border-radius: 12px;
-    border:1px solid rgba(255,255,255,0.12);
-    min-width: 78px;
+    background: rgba(0,0,0,0.40);
+    padding: 24px 28px;            /* BIGGER padding */
+    min-width: 110px;              /* BIGGER width */
+    border-radius: 20px;           /* BIGGER rounding */
+    border: 2px solid rgba(255,255,255,0.35);
     text-align: center;
+    box-shadow: 0 0 20px rgba(0,0,0,0.45);
 }
-.count-number { font-size: clamp(20px, 6vw, 60px); font-weight: 900; }
-.count-text { font-size: clamp(12px, 2.8vw, 18px); margin-top: 6px; }
+
+.count-number {
+    font-size: clamp(32px, 8vw, 80px);  /* BIGGER number */
+    font-weight: 900;
+    line-height: 1;
+}
+
+.count-text {
+    font-size: clamp(16px, 4vw, 28px);  /* BIGGER text */
+    margin-top: 10px;
+    letter-spacing: 1px;
+}
+
 
 /* Prayer rows (list) */
 .prayer-row {
