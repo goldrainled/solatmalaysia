@@ -233,7 +233,7 @@ html, body {
 .count-item {
     background: rgba(0,0,0,0.40);
     padding: 24px 28px;            /* BIGGER padding */
-    min-width: 110px;              /* BIGGER width */
+    min-width: 80px;              /* BIGGER width */
     border-radius: 20px;           /* BIGGER rounding */
     border: 2px solid rgba(255,255,255,0.35);
     text-align: center;
