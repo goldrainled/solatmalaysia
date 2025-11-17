@@ -348,21 +348,43 @@ function determineNextPrayer(){
 }
 
 /* Countdown updater */
-setInterval(() => {
-  if(!nextPrayerTime) return;
-  const now = new Date();
-  let diff = nextPrayerTime - now;
-  if(diff <= 0){
-    determineNextPrayer();
-    return;
-  }
-  const h = Math.floor(diff / (1000*60*60));
-  const m = Math.floor((diff / (1000*60)) % 60);
-  const s = Math.floor((diff / 1000) % 60);
-  setText("cdHour", String(h).padStart(2,"0"));
-  setText("cdMin", String(m).padStart(2,"0"));
-  setText("cdSec", String(s).padStart(2,"0"));
+setInterval(()=>{
+    if (!nextPrayerTime) return;
+
+    const now = new Date();
+    const diff = nextPrayerTime - now;
+
+    if (diff <= 0) { 
+        determineNextPrayer(); 
+        return; 
+    }
+
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff / 60000) % 60);
+    const s = Math.floor((diff / 1000) % 60);
+
+    // Update UI
+    const set = (id,v)=>{
+        const el=document.getElementById(id);
+        if(el) el.innerText = String(v).padStart(2,"0");
+    };
+    set("cdHour",h);
+    set("cdMin",m);
+    set("cdSec",s);
+
+    /* -------------------------------
+       Highlight countdown when <10 min
+    --------------------------------*/
+    const items = document.querySelectorAll(".count-item");
+
+    if (h === 0 && m <= 10) {
+        items.forEach(box => box.classList.add("count-urgent"));
+    } else {
+        items.forEach(box => box.classList.remove("count-urgent"));
+    }
+
 }, 1000);
+
 
 /* ============================================================
    CLOCK / CURRENT PRAYER CARD / HIGHLIGHT
