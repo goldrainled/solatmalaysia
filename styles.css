@@ -225,20 +225,26 @@ html, body {
 .countdown-container {
     display: flex;
     justify-content: center;
-    gap: 22px;                     /* bigger gap */
+    gap: 22px;
     margin: 22px auto 32px;
-    flex-wrap: nowrap;
 }
 
 .count-item {
     background: rgba(0,0,0,0.40);
-    padding: 14px 16px;            /* BIGGER padding */
-    width: 80px;             /* MAKE ALL 3 BOXES SAME */
-    min-width: 80px;              /* BIGGER width */
-    border-radius: 20px;           /* BIGGER rounding */
+    width: 90px;             /* SAME WIDTH */
+    height: 120px;           /* SAME HEIGHT */
+    min-width: 90px;
+    min-height: 120px;
+
+    border-radius: 20px;
     border: 1px solid rgba(255,255,255,0.35);
-    text-align: center;
     box-shadow: 0 0 20px rgba(0,0,0,0.45);
+
+    display: flex;                /* ⭐ REQUIRED */
+    flex-direction: column;
+    align-items: center;          /* center horizontally */
+    justify-content: center;      /* center vertically */
+    text-align: center;
 }
 
 .count-number {
