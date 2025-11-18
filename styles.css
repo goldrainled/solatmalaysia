@@ -46,7 +46,7 @@ html, body {
     height: 100%;
     object-fit: cover;
     opacity: 0;
-    animation: fadeBG 40s infinite ease-in-out;
+    animation: zoomBG 40s infinite ease-in-out;
 }
 
 /* For 8 images */
@@ -60,13 +60,29 @@ html, body {
 .slideshow-bg img:nth-child(8) { animation-delay: 56s; }
 
 
-@keyframes fadeBG {
-    0%   { opacity: 0; }
-    10%  { opacity: 1; }
-    40%  { opacity: 1; }
-    55%  { opacity: 0; }
-    100% { opacity: 0; }
+@keyframes zoomBG {
+  0% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  10% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.10); /* slow zoom in */
+  }
+  55% {
+    opacity: 0;
+    transform: scale(1.12);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.15);
+  }
 }
+
 
 /* =============================================================
    FIX: Always show slideshow behind content
