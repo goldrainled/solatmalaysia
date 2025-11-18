@@ -162,7 +162,7 @@ html, body {
 
 /* Card base */
 .card {
-    background: rgbargba(0, 0, 0, 0.45);
+    background: rgba(0, 0, 0, 0.45);
     padding: clamp(14px, 2.8vw, 28px);
     margin: 14px auto;
     border-radius: 20px;
