@@ -162,12 +162,12 @@ html, body {
 
 /* Card base */
 .card {
-    background: rgba(255,255,255,0.12);
+    background: rgbargba(0, 0, 0, 0.45);
     padding: clamp(14px, 2.8vw, 28px);
     margin: 14px auto;
     border-radius: 20px;
     width: 100%;
-    border: 1px solid rgba(255,255,255,0.12);
+    border: 1px solid rgba(0, 0, 0, 0.45);
     box-shadow: 0 6px 18px rgba(0,0,0,0.45);
     text-align: center;
 }
