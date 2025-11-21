@@ -267,7 +267,8 @@ html, body {
 }
 
 /* GOLD color style for last 10 minutes */
-color: #c7a000 !important;   /* gold */
+.count-gold {
+    color: #c7a000 !important;   /* gold */
     text-shadow: none !important;
 }
 
