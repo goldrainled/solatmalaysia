@@ -403,12 +403,13 @@ const totalSeconds = hh * 3600 + mm * 60 + ss;
 
 // Highlight for 0s → 600s (00:10:00 down to 00:00:00)
 if (totalSeconds >= 0 && totalSeconds <= 600) {
-    countdownBox?.classList.add("highlight");
+    if (countdownBox) countdownBox.classList.add("highlight");
 } else {
-    countdownBox?.classList.remove("highlight");
+    if (countdownBox) countdownBox.classList.remove("highlight");
 }
 
 }, 1000); // <-- properly closed
+
 
 /* ============================================================
    CLOCK / CURRENT PRAYER CARD / HIGHLIGHT
