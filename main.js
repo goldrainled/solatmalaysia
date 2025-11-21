@@ -392,7 +392,7 @@ setInterval(()=>{
    - ON when totalSeconds is between 0 and 600
    - OFF above 600 or below 0
 --------------------------------------------*/
-const countdownBox = document.querySelector(".countdown-box");
+const countdownBox = document.querySelector(".countdown-container");
 
 // Force numbers
 const hh = Number(h);
