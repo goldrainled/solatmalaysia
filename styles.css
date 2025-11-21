@@ -267,9 +267,8 @@ html, body {
 }
 
 /* GOLD color style for last 10 minutes */
-.count-gold {
-    color: #c7a000  !important;      /* gold */
-    text-shadow: 0 0 12px rgba(255, 215, 0, 0.8);
+color: #c7a000 !important;   /* gold */
+    text-shadow: none !important;
 }
 
 /* Prayer rows (list) */
