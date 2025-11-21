@@ -1,3 +1,4 @@
+
 /* ============================================================
    main.js — Option A (NO SCALING) — FULL FIXED VERSION
    - No transform scaling (Option A)
@@ -386,26 +387,21 @@ setInterval(()=>{
     set("cdMin",m);
     set("cdSec",s);
 
-    /* -------------------------------------------
-   HIGHLIGHT COUNTDOWN: 00:10:00 → 00:00:00
-   - ON when totalSeconds is between 0 and 600
-   - OFF above 600 or below 0
---------------------------------------------*/
-const countdownBox = document.querySelector(".countdown-box");
+    /* -------------------------------
+       NEW: Gold numbers + soft glow when <= 10 minutes
+    --------------------------------*/
+    const nums = [
+        document.getElementById("cdHour"),
+        document.getElementById("cdMin"),
+        document.getElementById("cdSec")
+    ];
 
-// Force numbers
-const hh = Number(h);
-const mm = Number(m);
-const ss = Number(s);
-
-const totalSeconds = hh * 3600 + mm * 60 + ss;
-
-// Highlight for 0s → 600s (00:10:00 down to 00:00:00)
-if (totalSeconds >= 0 && totalSeconds <= 600) {
-    countdownBox?.classList.add("highlight");
-} else {
-    countdownBox?.classList.remove("highlight");
-}
+    // Apply gold when less than or equal to 10 minutes remaining
+    if (h === 0 && m <= 10) {
+        nums.forEach(n => n && n.classList.add("count-gold"));
+    } else {
+        nums.forEach(n => n && n.classList.remove("count-gold"));
+    }
 
 }, 1000); // <-- properly closed
 
