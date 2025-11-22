@@ -1,10 +1,10 @@
 /* ============================================================
-   main.js — Option A (NO SCALING) — FULL FIXED VERSION
+   main.js — Option A (NO SCALING) — FIXED FULL VERSION
+   - Always use IP geolocation first (no permission needed)
+   - GPS only as fallback (if device supports)
+   - Never breaks when permission denied
    - No transform scaling (Option A)
-   - Robust time parsing & formatting
-   - Safe guards for undefined API fields
-   - Title-case location + "Malaysia" -> "MY"
-   - Correct next-prayer logic (after Isyak -> Subuh tomorrow)
+   - Countdown highlight 00:10:00 → 00:00:00
 ============================================================ */
 
 /* ----- NO SCALING (Option A) ----- */
@@ -89,7 +89,8 @@ async function ipGeolocate(){
     const res = await fetch("https://ipapi.co/json/");
     if(!res.ok) return "";
     const j = await res.json();
-    const parts = [j.city, j.region, j.country_name].filter(Boolean).map(s => String(s).toLowerCase());
+    const parts = [j.city, j.region, j.country_name]
+      .filter(Boolean).map(s => String(s).toLowerCase());
     return parts.join(", ");
   } catch(e){
     return "";
@@ -112,7 +113,6 @@ function capitalizePlace(s){
 
 function shortenCountry(placeStr){
   if(!placeStr) return placeStr;
-  // replace full 'malaysia' occurrences with 'MY' (case-insensitive)
   return placeStr.replace(/malaysia/gi, "MY");
 }
 
@@ -157,12 +157,10 @@ for(const [zone,arr] of Object.entries(ZONE_MAP)){
 function determineZoneFromPlace(placeStr){
   if(!placeStr) return null;
   const norm = placeStr.toLowerCase().replace(/[^\w\s]/g,' ');
-  // pass 1 - non-alias zones
   for(const z of zoneKeywords){
     if(z.zone.endsWith("_alias")) continue;
     if(norm.includes(z.key)) return z.zone;
   }
-  // pass 2 - include aliases
   for(const z of zoneKeywords){
     if(norm.includes(z.key)) return z.zone;
   }
@@ -170,56 +168,57 @@ function determineZoneFromPlace(placeStr){
 }
 
 /* ============================================================
-   DETECT ZONE & FORMAT LOCATION (Title-case + short country)
+   DETECT ZONE & FORMAT LOCATION — FIXED FOR KIOSK DEVICES
 ============================================================ */
 async function detectZoneAndLoad(){
   setText("zoneName", "Mengesan lokasi...");
 
   let placeStr = "";
-  if(navigator.geolocation){
+
+  /* 1️⃣ IP-BASED LOCATION FIRST (NO PERMISSION NEEDED) */
+  placeStr = await ipGeolocate();
+
+  /* 2️⃣ GPS ONLY IF IP FAILED */
+  if (!placeStr && navigator.geolocation) {
     try {
       const pos = await new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000, maximumAge: 5*60*1000 });
+        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 6000 });
       });
       placeStr = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
     } catch(e){
-      placeStr = await ipGeolocate();
+      // ignore
     }
-  } else {
-    placeStr = await ipGeolocate();
   }
 
-  // Shorten country (Malaysia -> MY) before title-casing
-  placeStr = shortenCountry(placeStr || "");
+  /* 3️⃣ STILL EMPTY → USE DEFAULT */
+  if (!placeStr) placeStr = "johor bahru, MY";
+
+  placeStr = shortenCountry(placeStr);
   const placeCap = capitalizePlace(placeStr);
+
   const foundZone = determineZoneFromPlace(placeStr);
 
   if(foundZone){
     zoneCode = foundZone.replace(/_alias$/,'');
     setText("zoneName", `${zoneCode.toUpperCase()} - ${placeCap}`);
   } else {
-    setText("zoneName", `${zoneCode} - ${placeCap || "Lokasi tidak dikesan"}`);
+    setText("zoneName", `${zoneCode} - ${placeCap}`);
   }
 
   await loadPrayerTimesForZone(zoneCode);
 }
 
 /* ============================================================
-   PRAYER TIMES LOADING & NORMALISATION
-   - fixTime() ensures internal format "HH:MM"
-   - UI uses format() to display "h:mm AM/PM"
+   PRAYER TIME NORMALISATION
 ============================================================ */
 function fixTime(t){
-  // t can be "0535", "530", "05:35", undefined, ""
   if(!t && t !== 0) return null;
   let s = String(t).trim();
-  // If already contains ":", try to normalise
   if(s.includes(":")){
-    const [hh,mm] = s.split(":").map(p => p.replace(/\D/g,''));
+    const [hh,mm] = s.split(":").map(p => p.replace(/\D/g,'')); 
     if(!hh) return null;
     return hh.padStart(2,"0") + ":" + (String(mm||"0").padStart(2,"0"));
   }
-  // If digits only
   s = s.replace(/\D/g,'').padStart(4,"0");
   return s.slice(0,2) + ":" + s.slice(2);
 }
@@ -243,7 +242,6 @@ async function loadPrayerTimesForZone(Z){
     let todayEntry = list.find(p => (p && (p.date === key1 || p.date === key2)));
     if(!todayEntry) todayEntry = list[list.length - 1] || {};
 
-    // Normalise internal times (HH:MM) or null if not available
     prayerTimes = {
       Imsak   : fixTime(todayEntry.imsak),
       Subuh   : fixTime(todayEntry.fajr),
@@ -254,7 +252,15 @@ async function loadPrayerTimesForZone(Z){
       Isyak   : fixTime(todayEntry.isha)
     };
 
-    // Update UI (display in AM/PM) or --:-- if unavailable
+    if(Object.values(prayerTimes).every(v => v === null)){
+      setText("zoneName", `Gagal muat masa solat (${Z})`);
+      nextPrayerTime = null;
+      ["imsakTime","subuhTime","syurukTime","zohorTime","asarTime","maghribTime","isyakTime"]
+        .forEach(id => setText(id,"--:--"));
+      setText("nextPrayerNameLarge","--");
+      return;
+    }
+
     const uiSet = (id, value) => {
       const el = document.getElementById(id);
       if(!el) return;
@@ -274,15 +280,13 @@ async function loadPrayerTimesForZone(Z){
     updateCurrentPrayerCard();
 
   } catch(err){
-    dbg("loadPrayerTimesForZone error:", err);
     setText("zoneName", `Gagal muat masa solat (${Z})`);
+    nextPrayerTime = null;
   }
 }
 
 /* ============================================================
-   FORMAT DISPLAY (safe)
-   - input t expected "HH:MM" or similar; returns "h:mm AM/PM"
-   - returns "--:--" on invalid input
+   FORMAT DISPLAY
 ============================================================ */
 function format(t){
   if(!t && t !== 0) return "--:--";
@@ -303,19 +307,16 @@ function format(t){
 }
 
 /* ============================================================
-   NEXT PRAYER / COUNTDOWN (robust)
+   NEXT PRAYER + COUNTDOWN
 ============================================================ */
 function determineNextPrayer(){
-  // find the next prayer time after now (today)
   const now = new Date();
   let found = null;
   let foundName = null;
 
-  // Iterate in object order (Imsak, Subuh, Syuruk, Zohor, Asar, Maghrib, Isyak)
   for(const [name, raw] of Object.entries(prayerTimes)){
     if(!raw) continue;
     const [h,m] = raw.split(":").map(Number);
-    if(Number.isNaN(h) || Number.isNaN(m)) continue;
     const when = new Date();
     when.setHours(h, m, 0, 0);
     if(when > now){
@@ -325,7 +326,6 @@ function determineNextPrayer(){
     }
   }
 
-  // If none found (we are after Isyak), go to Subuh tomorrow (if available)
   if(!found){
     const sub = prayerTimes.Subuh;
     if(sub){
@@ -336,7 +336,6 @@ function determineNextPrayer(){
       found = when;
       foundName = "Subuh";
     } else {
-      // Last resort: set nextPrayerTime null (countdown disabled)
       nextPrayerTime = null;
       setText("nextPrayerNameLarge", "--");
       return;
@@ -347,47 +346,42 @@ function determineNextPrayer(){
   setText("nextPrayerNameLarge", foundName || "--");
 }
 
-/* Countdown updater */
 setInterval(()=>{
-    if (!nextPrayerTime) return;
+  if (!nextPrayerTime) return;
 
-    const now = new Date();
-    const diff = nextPrayerTime - now;
+  const now = new Date();
+  const diff = nextPrayerTime - now;
 
-    if (diff <= 0) { 
-        determineNextPrayer(); 
-        return; 
-    }
+  if (diff <= 0) { 
+      determineNextPrayer(); 
+      return; 
+  }
 
-    const h = Math.floor(diff / 3600000);
-    const m = Math.floor((diff / 60000) % 60);
-    const s = Math.floor((diff / 1000) % 60);
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff / 60000) % 60);
+  const s = Math.floor((diff / 1000) % 60);
 
-    // Update UI
-    const set = (id,v)=>{
-        const el=document.getElementById(id);
-        if(el) el.innerText = String(v).padStart(2,"0");
-    };
-    set("cdHour",h);
-    set("cdMin",m);
-    set("cdSec",s);
+  const set = (id,v)=>{
+      const el=document.getElementById(id);
+      if(el) el.innerText = String(v).padStart(2,"0");
+  };
+  set("cdHour",h);
+  set("cdMin",m);
+  set("cdSec",s);
 
-    /* -------------------------------
-       Highlight countdown when <10 min
-    --------------------------------*/
-    const items = document.querySelectorAll(".count-item");
+  const countdownBox = document.querySelector(".countdown-container");
+  const totalSeconds = h * 3600 + m * 60 + s;
 
-    if (h === 0 && m <= 10) {
-        items.forEach(box => box.classList.add("count-urgent"));
-    } else {
-        items.forEach(box => box.classList.remove("count-urgent"));
-    }
+  if (totalSeconds >= 0 && totalSeconds <= 600) {
+      countdownBox?.classList.add("highlight");
+  } else {
+      countdownBox?.classList.remove("highlight");
+  }
 
 }, 1000);
 
-
 /* ============================================================
-   CLOCK / CURRENT PRAYER CARD / HIGHLIGHT
+   CLOCK + HIGHLIGHT CURRENT PRAYER
 ============================================================ */
 function updateClock(){
   const now = new Date();
@@ -404,13 +398,11 @@ setInterval(updateClock, 1000);
 updateClock();
 
 function updateCurrentPrayerCard(){
-  // determine active prayer (latest one whose time <= now)
   const now = new Date();
-  let active = "Isyak"; // default fallback
+  let active = "Isyak";
   for(const [name, raw] of Object.entries(prayerTimes)){
     if(!raw) continue;
     const [h,m] = raw.split(":").map(Number);
-    if(Number.isNaN(h) || Number.isNaN(m)) continue;
     const t = new Date();
     t.setHours(h,m,0,0);
     if(t <= now) active = name;
@@ -427,7 +419,6 @@ function updateHighlight(){
   for(const [name, raw] of Object.entries(prayerTimes)){
     if(!raw) continue;
     const [h,m] = raw.split(":").map(Number);
-    if(Number.isNaN(h) || Number.isNaN(m)) continue;
     const t = new Date();
     t.setHours(h,m,0,0);
     if(t <= now) active = name;
@@ -442,6 +433,6 @@ function updateHighlight(){
 ============================================================ */
 (async function init(){
   await setAutoDates();
-  scaleToFit();          // Option A: no transform scaling
+  scaleToFit();
   await detectZoneAndLoad();
 })();
