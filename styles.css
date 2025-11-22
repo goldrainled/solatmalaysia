@@ -1,3 +1,4 @@
+
 /* styles.css — Optimized for Option A (NO JS scaling)
    - Mobile-first responsive
    - No transform()/scale() required
@@ -46,22 +47,24 @@ html, body {
     height: 100%;
     object-fit: cover;
     opacity: 0;
-    animation: fadeBG 40s infinite ease-in-out;
+    animation: zoomBG 40s infinite ease-in-out;
 }
 
-/* For 4 images */
-.slideshow-bg img:nth-child(1){ animation-delay: 0s; }
-.slideshow-bg img:nth-child(2){ animation-delay: 10s; }
-.slideshow-bg img:nth-child(3){ animation-delay: 20s; }
-.slideshow-bg img:nth-child(4){ animation-delay: 30s; }
+/* For 5 images */
+.slideshow-bg img:nth-child(1) { animation-delay: 0s; }
+.slideshow-bg img:nth-child(2) { animation-delay: 8s; }
+.slideshow-bg img:nth-child(3) { animation-delay: 16s; }
+.slideshow-bg img:nth-child(4) { animation-delay: 24s; }
+.slideshow-bg img:nth-child(5) { animation-delay: 32s; }
 
-@keyframes fadeBG {
-    0%   { opacity: 0; }
-    10%  { opacity: 1; }
-    40%  { opacity: 1; }
-    55%  { opacity: 0; }
-    100% { opacity: 0; }
+@keyframes zoomBG {
+  0%   { opacity: 0; transform: scale(1); }
+  10%  { opacity: 1; transform: scale(1.12); }
+  40%  { opacity: 1; transform: scale(1.22); }
+  55%  { opacity: 0; transform: scale(1.27); }
+  100% { opacity: 0; transform: scale(1.30); }
 }
+
 
 /* =============================================================
    FIX: Always show slideshow behind content
@@ -127,6 +130,7 @@ html, body {
     font-size: clamp(22px, 4vw, 42px);
     font-weight: 700;
     line-height: 1.1;
+    text-shadow: 0 0 14px rgba(0,0,0,0.6);
 }
 
 /* Row 2 — Hijri date (bigger & stronger) */
@@ -135,6 +139,7 @@ html, body {
     font-weight: 650;
     opacity: 0.95;
     line-height: 1.1;
+    text-shadow: 0 0 12px rgba(0,0,0,0.6);
 }
 
 /* Row 3 — Location (bigger but slightly softer) */
@@ -143,6 +148,7 @@ html, body {
     font-weight: 700;
     opacity: 0.85;
     line-height: 1.1;
+    text-shadow: 0 0 10px rgba(0,0,0,0.6);
 }
 
 #currentPrayerName {
@@ -162,7 +168,7 @@ html, body {
 
 /* Card base */
 .card {
-    background: rgba(255,255,255,0.12);
+    background: rgba(0, 0, 0, 0.45);
     padding: clamp(14px, 2.8vw, 28px);
     margin: 14px auto;
     border-radius: 20px;
@@ -176,7 +182,7 @@ html, body {
     padding: clamp(14px, 2.8vw, 28px);
     width: 100%;
     border-radius: 20px;
-    background: rgba(255,255,255,0.12);
+    background: rgba(0, 0, 0, 0.45);
     border: 1px solid rgba(255,255,255,0.12);
     box-shadow: 0 0 20px rgba(0,0,0,0.45);
     margin: 14px auto;
@@ -216,6 +222,7 @@ html, body {
     margin-top: 26px;
     margin-bottom: 14px;
     text-align: center;
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.6);
 }
 
 /* =============================================================
@@ -230,7 +237,7 @@ html, body {
 }
 
 .count-item {
-    background: rgba(255,255,255,0.12);
+    background: rgba(0, 0, 0, 0.45);
     padding: 18px 20px;
     border-radius: 20px;
     border: 1px solid rgba(255,255,255,0.12);
@@ -261,14 +268,13 @@ html, body {
 }
 
 /* GOLD color style for last 10 minutes */
-.count-gold {
-    color: #c7a000  !important;      /* gold */
-    text-shadow: 0 0 12px rgba(255, 215, 0, 0.8);
+.highlight .count-number {
+    color: #c7a000 !important;
 }
 
 /* Prayer rows (list) */
 .prayer-row {
-    background: rgba(255,255,255,0.12);
+    background: rgba(0, 0, 0, 0.45);
     border-radius: 14px;
     padding: clamp(12px, 3vw, 18px) clamp(16px, 4vw, 24px);
     width: 100%;
