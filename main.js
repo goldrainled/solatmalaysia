@@ -198,72 +198,169 @@ function determineZoneFromPlace(placeStr){
 }
 
 /* ============================================================
-   AUTO-LOCATION (GPS → IP fallback → Zone match)
+   REWRITTEN GEOLOCATION SYSTEM (GPS → IPWHO → ZONE)
+   - Accurate GPS physical location
+   - Correct reverse geocode (OSM with valid User-Agent)
+   - Fallback to ipwho.is (works on GitHub Pages)
+   - Drop-in replacement for your old functions
 ============================================================ */
 
-async function detectZoneAndLoad() {
-    setText("zoneName", "Mengesan lokasi...");
+/* Reverse geocode (OpenStreetMap, with proper User-Agent) */
+async function reverseGeocode(lat, lon){
+  try {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`;
+    const res = await fetch(url, {
+      headers: {
+        // REAL User-Agent required or OSM will BLOCK the request
+        "User-Agent": "goldrain-salat-display/1.0 (contact: your-email@example.com)"
+      }
+    });
 
-    let placeStr = "";
+    if(!res.ok) throw new Error("revgeo HTTP " + res.status);
 
-    // ----------------------------
-    // 1. Try GPS (browser location)
-    // ----------------------------
-    try {
-        const gpsAllowed = await tryGPSLocation();
-        if (gpsAllowed) {
-            placeStr = gpsAllowed; // already lowercase
-            console.log("GPS location used:", placeStr);
-        }
-    } catch (e) {
-        console.warn("GPS failed:", e);
-    }
+    const j = await res.json();
+    const addr = j.address || {};
 
-    // ----------------------------------------------------
-    // 2. Fallback to IP (ipwho.is) only if GPS unavailable
-    // ----------------------------------------------------
-    if (!placeStr) {
-        try {
-            const res = await fetch("https://ipwho.is/");
-            const j = await res.json();
+    const parts = [
+      addr.suburb,
+      addr.village,
+      addr.town,
+      addr.city,
+      addr.county,
+      addr.state,
+      addr.region,
+      addr.country
+    ]
+    .filter(Boolean)
+    .map(s => s.toLowerCase());
 
-            placeStr = [
-                j.city || "",
-                j.region || "",
-                j.country || ""
-            ]
-            .filter(Boolean)
-            .map(s => s.toLowerCase())
-            .join(", ");
-
-            console.log("IP fallback used:", placeStr);
-
-        } catch (e) {
-            console.error("IP lookup failed:", e);
-            placeStr = "";
-        }
-    }
-
-    // ----------------------------------------------
-    // 3. Shorten "Malaysia" -> "MY"
-    // ----------------------------------------------
-    placeStr = shortenCountry(placeStr || "");
-    const placeCap = capitalizePlace(placeStr);
-
-    // ----------------------------------------------
-    // 4. Determine prayer zone
-    // ----------------------------------------------
-    const foundZone = determineZoneFromPlace(placeStr);
-
-    if (foundZone) {
-        zoneCode = foundZone.replace(/_alias$/, "");
-        setText("zoneName", `${zoneCode.toUpperCase()} - ${placeCap}`);
-    } else {
-        setText("zoneName", `${zoneCode} - ${placeCap || "Lokasi tidak dikesan"}`);
-    }
-
-    await loadPrayerTimesForZone(zoneCode);
+    return parts.join(", ");
+  } catch(e){
+    console.warn("Reverse geocode failed:", e);
+    return "";
+  }
 }
+
+/* IP geolocation fallback (ipwho.is) */
+async function ipGeolocate(){
+  try {
+    const res = await fetch("https://ipwho.is/");
+    if(!res.ok) throw new Error("ipwho HTTP " + res.status);
+
+    const j = await res.json();
+    if(j.success === false) throw new Error("ipwho returned error");
+
+    const parts = [
+      j.city,
+      j.region,
+      j.country
+    ]
+    .filter(Boolean)
+    .map(s => s.toLowerCase());
+
+    return parts.join(", ");
+  } catch(e){
+    console.warn("ipwho lookup failed:", e);
+    return "";
+  }
+}
+
+/* Match the location string to a zone */
+function determineZoneFromPlace(placeStr){
+  if(!placeStr) return null;
+
+  const norm = placeStr.toLowerCase().replace(/[^\w\s]/g,' ');
+
+  // pass 1 - avoid alias first
+  for(const z of zoneKeywords){
+    if(z.zone.endsWith("_alias")) continue;
+    if(norm.includes(z.key)) return z.zone;
+  }
+
+  // pass 2 - include aliases
+  for(const z of zoneKeywords){
+    if(norm.includes(z.key)) return z.zone;
+  }
+
+  return null;
+}
+
+/* Capitalize first part only (city/town) */
+function capitalizePlace(s){
+  if(!s) return "";
+  return s.split(",")[0]
+          .split(" ")
+          .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(" ");
+}
+
+/* ============================================================
+   NEW detectZoneAndLoad()
+   GPS → reverseGeocode → zone
+   fallback → ipwho → zone
+============================================================ */
+async function detectZoneAndLoad(){
+  setText("zoneName", "Mengesan lokasi...");
+  let placeStr = "";
+
+  /* -------------------------
+     1. Try GPS first
+  ------------------------- */
+  if(navigator.geolocation){
+    try {
+      const pos = await new Promise((resolve, reject) =>
+        navigator.geolocation.getCurrentPosition(
+          resolve,
+          reject,
+          { timeout: 8000, maximumAge: 5 * 60 * 1000, enableHighAccuracy: true }
+        )
+      );
+
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+
+      dbg("GPS coords:", lat, lon);
+
+      placeStr = await reverseGeocode(lat, lon);
+
+      if(placeStr) dbg("Location from GPS:", placeStr);
+
+    } catch(e){
+      dbg("GPS failed:", e);
+    }
+  }
+
+  /* -------------------------
+     2. If GPS fails → use IP
+  ------------------------- */
+  if(!placeStr){
+    placeStr = await ipGeolocate();
+    dbg("Location from IP:", placeStr);
+  }
+
+  /* -------------------------
+     3. Determine zone
+  ------------------------- */
+  const foundZone = determineZoneFromPlace(placeStr);
+
+  if(foundZone){
+    const standardized = foundZone.replace(/_alias$/, '');
+    zoneCode = standardized;
+
+    setText("zoneName", `${zoneCode.toUpperCase()} - ${capitalizePlace(placeStr)}`);
+    dbg("Zone determined:", zoneCode);
+
+  } else {
+    dbg("Zone NOT found, default zone used:", zoneCode);
+    setText("zoneName", `${zoneCode} - ${capitalizePlace(placeStr || "Lokasi tidak dikesan")}`);
+  }
+
+  /* -------------------------
+     4. Load prayer times
+  ------------------------- */
+  await loadPrayerTimesForZone(zoneCode);
+}
+
 
 /* ============================================================
    PRAYER TIMES LOADING & NORMALISATION
