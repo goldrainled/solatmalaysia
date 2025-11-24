@@ -198,45 +198,71 @@ function determineZoneFromPlace(placeStr){
 }
 
 /* ============================================================
-   AUTO-LOCATION (GitHub Pages Safe, using ipwho.is)
+   AUTO-LOCATION (GPS → IP fallback → Zone match)
 ============================================================ */
+
 async function detectZoneAndLoad() {
-  setText("zoneName", "Mengesan lokasi...");
+    setText("zoneName", "Mengesan lokasi...");
 
-  let placeStr = "";
+    let placeStr = "";
 
-  try {
-    // 100% working on GitHub Pages
-    const res = await fetch("https://ipwho.is/");
-    const j = await res.json();
+    // ----------------------------
+    // 1. Try GPS (browser location)
+    // ----------------------------
+    try {
+        const gpsAllowed = await tryGPSLocation();
+        if (gpsAllowed) {
+            placeStr = gpsAllowed; // already lowercase
+            console.log("GPS location used:", placeStr);
+        }
+    } catch (e) {
+        console.warn("GPS failed:", e);
+    }
 
-    placeStr = [
-      j.city || "",
-      j.region || "",
-      j.country || ""
-    ]
-    .filter(Boolean)
-    .map(s => s.toLowerCase())
-    .join(", ");
+    // ----------------------------------------------------
+    // 2. Fallback to IP (ipwho.is) only if GPS unavailable
+    // ----------------------------------------------------
+    if (!placeStr) {
+        try {
+            const res = await fetch("https://ipwho.is/");
+            const j = await res.json();
 
-  } catch (e) {
-    console.error("IP lookup failed:", e);
-    placeStr = "";
-  }
+            placeStr = [
+                j.city || "",
+                j.region || "",
+                j.country || ""
+            ]
+            .filter(Boolean)
+            .map(s => s.toLowerCase())
+            .join(", ");
 
-  // Replace Malaysia → MY
-  placeStr = shortenCountry(placeStr || "");
-  const placeCap = capitalizePlace(placeStr);
-  const foundZone = determineZoneFromPlace(placeStr);
+            console.log("IP fallback used:", placeStr);
 
-  if (foundZone) {
-    zoneCode = foundZone.replace(/_alias$/, "");
-    setText("zoneName", `${zoneCode.toUpperCase()} - ${placeCap}`);
-  } else {
-    setText("zoneName", `${zoneCode} - ${placeCap || "Lokasi tidak dikesan"}`);
-  }
+        } catch (e) {
+            console.error("IP lookup failed:", e);
+            placeStr = "";
+        }
+    }
 
-  await loadPrayerTimesForZone(zoneCode);
+    // ----------------------------------------------
+    // 3. Shorten "Malaysia" -> "MY"
+    // ----------------------------------------------
+    placeStr = shortenCountry(placeStr || "");
+    const placeCap = capitalizePlace(placeStr);
+
+    // ----------------------------------------------
+    // 4. Determine prayer zone
+    // ----------------------------------------------
+    const foundZone = determineZoneFromPlace(placeStr);
+
+    if (foundZone) {
+        zoneCode = foundZone.replace(/_alias$/, "");
+        setText("zoneName", `${zoneCode.toUpperCase()} - ${placeCap}`);
+    } else {
+        setText("zoneName", `${zoneCode} - ${placeCap || "Lokasi tidak dikesan"}`);
+    }
+
+    await loadPrayerTimesForZone(zoneCode);
 }
 
 /* ============================================================
