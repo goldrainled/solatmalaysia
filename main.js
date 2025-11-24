@@ -120,39 +120,61 @@ function shortenCountry(placeStr){
 }
 
 /* ============================================================
-   ZONE MAP & DETECTION
+   ZONE MAP (Fixed + Cleaned + No Duplicate Keys)
 ============================================================ */
 const ZONE_MAP = {
-   "JHR02": ["johor bahru","jb","johor","kota tinggi","mersing"],
-   "KUL01": ["kuala lumpur","kl","wp kuala lumpur"],
-   "SGR01": ["selangor","shah alam","klang","kajang","petaling","gombak"]
-   "JHR01": ["pulau aur","pulau pemanggil"],
-   "JHR02": ["johor bahru","kota tinggi","mersing","jhr02","jb","johor bharu"],
-   "JHR03": ["kluang","pontian"],
-   "JHR04": ["batu pahat","muar","segamat","gemas"],
-   "KDH01": ["kota setar","kubang pasu","pokok sena"],
-   "KDH02": ["kuala muda","yan","pendang"],
-   "KDH03": ["padang terap","sik"],
-   "KDH04": ["baling"],
-   "KDH05": ["bandar baharu","kulim"],
-   "KDH06": ["langkawi"],
-   "KTN01": ["bachok","kota bharu","machang","pasir mas","pasir puteh","tanah merah","tumpat","kuala krai"],
-   "MLK01": ["alor gajah","melaka"],
-   "PLS01": ["perlis","kangar"],
-   "PNG01": ["pulau pinang","george town","penang","seberang perai"],
-   "KDH07": ["gunung jerai"],
-   "PHG01": ["pahang","kuantan","cameron"],
-   "PHG02": ["temerloh","lipis","raub"],
-   "PRK01": ["ipoh","perak","kinta","manjung","taiping","kerian"],
-   "SGR01": ["selangor","shah alam","kajang","klang","petaling","gombak","kuala langat","kuala selangor","hulu selangor"],
-   "KUL01": ["kuala lumpur","wp kuala lumpur","wp kl"],
-   "SBH01": ["sabah","kota kinabalu","sandakan","tawau"],
-   "SRW01": ["sri aman","sarawak","kuching","sibu","miri"],
-   "TRG01": ["kuala terengganu"],
-   "KEL01": ["kelantan"],
-   "JHR02_alias": ["johor","johor bahru","jb"],
-   "SBH02": ["labuan"],
+  "JHR01": ["pulau aur","pulau pemanggil"],
+
+  "JHR02": [
+    "johor bahru","jb","johor","kota tinggi",
+    "mersing","johor bharu","jhr02"
+  ],
+
+  "JHR03": ["kluang","pontian"],
+  "JHR04": ["batu pahat","muar","segamat","gemas"],
+
+  "KDH01": ["kota setar","kubang pasu","pokok sena"],
+  "KDH02": ["kuala muda","yan","pendang"],
+  "KDH03": ["padang terap","sik"],
+  "KDH04": ["baling"],
+  "KDH05": ["bandar baharu","kulim"],
+  "KDH06": ["langkawi"],
+  "KDH07": ["gunung jerai"],
+
+  "KTN01": [
+    "bachok","kota bharu","machang","pasir mas",
+    "pasir puteh","tanah merah","tumpat","kuala krai"
+  ],
+
+  "MLK01": ["alor gajah","melaka"],
+
+  "PLS01": ["perlis","kangar"],
+
+  "PNG01": ["pulau pinang","george town","penang","seberang perai"],
+
+  "PHG01": ["pahang","kuantan","cameron"],
+  "PHG02": ["temerloh","lipis","raub"],
+
+  "PRK01": ["ipoh","perak","kinta","manjung","taiping","kerian"],
+
+  "SGR01": [
+    "selangor","shah alam","kajang","klang","petaling",
+    "gombak","kuala langat","kuala selangor","hulu selangor"
+  ],
+
+  "KUL01": ["kuala lumpur","kl","wp kuala lumpur","wp kl"],
+
+  "SBH01": ["sabah","kota kinabalu","sandakan","tawau"],
+  "SBH02": ["labuan"],
+
+  "SRW01": ["sri aman","sarawak","kuching","sibu","miri"],
+
+  "TRG01": ["kuala terengganu"],
+  "KEL01": ["kelantan"],
+
+  "JHR02_alias": ["johor","johor bahru","jb"]
 };
+
 
 const zoneKeywords = [];
 for(const [zone,arr] of Object.entries(ZONE_MAP)){
