@@ -123,32 +123,35 @@ function shortenCountry(placeStr){
    ZONE MAP & DETECTION
 ============================================================ */
 const ZONE_MAP = {
-  "JHR01": ["pulau aur","pulau pemanggil"],
-  "JHR02": ["johor bahru","kota tinggi","mersing","jhr02","jb","johor bharu"],
-  "JHR03": ["kluang","pontian"],
-  "JHR04": ["batu pahat","muar","segamat","gemas"],
-  "KDH01": ["kota setar","kubang pasu","pokok sena"],
-  "KDH02": ["kuala muda","yan","pendang"],
-  "KDH03": ["padang terap","sik"],
-  "KDH04": ["baling"],
-  "KDH05": ["bandar baharu","kulim"],
-  "KDH06": ["langkawi"],
-  "KTN01": ["bachok","kota bharu","machang","pasir mas","pasir puteh","tanah merah","tumpat","kuala krai"],
-  "MLK01": ["alor gajah","melaka"],
-  "PLS01": ["perlis","kangar"],
-  "PNG01": ["pulau pinang","george town","penang","seberang perai"],
-  "KDH07": ["gunung jerai"],
-  "PHG01": ["pahang","kuantan","cameron"],
-  "PHG02": ["temerloh","lipis","raub"],
-  "PRK01": ["ipoh","perak","kinta","manjung","taiping","kerian"],
-  "SGR01": ["selangor","shah alam","kajang","klang","petaling","gombak","kuala langat","kuala selangor","hulu selangor"],
-  "KUL01": ["kuala lumpur","wp kuala lumpur","wp kl"],
-  "SBH01": ["sabah","kota kinabalu","sandakan","tawau"],
-  "SRW01": ["sri aman","sarawak","kuching","sibu","miri"],
-  "TRG01": ["kuala terengganu"],
-  "KEL01": ["kelantan"],
-  "JHR02_alias": ["johor","johor bahru","jb"],
-  "SBH02": ["labuan"],
+   "JHR02": ["johor bahru","jb","johor","kota tinggi","mersing"],
+   "KUL01": ["kuala lumpur","kl","wp kuala lumpur"],
+   "SGR01": ["selangor","shah alam","klang","kajang","petaling","gombak"]
+   "JHR01": ["pulau aur","pulau pemanggil"],
+   "JHR02": ["johor bahru","kota tinggi","mersing","jhr02","jb","johor bharu"],
+   "JHR03": ["kluang","pontian"],
+   "JHR04": ["batu pahat","muar","segamat","gemas"],
+   "KDH01": ["kota setar","kubang pasu","pokok sena"],
+   "KDH02": ["kuala muda","yan","pendang"],
+   "KDH03": ["padang terap","sik"],
+   "KDH04": ["baling"],
+   "KDH05": ["bandar baharu","kulim"],
+   "KDH06": ["langkawi"],
+   "KTN01": ["bachok","kota bharu","machang","pasir mas","pasir puteh","tanah merah","tumpat","kuala krai"],
+   "MLK01": ["alor gajah","melaka"],
+   "PLS01": ["perlis","kangar"],
+   "PNG01": ["pulau pinang","george town","penang","seberang perai"],
+   "KDH07": ["gunung jerai"],
+   "PHG01": ["pahang","kuantan","cameron"],
+   "PHG02": ["temerloh","lipis","raub"],
+   "PRK01": ["ipoh","perak","kinta","manjung","taiping","kerian"],
+   "SGR01": ["selangor","shah alam","kajang","klang","petaling","gombak","kuala langat","kuala selangor","hulu selangor"],
+   "KUL01": ["kuala lumpur","wp kuala lumpur","wp kl"],
+   "SBH01": ["sabah","kota kinabalu","sandakan","tawau"],
+   "SRW01": ["sri aman","sarawak","kuching","sibu","miri"],
+   "TRG01": ["kuala terengganu"],
+   "KEL01": ["kelantan"],
+   "JHR02_alias": ["johor","johor bahru","jb"],
+   "SBH02": ["labuan"],
 };
 
 const zoneKeywords = [];
@@ -173,32 +176,43 @@ function determineZoneFromPlace(placeStr){
 }
 
 /* ============================================================
-   DETECT ZONE & FORMAT LOCATION (Title-case + short country)
+   AUTO-LOCATION (GitHub Pages Safe)
+   - No GPS
+   - No CSP break
+   - No CORS blocking
+   - 100% IP-based (ipapi.co)
 ============================================================ */
-async function detectZoneAndLoad(){
+async function detectZoneAndLoad() {
   setText("zoneName", "Mengesan lokasi...");
 
   let placeStr = "";
-  if(navigator.geolocation){
-    try {
-      const pos = await new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000, maximumAge: 5*60*1000 });
-      });
-      placeStr = await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
-    } catch(e){
-      placeStr = await ipGeolocate();
-    }
-  } else {
-    placeStr = await ipGeolocate();
+
+  try {
+    // IP-based lookup only (GitHub Pages compatible)
+    const res = await fetch("https://ipapi.co/json/");
+    const j = await res.json();
+
+    placeStr = [
+      j.city || "",
+      j.region || "",
+      j.country_name || ""
+    ]
+    .filter(Boolean)
+    .map(s => s.toLowerCase())
+    .join(", ");
+
+  } catch (e) {
+    console.error("IP lookup failed:", e);
+    placeStr = ""; // fallback safely
   }
 
-  // Shorten country (Malaysia -> MY) before title-casing
+  // Shorten "Malaysia" -> "MY"
   placeStr = shortenCountry(placeStr || "");
   const placeCap = capitalizePlace(placeStr);
   const foundZone = determineZoneFromPlace(placeStr);
 
-  if(foundZone){
-    zoneCode = foundZone.replace(/_alias$/,'');
+  if (foundZone) {
+    zoneCode = foundZone.replace(/_alias$/, '');
     setText("zoneName", `${zoneCode.toUpperCase()} - ${placeCap}`);
   } else {
     setText("zoneName", `${zoneCode} - ${placeCap || "Lokasi tidak dikesan"}`);
