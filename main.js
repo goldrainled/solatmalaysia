@@ -198,11 +198,7 @@ function determineZoneFromPlace(placeStr){
 }
 
 /* ============================================================
-   AUTO-LOCATION (GitHub Pages Safe)
-   - No GPS
-   - No CSP break
-   - No CORS blocking
-   - 100% IP-based (ipapi.co)
+   AUTO-LOCATION (GitHub Pages Safe, using ipwho.is)
 ============================================================ */
 async function detectZoneAndLoad() {
   setText("zoneName", "Mengesan lokasi...");
@@ -210,14 +206,14 @@ async function detectZoneAndLoad() {
   let placeStr = "";
 
   try {
-    // IP-based lookup only (GitHub Pages compatible)
-    const res = await fetch("https://ipapi.co/json/");
+    // 100% working on GitHub Pages
+    const res = await fetch("https://ipwho.is/");
     const j = await res.json();
 
     placeStr = [
       j.city || "",
       j.region || "",
-      j.country_name || ""
+      j.country || ""
     ]
     .filter(Boolean)
     .map(s => s.toLowerCase())
@@ -225,16 +221,16 @@ async function detectZoneAndLoad() {
 
   } catch (e) {
     console.error("IP lookup failed:", e);
-    placeStr = ""; // fallback safely
+    placeStr = "";
   }
 
-  // Shorten "Malaysia" -> "MY"
+  // Replace Malaysia → MY
   placeStr = shortenCountry(placeStr || "");
   const placeCap = capitalizePlace(placeStr);
   const foundZone = determineZoneFromPlace(placeStr);
 
   if (foundZone) {
-    zoneCode = foundZone.replace(/_alias$/, '');
+    zoneCode = foundZone.replace(/_alias$/, "");
     setText("zoneName", `${zoneCode.toUpperCase()} - ${placeCap}`);
   } else {
     setText("zoneName", `${zoneCode} - ${placeCap || "Lokasi tidak dikesan"}`);
