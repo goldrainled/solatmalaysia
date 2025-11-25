@@ -570,13 +570,17 @@ function updateHighlight(){
 
   // ⭐ FIXED ZONE MODE
   if (typeof window.SELECTED_ZONE !== "undefined") {
-      zoneCode = window.SELECTED_ZONE;
-      setText("zoneName", zoneCode + " – Zon Tetap");
-      await loadPrayerTimesForZone(zoneCode);
-      return; // ← STOP AUTO-DETECT
-  }
+    zoneCode = window.SELECTED_ZONE;
 
-  // Auto detect mode (mobile/PC)
-  await detectZoneAndLoad();
-})();
+    // Show correct Negeri + Daerah based on ZONE_INFO
+    if (ZONE_INFO[zoneCode]) {
+        setText("zoneName", `${zoneCode} – ${ZONE_INFO[zoneCode].daerah}`);
+    } else {
+        setText("zoneName", zoneCode);
+    }
+
+    await loadPrayerTimesForZone(zoneCode);
+    return; // stop auto-detect
+}
+
 
