@@ -45,6 +45,17 @@ const PRAYER_LABELS = {
   Isyak  : "Isyak (عشاء)"
 };
 
+/* Needed for Jawi on NEXT PRAYER */
+const PRAYER_JAWI = {
+  Imsak  : "(إمساك)",
+  Subuh  : "(صبح)",
+  Syuruk : "(شروق)",
+  Zohor  : "(ظهر)",
+  Asar   : "(عصر)",
+  Maghrib: "(مغرب)",
+  Isyak  : "(عشاء)"
+};
+
 function applyJawiLabels() {
   for (const key of Object.keys(PRAYER_LABELS)) {
     const card = document.getElementById("card" + key);
@@ -582,7 +593,8 @@ function determineNextPrayer(){
   }
 
   nextPrayerTime = found;
-  setText("nextPrayerNameLarge", foundName || "--");
+  setText("nextPrayerNameLarge", `${foundName} ${PRAYER_JAWI[foundName] || ""}`);
+
 }
 
 /* Countdown interval (updates cdHour/cdMin/cdSec and highlight) */
