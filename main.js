@@ -624,7 +624,6 @@ function determineNextPrayer(){
 
   nextPrayerTime = found;
   setText("nextPrayerNameLarge", `${foundName} ${PRAYER_JAWI[foundName] || ""}`);
-
 }
 
 /* Countdown interval (updates cdHour/cdMin/cdSec and highlight) */
@@ -684,7 +683,6 @@ function updateCurrentPrayerCard(){
   const activeTime = prayerTimes[active];
    setText("currentPrayerName", `${active} ${PRAYER_JAWI[active] || ""}`);
    setText("currentPrayerTime", activeTime ? format(activeTime) : "--:--");
-
 }
 
 function updateHighlight(){
