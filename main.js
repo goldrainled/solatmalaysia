@@ -410,55 +410,85 @@ function determineZoneFromPlace(placeStr){
 
 /* ============================================================
    ZONE DETECTION + LOAD PRAYER TIMES
+   - GPS → reverse geocode
+   - IP fallback → ipwho.is
+   - Keyword match → ZONE_MAP
+   - Load prayer times
+   - Apply Jawi labels
 ============================================================ */
-async function detectZoneAndLoad(){
+async function detectZoneAndLoad() {
+
   setText("zoneName", "Mengesan lokasi...");
   let placeStr = "";
 
-  // 1) Try GPS
-  if(navigator.geolocation){
+  /* -------------------------------
+     1) Try GPS first
+  --------------------------------*/
+  if (navigator.geolocation) {
     try {
       const pos = await new Promise((resolve, reject) =>
         navigator.geolocation.getCurrentPosition(resolve, reject, {
-          timeout: 8000, maximumAge: 5*60*1000, enableHighAccuracy: true
+          timeout: 8000,
+          maximumAge: 5 * 60 * 1000,
+          enableHighAccuracy: true
         })
       );
+
       const lat = pos.coords.latitude;
       const lon = pos.coords.longitude;
+
       dbg("GPS coords:", lat, lon);
+
       placeStr = await reverseGeocode(lat, lon);
-      if(placeStr) dbg("Location from GPS:", placeStr);
-    } catch(e){
+      if (placeStr) dbg("Location from GPS:", placeStr);
+
+    } catch (e) {
       dbg("GPS failed:", e);
     }
   }
 
-  // 2) Fallback to IP
-  if(!placeStr){
+  /* -------------------------------
+     2) Fallback → IP geolocation
+  --------------------------------*/
+  if (!placeStr) {
     placeStr = await ipGeolocate();
     dbg("Location from IP:", placeStr);
   }
 
-  // 3) Determine zone using keywords
+  /* -------------------------------
+     3) Identify zone from keywords
+  --------------------------------*/
   const foundZone = determineZoneFromPlace(placeStr);
-  if(foundZone){
-    const standardized = foundZone.replace(/_alias$/, '');
+
+  if (foundZone) {
+    const standardized = foundZone.replace(/_alias$/, "");
     zoneCode = standardized;
+
     if (ZONE_INFO[zoneCode]) {
       setText("zoneName", `${zoneCode} – ${ZONE_INFO[zoneCode].daerah}`);
     } else {
       setText("zoneName", `${zoneCode} – ${capitalizePlace(placeStr)}`);
     }
+
     dbg("Zone determined:", zoneCode);
+
   } else {
+    // If no match → use default JHR02
     dbg("Zone NOT found, using default:", zoneCode);
-    setText("zoneName", `${zoneCode} - ${capitalizePlace(placeStr || "Lokasi tidak dikesan")}`);
+    setText("zoneName", `${zoneCode} – ${capitalizePlace(placeStr || "Lokasi tidak dikesan")}`);
   }
 
-  // 4) Load prayer times
+  /* -------------------------------
+     4) Load prayer times for zone
+  --------------------------------*/
   await loadPrayerTimesForZone(zoneCode);
-   applyJawiLabels();
+
+  /* -------------------------------
+     5) Apply prayer labels with Jawi
+  --------------------------------*/
+  applyJawiLabels();
 }
+
 
 /* ============================================================
    PRAYER TIMES: normalise + UI update
