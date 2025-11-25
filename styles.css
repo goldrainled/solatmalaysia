@@ -170,7 +170,6 @@ html, body {
 .card {
     background: rgba(0, 0, 0, 0.45);
     padding: clamp(14px, 2.8vw, 28px);
-    padding-top: 12px
     margin: 14px auto;
     border-radius: 20px;
     width: 100%;
@@ -181,6 +180,7 @@ html, body {
 
 .card-current {
     padding: clamp(9px, 2.8vw, 18px);
+    padding-top: 12px
     width: 100%;
     border-radius: 20px;
     background: rgba(0, 0, 0, 0.45);
