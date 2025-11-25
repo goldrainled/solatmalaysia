@@ -36,15 +36,26 @@ const HIJRI_MONTH_BM = {
   "safar": "Safar",
   "rabi al awwal": "Rabiulawal",
   "rabi al thani": "Rabiulakhir",
+
   "jumada al ula": "Jamadilawal",
+  "jumada al ulaa": "Jamadilawal",      // extra variation
   "jumada al akhira": "Jamadilakhir",
+  "jumada al akhirah": "Jamadilakhir",  // ⭐ FIX HERE ⭐
+  "jumada al akhirah": "Jamadilakhir",
+
   "rajab": "Rejab",
   "shaban": "Syaaban",
   "ramadan": "Ramadan",
   "shawwal": "Syawal",
+
   "dhul qadah": "Zulkaedah",
-  "dhul hijjah": "Zulhijjah"
+  "dhul qada": "Zulkaedah",
+  "dhu al qadah": "Zulkaedah",          // variation
+
+  "dhul hijjah": "Zulhijjah",
+  "dhu al hijjah": "Zulhijjah"          // variation
 };
+
 
 
 /* ============================================================
@@ -70,8 +81,11 @@ async function setAutoDates(){
        const norm = normalizeHijriName(hijriMonthEN);
        const hijriMonthBM = HIJRI_MONTH_BM[norm] || hijriMonthEN;
 
+// ⭐ DISPLAY THE HIJRI DATE (THIS MUST EXIST)
+setText("dateTodayH", `${h.day} ${hijriMonthBM} ${h.year}H`);
 
-      return;
+return;
+
     }
 
     setText("dateTodayG", now.toLocaleDateString());
@@ -81,6 +95,21 @@ async function setAutoDates(){
     setText("dateTodayG", new Date().toLocaleDateString());
     setText("dateTodayH", "");
   }
+}
+
+function normalizeHijriName(name) {
+  if (!name) return "";
+  return name
+    .normalize("NFD")                    // remove accents
+    .replace(/[\u0300-\u036f]/g, "")     // strip diacritics
+    .replace(/ā/g, "a")                  // long vowels → normal
+    .replace(/ū/g, "u")
+    .replace(/á/g, "a")
+    .replace(/í/g, "i")
+    .replace(/-/g, " ")                  // hyphens → space
+    .replace(/'/g, "")                   // apostrophes
+    .toLowerCase()
+    .trim();
 }
 
 /* ============================================================
