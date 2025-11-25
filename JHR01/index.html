@@ -26,11 +26,14 @@
     <div id="zoneName" class="header-row location-row">Loading zone...</div>
 </div>
 
-<div class="card"><div class="card-title">Waktu Sekarang</div><div id="currentTime" class="time-big">--:--:--</div></div>
+<div class="card">
+  <div class="card-title">Waktu Sekarang</div>
+  <div id="currentTime" class="time-big">--:--:--</div>
+</div>
 
 <div class="card card-current">
   <div id="currentPrayerName" class="time-label">--</div>
-  <div id="currentPrayerTime" class="time-medium">--:--</div>        
+  <div id="currentPrayerTime" class="time-medium">--:--</div>
 </div>
 
 <div class="card">
@@ -45,13 +48,41 @@
   <div class="count-item"><div id="cdSec" class="count-number">00</div><div class="count-text">SAAT</div></div>
 </div>
 
-<div id="cardImsak" class="prayer-row"><span>Imsak</span><span id="imsakTime">--:--</span></div>
-<div id="cardSubuh" class="prayer-row"><span>Subuh</span><span id="subuhTime">--:--</span></div>
-<div id="cardSyuruk" class="prayer-row"><span>Syuruk</span><span id="syurukTime">--:--</span></div>
-<div id="cardZohor" class="prayer-row"><span>Zohor</span><span id="zohorTime">--:--</span></div>
-<div id="cardAsar" class="prayer-row"><span>Asar</span><span id="asarTime">--:--</span></div>
-<div id="cardMaghrib" class="prayer-row"><span>Maghrib</span><span id="maghribTime">--:--</span></div>
-<div id="cardIsyak" class="prayer-row"><span>Isyak</span><span id="isyakTime">--:--</span></div>
+<!-- Prayer rows with Jawi labels -->
+<div id="cardImsak" class="prayer-row">
+    <span class="prayer-label" data-name="Imsak">Imsak</span>
+    <span id="imsakTime">--:--</span>
+</div>
+
+<div id="cardSubuh" class="prayer-row">
+    <span class="prayer-label" data-name="Subuh">Subuh</span>
+    <span id="subuhTime">--:--</span>
+</div>
+
+<div id="cardSyuruk" class="prayer-row">
+    <span class="prayer-label" data-name="Syuruk">Syuruk</span>
+    <span id="syurukTime">--:--</span>
+</div>
+
+<div id="cardZohor" class="prayer-row">
+    <span class="prayer-label" data-name="Zohor">Zohor</span>
+    <span id="zohorTime">--:--</span>
+</div>
+
+<div id="cardAsar" class="prayer-row">
+    <span class="prayer-label" data-name="Asar">Asar</span>
+    <span id="asarTime">--:--</span>
+</div>
+
+<div id="cardMaghrib" class="prayer-row">
+    <span class="prayer-label" data-name="Maghrib">Maghrib</span>
+    <span id="maghribTime">--:--</span>
+</div>
+
+<div id="cardIsyak" class="prayer-row">
+    <span class="prayer-label" data-name="Isyak">Isyak</span>
+    <span id="isyakTime">--:--</span>
+</div>
 
 </div>
 </div>
@@ -61,6 +92,8 @@
   window.SELECTED_ZONE = "JHR01";
 </script>
 
+<!-- This loads the UPDATED main.js with Jawi support -->
 <script src="../main.js"></script>
+
 </body>
 </html>
