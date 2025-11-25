@@ -44,6 +44,18 @@ const PRAYER_LABELS = {
   Isyak  : "Isyak (عشاء)"
 };
 
+function applyJawiLabels() {
+  for (const key of Object.keys(PRAYER_LABELS)) {
+    const card = document.getElementById("card" + key);
+    if (!card) continue;
+
+    const firstSpan = card.querySelector("span:first-child");
+    if (firstSpan) {
+      firstSpan.innerText = PRAYER_LABELS[key];
+    }
+  }
+}
+
 /* put prayer labels into the HTML (assumes each prayer-row first span is label) */
 function setPrayerLabels(){
   try {
@@ -433,6 +445,7 @@ async function detectZoneAndLoad(){
 
   // 4) Load prayer times
   await loadPrayerTimesForZone(zoneCode);
+   applyJawiLabels();
 }
 
 /* ============================================================
