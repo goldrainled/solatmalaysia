@@ -568,23 +568,20 @@ function updateHighlight(){
   await setAutoDates();
   scaleToFit();
 
-  // ⭐ FIXED ZONE MODE
-  // ⭐ FIXED ZONE MODE (DEVICE)
-if (typeof window.SELECTED_ZONE !== "undefined") {
-
+  if (typeof window.SELECTED_ZONE !== "undefined" && window.SELECTED_ZONE) {
     zoneCode = window.SELECTED_ZONE;
-
-    // Show correct district name
     if (ZONE_INFO[zoneCode]) {
-        setText("zoneName", `${zoneCode} – ${ZONE_INFO[zoneCode].daerah}`);
+      setText("zoneName", `${zoneCode} – ${ZONE_INFO[zoneCode].daerah}`);
     } else {
-        setText("zoneName", zoneCode);
+      setText("zoneName", zoneCode);
     }
-
-    // Load prayer times immediately
     await loadPrayerTimesForZone(zoneCode);
-    return; // STOP auto-detect completely
-}
+    return;
+  }
+
+  // auto-detect mode (root)
+  await detectZoneAndLoad();
+})();
 
 
 
