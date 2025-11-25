@@ -1,13 +1,11 @@
-
-
 /* ============================================================
-   main.js — Option A (NO SCALING) — FULL FIXED VERSION
-   - No transform scaling (Option A)
-   - Robust time parsing & formatting
-   - Safe guards for undefined API fields
-   - Title-case location + "Malaysia" -> "MY"
-   - Correct next-prayer logic (after Isyak -> Subuh tomorrow)
-   - Countdown numbers turn gold + soft glow when <= 10 minutes
+   main.js — Cleaned / Single-file version
+   - No duplicate functions
+   - ZONE_MAP for detection (keywords)
+   - ZONE_INFO for display (your preferred names)
+   - GPS (reverse geocode via Nominatim) -> IP fallback (ipwho.is)
+   - e-Solat monthly API loader
+   - Countdown + clock + next-prayer logic
 ============================================================ */
 
 /* ----- NO SCALING (Option A) ----- */
@@ -22,12 +20,10 @@ function scaleToFit() {
 
 /* ----- Globals ----- */
 let zoneCode = "JHR02";
-let prayerTimes = {};      // internal storage: keys -> "HH:MM" (24h)
-let nextPrayerTime = null; // Date
+let prayerTimes = {};      // keys: Imsak/Subuh/Syuruk/Zohor/Asar/Maghrib/Isyak -> "HH:MM" or null
+let nextPrayerTime = null; // Date object
 let dbgEnabled = false;
-
 function dbg(...args){ if(dbgEnabled) console.debug("dbg:", ...args); }
-
 function setText(id, txt){
   const el = document.getElementById(id);
   if(!el) return;
@@ -35,7 +31,7 @@ function setText(id, txt){
 }
 
 /* ============================================================
-   DATE HANDLING (Gregorian + Hijri)
+   DATE HANDLING
 ============================================================ */
 async function setAutoDates(){
   try {
@@ -61,68 +57,89 @@ async function setAutoDates(){
     setText("dateTodayG", now.toLocaleDateString());
     setText("dateTodayH", "");
   } catch(e){
+    dbg("setAutoDates error:", e);
     setText("dateTodayG", new Date().toLocaleDateString());
     setText("dateTodayH", "");
   }
 }
 
 /* ============================================================
-   GEOLOCATION (reverse geocode + ip fallback)
+   ZONE MAP (keyword detection) — keep as your detection source
+   (trimmed/clean; modify keywords if you want more matches)
 ============================================================ */
-async function reverseGeocode(lat, lon){
-  try {
-    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`;
-    const res = await fetch(url, { headers: { 'User-Agent': 'solat-display/1.0' }});
-    if(!res.ok) return "";
-    const j = await res.json();
-    const addr = j.address || {};
-    const parts = [
-      addr.city, addr.town, addr.village,
-      addr.county, addr.state, addr.region, addr.state_district,
-      addr.country
-    ].filter(Boolean).map(s => String(s).toLowerCase());
-    return parts.join(", ");
-  } catch(e){
-    return "";
-  }
-}
+const ZONE_MAP = {
+  "JHR01": ["pulau aur","pulau pemanggil"],
+  "JHR02": ["johor bahru","jb","johor","kota tinggi","mersing","kulai","jhr02"],
+  "JHR03": ["kluang","pontian"],
+  "JHR04": ["batu pahat","muar","segamat","gemas","tangkak"],
 
-async function ipGeolocate(){
-  try {
-    const res = await fetch("https://ipapi.co/json/");
-    if(!res.ok) return "";
-    const j = await res.json();
-    const parts = [j.city, j.region, j.country_name].filter(Boolean).map(s => String(s).toLowerCase());
-    return parts.join(", ");
-  } catch(e){
-    return "";
-  }
-}
+  "KDH01": ["kota setar","kubang pasu","pokok sena"],
+  "KDH02": ["kuala muda","yan","pendang"],
+  "KDH03": ["padang terap","sik"],
+  "KDH04": ["baling"],
+  "KDH05": ["bandar baharu","kulim"],
+  "KDH06": ["langkawi"],
+  "KDH07": ["gunung jerai"],
+
+  "KTN01": ["bachok","kota bharu","machang","pasir mas","pasir puteh","tanah merah","tumpat","kuala krai"],
+  "KTN02": ["jela","gua musang","jeli"],
+
+  "MLK01": ["alor gajah","melaka","melaka tengah"],
+
+  "PLS01": ["perlis","kangar"],
+
+  "PNG01": ["pulau pinang","georgetown","penang","seberang perai"],
+
+  "PHG01": ["kuantan","pahang","pulau tioman","cameron"],
+  "PHG02": ["temerloh","lipis","raub"],
+  "PHG03": ["jerantut","temerloh","maran"],
+  "PHG04": ["bentong","lipis","raub"],
+  "PHG05": ["genting sempah","janda baik","bukit tinggi"],
+  "PHG06": ["cameron highlands","bukit fraser","genting"],
+
+  "PRK01": ["tapah","slim river","tanjung malim","ipoh","perak","kinta"],
+  "PRK02": ["kuala kangsar","sungai siput","ipoh","batu gajah","kampar"],
+  "PRK03": ["lenggong","pengkalan hulu","grik"],
+  "PRK04": ["temengor","belum"],
+  "PRK05": ["teluk intan","bagan datuk","sitiawan","pangkor"],
+  "PRK06": ["taiping","selama","bagan serai","parit buntar"],
+  "PRK07": ["bukit larut","maxwell hill","taiping"],
+
+  "SBH01": ["sandakan","sabah","kota kinabalu","tawau"],
+  "SBH02": ["labuan"],
+  "SBH03": ["lahad datu","semporna","kunak","tungku"],
+  "SBH04": ["tawau","kalabakan"],
+  "SBH05": ["kudat","pulau banggi","pitas"],
+  "SBH06": ["kinabalu","mount kinabalu"],
+  "SBH07": ["kota kinabalu","ranau","penampang","papar","putatan"],
+  "SBH08": ["keningau","tambunan","nabawan"],
+  "SBH09": ["beaufort","sipitang","tenom"],
+
+  "SWK01": ["limbang","lawas"],
+  "SWK02": ["miri"],
+  "SWK03": ["bintulu"],
+  "SWK04": ["mukah","sibu"],
+  "SWK05": ["sarikei"],
+  "SWK06": ["sri aman","lubok antu","betong"],
+  "SWK07": ["serian","samarahan"],
+  "SWK08": ["kuching","bau","lundu"],
+  "SWK09": ["kampung patarikan"],
+
+  "SGR01": ["selangor","shah alam","gombak","petaling","klang","hulu langat","sepang","hulu selangor"],
+  "SGR02": ["kuala selangor","sabak bernam"],
+  "SGR03": ["klang","kuala langat"],
+
+  "TRG01": ["kuala terengganu","marang"],
+  "TRG02": ["besut","setiu"],
+  "TRG03": ["hulu terengganu"],
+  "TRG04": ["dungun","kemaman"],
+
+  "WLY01": ["kuala lumpur","putrajaya","wp kuala lumpur"],
+  "WLY02": ["labuan"]
+};
 
 /* ============================================================
-   LOCATION / TEXT HELPERS
-============================================================ */
-function capitalizePlace(s){
-  if(!s) return "";
-  return s.split(",")
-    .map(p => p.trim().split(" ")
-      .map(w => w ? w.charAt(0).toUpperCase() + w.slice(1) : "")
-      .join(" ")
-    )
-    .filter(Boolean)
-    .join(", ");
-}
-
-function shortenCountry(placeStr){
-  if(!placeStr) return placeStr;
-  // replace full 'malaysia' occurrences with 'MY' (case-insensitive)
-  return placeStr.replace(/malaysia/gi, "MY");
-}
-
-/* ============================================================
-   ZONE INFO (DISPLAY PURPOSE ONLY)
-   - Preferred Negeri + Daerah names (your provided list)
-   - Does NOT affect auto-detection
+   ZONE INFO (DISPLAY PURPOSE ONLY) — your preferred names
 ============================================================ */
 const ZONE_INFO = {
   "JHR01": { negeri: "Johor", daerah: "Pulau Aur dan Pulau Pemanggil" },
@@ -199,103 +216,58 @@ const ZONE_INFO = {
   "WLY02": { negeri: "Wilayah Persekutuan", daerah: "Labuan" }
 };
 
-
-
+/* Build zoneKeywords for fast detection */
 const zoneKeywords = [];
 for(const [zone,arr] of Object.entries(ZONE_MAP)){
   if(!Array.isArray(arr)) continue;
-  arr.forEach(k => zoneKeywords.push({ zone, key: k.toLowerCase() }));
+  arr.forEach(k => zoneKeywords.push({ zone, key: String(k).toLowerCase() }));
 }
 
 /* ============================================================
-   REWRITTEN GEOLOCATION SYSTEM (GPS → IPWHO → ZONE)
-   - Accurate GPS physical location
-   - Correct reverse geocode (OSM with valid User-Agent)
-   - Fallback to ipwho.is (works on GitHub Pages)
-   - Drop-in replacement for your old functions
+   GEOLOCATION (single reverseGeocode + single ip fallback)
+   - Uses Nominatim with a proper User-Agent (important)
+   - Fallback to ipwho.is for GitHub Pages environments
 ============================================================ */
-
-/* Reverse geocode (OpenStreetMap, with proper User-Agent) */
 async function reverseGeocode(lat, lon){
   try {
     const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`;
     const res = await fetch(url, {
       headers: {
-        // REAL User-Agent required or OSM will BLOCK the request
-        "User-Agent": "goldrain-salat-display/1.0 (contact: your-email@example.com)"
+        // put your site/contact so OSM won't block heavy usage
+        "User-Agent": "goldrainled.github.io/solatmalaysia (contact: goldrainled@gmail.com)"
       }
     });
-
     if(!res.ok) throw new Error("revgeo HTTP " + res.status);
-
     const j = await res.json();
     const addr = j.address || {};
-
     const parts = [
-      addr.suburb,
-      addr.village,
-      addr.town,
-      addr.city,
-      addr.county,
-      addr.state,
-      addr.region,
-      addr.country
-    ]
-    .filter(Boolean)
-    .map(s => s.toLowerCase());
-
+      addr.suburb, addr.village, addr.town, addr.city,
+      addr.county, addr.state, addr.region, addr.country
+    ].filter(Boolean).map(s => String(s).toLowerCase());
     return parts.join(", ");
   } catch(e){
-    console.warn("Reverse geocode failed:", e);
+    dbg("reverseGeocode failed:", e);
     return "";
   }
 }
 
-/* IP geolocation fallback (ipwho.is) */
 async function ipGeolocate(){
   try {
     const res = await fetch("https://ipwho.is/");
     if(!res.ok) throw new Error("ipwho HTTP " + res.status);
-
     const j = await res.json();
     if(j.success === false) throw new Error("ipwho returned error");
-
-    const parts = [
-      j.city,
-      j.region,
-      j.country
-    ]
-    .filter(Boolean)
-    .map(s => s.toLowerCase());
-
+    const parts = [ j.city, j.region, j.country ].filter(Boolean).map(s => String(s).toLowerCase());
     return parts.join(", ");
   } catch(e){
-    console.warn("ipwho lookup failed:", e);
+    dbg("ipGeolocate failed:", e);
     return "";
   }
 }
 
-/* Match the location string to a zone */
-function determineZoneFromPlace(placeStr){
-  if(!placeStr) return null;
-
-  const norm = placeStr.toLowerCase().replace(/[^\w\s]/g,' ');
-
-  // pass 1 - avoid alias first
-  for(const z of zoneKeywords){
-    if(z.zone.endsWith("_alias")) continue;
-    if(norm.includes(z.key)) return z.zone;
-  }
-
-  // pass 2 - include aliases
-  for(const z of zoneKeywords){
-    if(norm.includes(z.key)) return z.zone;
-  }
-
-  return null;
-}
-
-/* Capitalize first part only (city/town) */
+/* ============================================================
+   TEXT HELPERS
+============================================================ */
 function capitalizePlace(s){
   if(!s) return "";
   return s.split(",")[0]
@@ -303,96 +275,92 @@ function capitalizePlace(s){
           .map(w => w.charAt(0).toUpperCase() + w.slice(1))
           .join(" ");
 }
+function shortenCountry(placeStr){
+  if(!placeStr) return placeStr;
+  return placeStr.replace(/malaysia/gi, "MY");
+}
 
 /* ============================================================
-   NEW detectZoneAndLoad()
-   GPS → reverseGeocode → zone
-   fallback → ipwho → zone
+   DETECTION: match location string to zone code
+============================================================ */
+function determineZoneFromPlace(placeStr){
+  if(!placeStr) return null;
+  const norm = placeStr.toLowerCase().replace(/[^\w\s]/g,' ');
+
+  // Pass 1: skip alias-like keys if any
+  for(const z of zoneKeywords){
+    if(z.zone.endsWith("_alias")) continue;
+    if(norm.includes(z.key)) return z.zone;
+  }
+  // Pass 2: include all keys
+  for(const z of zoneKeywords){
+    if(norm.includes(z.key)) return z.zone;
+  }
+  return null;
+}
+
+/* ============================================================
+   ZONE DETECTION + LOAD PRAYER TIMES
 ============================================================ */
 async function detectZoneAndLoad(){
   setText("zoneName", "Mengesan lokasi...");
   let placeStr = "";
 
-  /* -------------------------
-     1. Try GPS first
-  ------------------------- */
+  // 1) Try GPS
   if(navigator.geolocation){
     try {
       const pos = await new Promise((resolve, reject) =>
-        navigator.geolocation.getCurrentPosition(
-          resolve,
-          reject,
-          { timeout: 8000, maximumAge: 5 * 60 * 1000, enableHighAccuracy: true }
-        )
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          timeout: 8000, maximumAge: 5*60*1000, enableHighAccuracy: true
+        })
       );
-
       const lat = pos.coords.latitude;
       const lon = pos.coords.longitude;
-
       dbg("GPS coords:", lat, lon);
-
       placeStr = await reverseGeocode(lat, lon);
-
       if(placeStr) dbg("Location from GPS:", placeStr);
-
     } catch(e){
       dbg("GPS failed:", e);
     }
   }
 
-  /* -------------------------
-     2. If GPS fails → use IP
-  ------------------------- */
+  // 2) Fallback to IP
   if(!placeStr){
     placeStr = await ipGeolocate();
     dbg("Location from IP:", placeStr);
   }
 
-  /* -------------------------
-     3. Determine zone
-  ------------------------- */
+  // 3) Determine zone using keywords
   const foundZone = determineZoneFromPlace(placeStr);
-
   if(foundZone){
     const standardized = foundZone.replace(/_alias$/, '');
     zoneCode = standardized;
-
     if (ZONE_INFO[zoneCode]) {
-    setText("zoneName", `${zoneCode} – ${ZONE_INFO[zoneCode].daerah}`);
-} else {
-    setText("zoneName", `${zoneCode} – ${capitalizePlace(placeStr)}`);
-}
-
+      setText("zoneName", `${zoneCode} – ${ZONE_INFO[zoneCode].daerah}`);
+    } else {
+      setText("zoneName", `${zoneCode} – ${capitalizePlace(placeStr)}`);
+    }
     dbg("Zone determined:", zoneCode);
-
   } else {
-    dbg("Zone NOT found, default zone used:", zoneCode);
+    dbg("Zone NOT found, using default:", zoneCode);
     setText("zoneName", `${zoneCode} - ${capitalizePlace(placeStr || "Lokasi tidak dikesan")}`);
   }
 
-  /* -------------------------
-     4. Load prayer times
-  ------------------------- */
+  // 4) Load prayer times
   await loadPrayerTimesForZone(zoneCode);
 }
 
-
 /* ============================================================
-   PRAYER TIMES LOADING & NORMALISATION
-   - fixTime() ensures internal format "HH:MM"
-   - UI uses format() to display "h:mm AM/PM"
+   PRAYER TIMES: normalise + UI update
 ============================================================ */
 function fixTime(t){
-  // t can be "0535", "530", "05:35", undefined, ""
   if(!t && t !== 0) return null;
   let s = String(t).trim();
-  // If already contains ":", try to normalise
   if(s.includes(":")){
     const [hh,mm] = s.split(":").map(p => p.replace(/\D/g,'')); 
     if(!hh) return null;
     return hh.padStart(2,"0") + ":" + (String(mm||"0").padStart(2,"0"));
   }
-  // If digits only
   s = s.replace(/\D/g,'').padStart(4,"0");
   return s.slice(0,2) + ":" + s.slice(2);
 }
@@ -409,14 +377,12 @@ async function loadPrayerTimesForZone(Z){
     const dd = String(today.getDate()).padStart(2,'0');
     const yyyy = today.getFullYear();
     const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-
     const key1 = `${dd}-${months[today.getMonth()]}-${yyyy}`;
     const key2 = `${dd}-${months[today.getMonth()].toUpperCase()}-${yyyy}`;
 
     let todayEntry = list.find(p => (p && (p.date === key1 || p.date === key2)));
     if(!todayEntry) todayEntry = list[list.length - 1] || {};
 
-    // Normalise internal times (HH:MM) or null if not available
     prayerTimes = {
       Imsak   : fixTime(todayEntry.imsak),
       Subuh   : fixTime(todayEntry.fajr),
@@ -427,18 +393,15 @@ async function loadPrayerTimesForZone(Z){
       Isyak   : fixTime(todayEntry.isha)
     };
 
-    // If all times missing, show error and bail
     if(Object.values(prayerTimes).every(v => v === null)){
-      dbg("No prayer times available for zone:", Z);
+      dbg("No prayer times for zone:", Z);
       setText("zoneName", `Gagal muat masa solat (${Z})`);
       nextPrayerTime = null;
-      // Clear UI to indicate missing times
       ["imsakTime","subuhTime","syurukTime","zohorTime","asarTime","maghribTime","isyakTime"].forEach(id => setText(id,"--:--"));
       setText("nextPrayerNameLarge","--");
       return;
     }
 
-    // Update UI (display in AM/PM) or --:-- if unavailable
     const uiSet = (id, value) => {
       const el = document.getElementById(id);
       if(!el) return;
@@ -465,9 +428,7 @@ async function loadPrayerTimesForZone(Z){
 }
 
 /* ============================================================
-   FORMAT DISPLAY (safe)
-   - input t expected "HH:MM" or similar; returns "h:mm AM/PM"
-   - returns "--:--" on invalid input
+   FORMAT DISPLAY / NEXT PRAYER / COUNTDOWN
 ============================================================ */
 function format(t){
   if(!t && t !== 0) return "--:--";
@@ -487,16 +448,11 @@ function format(t){
   }
 }
 
-/* ============================================================
-   NEXT PRAYER / COUNTDOWN (robust)
-============================================================ */
 function determineNextPrayer(){
-  // find the next prayer time after now (today)
   const now = new Date();
   let found = null;
   let foundName = null;
 
-  // Iterate in object order (Imsak, Subuh, Syuruk, Zohor, Asar, Maghrib, Isyak)
   for(const [name, raw] of Object.entries(prayerTimes)){
     if(!raw) continue;
     const [h,m] = raw.split(":").map(Number);
@@ -510,7 +466,6 @@ function determineNextPrayer(){
     }
   }
 
-  // If none found (we are after Isyak), go to Subuh tomorrow (if available)
   if(!found){
     const sub = prayerTimes.Subuh;
     if(sub){
@@ -521,7 +476,6 @@ function determineNextPrayer(){
       found = when;
       foundName = "Subuh";
     } else {
-      // Last resort: set nextPrayerTime null (countdown disabled)
       nextPrayerTime = null;
       setText("nextPrayerNameLarge", "--");
       return;
@@ -532,55 +486,30 @@ function determineNextPrayer(){
   setText("nextPrayerNameLarge", foundName || "--");
 }
 
-/* Countdown updater */
+/* Countdown interval (updates cdHour/cdMin/cdSec and highlight) */
 setInterval(()=>{
-    // If nextPrayerTime not set, nothing to do (silent)
-    if (!nextPrayerTime) return;
+  if(!nextPrayerTime) return;
+  const now = new Date();
+  const diff = nextPrayerTime - now;
+  if(diff <= 0){ determineNextPrayer(); return; }
 
-    const now = new Date();
-    const diff = nextPrayerTime - now;
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff / 60000) % 60);
+  const s = Math.floor((diff / 1000) % 60);
 
-    if (diff <= 0) { 
-        determineNextPrayer(); 
-        return; 
-    }
+  const set = (id,v)=>{ const el=document.getElementById(id); if(el) el.innerText = String(v).padStart(2,"0"); };
+  set("cdHour", h);
+  set("cdMin", m);
+  set("cdSec", s);
 
-    const h = Math.floor(diff / 3600000);
-    const m = Math.floor((diff / 60000) % 60);
-    const s = Math.floor((diff / 1000) % 60);
-
-    // Update UI
-    const set = (id,v)=>{
-        const el=document.getElementById(id);
-        if(el) el.innerText = String(v).padStart(2,"0");
-    };
-    set("cdHour",h);
-    set("cdMin",m);
-    set("cdSec",s);
-
-    /* -------------------------------------------
-   HIGHLIGHT COUNTDOWN: 00:10:00 → 00:00:00
-   - ON when totalSeconds is between 0 and 600
-   - OFF above 600 or below 0
---------------------------------------------*/
-const countdownBox = document.querySelector(".countdown-container");
-
-// Force numbers
-const hh = Number(h);
-const mm = Number(m);
-const ss = Number(s);
-
-const totalSeconds = hh * 3600 + mm * 60 + ss;
-
-// Highlight for 0s → 600s (00:10:00 down to 00:00:00)
-if (totalSeconds >= 0 && totalSeconds <= 600) {
-    if (countdownBox) countdownBox.classList.add("highlight");
-} else {
-    if (countdownBox) countdownBox.classList.remove("highlight");
-}
-
-}, 1000); // <-- properly closed
-
+  const totalSeconds = h*3600 + m*60 + s;
+  const countdownBox = document.querySelector(".countdown-container");
+  if(totalSeconds >= 0 && totalSeconds <= 600){
+    if(countdownBox) countdownBox.classList.add("highlight");
+  } else {
+    if(countdownBox) countdownBox.classList.remove("highlight");
+  }
+}, 1000);
 
 /* ============================================================
    CLOCK / CURRENT PRAYER CARD / HIGHLIGHT
@@ -600,9 +529,8 @@ setInterval(updateClock, 1000);
 updateClock();
 
 function updateCurrentPrayerCard(){
-  // determine active prayer (latest one whose time <= now)
   const now = new Date();
-  let active = "Isyak"; // default fallback
+  let active = "Isyak";
   for(const [name, raw] of Object.entries(prayerTimes)){
     if(!raw) continue;
     const [h,m] = raw.split(":").map(Number);
@@ -624,8 +552,7 @@ function updateHighlight(){
     if(!raw) continue;
     const [h,m] = raw.split(":").map(Number);
     if(Number.isNaN(h) || Number.isNaN(m)) continue;
-    const t = new Date();
-    t.setHours(h,m,0,0);
+    const t = new Date(); t.setHours(h,m,0,0);
     if(t <= now) active = name;
   }
   document.querySelectorAll(".prayer-row").forEach(e => e.classList.remove("currentPrayer"));
@@ -638,6 +565,6 @@ function updateHighlight(){
 ============================================================ */
 (async function init(){
   await setAutoDates();
-  scaleToFit();          // Option A: no transform scaling
+  scaleToFit();
   await detectZoneAndLoad();
 })();
