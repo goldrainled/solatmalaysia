@@ -180,7 +180,7 @@ html, body {
 
 .card-current {
     padding: clamp(6px, 2vw, 12px);
-    padding-top: 6px;
+    padding-top: 4px;
     width: 100%;
     border-radius: 20px;
     background: rgba(0, 0, 0, 0.45);
@@ -207,13 +207,13 @@ html, body {
 .time-medium {
     font-size: clamp(28px, 8vw, 58px);
     font-weight: 800;
-    line-height: 1;
+    line-height: 0.95;
 }
 
 .time-label {
     font-size: clamp(16px, 3.2vw, 40px);
-    margin-top: 6px;
-    opacity: 0.95;
+    font-weight: 800;
+    line-height: 0.95;
 }
 
 /* Section title */
