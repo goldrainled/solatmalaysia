@@ -179,12 +179,12 @@ html, body {
 }
 
 .card-current {
-    padding: clamp(11px, 2.8vw, 22px);
+    padding: clamp(9px, 2.8vw, 18px);
     width: 100%;
     border-radius: 20px;
     background: rgba(0, 0, 0, 0.45);
     border: 1px solid rgba(255,255,255,0.12);
-    box-shadow: 0 0 20px rgba(0,0,0,0.45);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.45);
     margin: 14px auto;
    text-align: center;
 }
