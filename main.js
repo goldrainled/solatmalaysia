@@ -717,6 +717,7 @@ function updateHighlight(){
       setText("zoneName", zoneCode);
     }
     await loadPrayerTimesForZone(zoneCode);
+     applyJawiLabels();
     return;
   }
 
