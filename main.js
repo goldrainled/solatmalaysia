@@ -1,11 +1,11 @@
 /* ============================================================
-   main.js — Cleaned / Single-file version
-   - No duplicate functions
-   - ZONE_MAP for detection (keywords)
-   - ZONE_INFO for display (your preferred names)
-   - GPS (reverse geocode via Nominatim) -> IP fallback (ipwho.is)
-   - e-Solat monthly API loader
-   - Countdown + clock + next-prayer logic
+   main.js — Complete updated version
+   - Gregorian BM, Hijri BM translation (normalize)
+   - Zone detection (GPS -> Nominatim) with IP fallback
+   - e-Solat monthly loader
+   - Prayer labels with Jawi
+   - Current / Next prayer + Jawi
+   - Countdown, clock, highlight
 ============================================================ */
 
 /* ----- NO SCALING (Option A) ----- */
@@ -31,32 +31,31 @@ function setText(id, txt){
 }
 
 /* ============================================================
-   PRAYER NAMES + JAWI (Option A - same line)
-   Format: "Label (Jawi)"
+   PRAYER LABELS + JAWI
+   - PRAYER_LABELS: printed on the list rows (Label + Jawi)
+   - PRAYER_JAWI: used for appending to current/next prayer names
 ============================================================ */
 const PRAYER_LABELS = {
   Imsak  : "Imsak (إمساك)",
-  Subuh  : "Subuh (صبح)",
-  Syuruk : "Syuruk (شروق)",
-  Zohor  : "Zohor (ظهر)",
-  Asar   : "Asar (عصر)",
-  Maghrib: "Maghrib (مغرب)",
-  Isyak  : "Isyak (عشاء)"
+  Subuh  : "Subuh (صُبْح)",
+  Syuruk : "Syuruk (شُرُوق)",
+  Zohor  : "Zohor (ظُهْر)",
+  Asar   : "Asar (عَصْر)",
+  Maghrib: "Maghrib (مَغْرِب)",
+  Isyak  : "Isyak (عِشَاء)"
 };
 
-function applyJawiLabels() {
-  for (const key of Object.keys(PRAYER_LABELS)) {
-    const card = document.getElementById("card" + key);
-    if (!card) continue;
+// Jawi/Arabic snippet to append (used for current/next)
+const PRAYER_JAWI = {
+  Imsak  : "(إمساك)",
+  Subuh  : "(صُبْح)",
+  Syuruk : "(شُرُوق)",
+  Zohor  : "(ظُهْر)",
+  Asar   : "(عَصْر)",
+  Maghrib: "(مَغْرِب)",
+  Isyak  : "(عِشَاء)"
+};
 
-    const firstSpan = card.querySelector("span:first-child");
-    if (firstSpan) {
-      firstSpan.innerText = PRAYER_LABELS[key];
-    }
-  }
-}
-
-/* put prayer labels into the HTML (assumes each prayer-row first span is label) */
 function setPrayerLabels(){
   try {
     const map = {
@@ -77,37 +76,36 @@ function setPrayerLabels(){
   } catch(e){ dbg("setPrayerLabels error:", e); }
 }
 
-// Hijri month names (Arabic → Bahasa Malaysia)
+/* ============================================================
+   HIJRI / GREGORIAN MONTH NAMES
+============================================================ */
+// Hijri month names normalized -> Bahasa Malaysia
 const HIJRI_MONTH_BM = {
   "muharram": "Muharam",
   "safar": "Safar",
   "rabi al awwal": "Rabiulawal",
   "rabi al thani": "Rabiulakhir",
-
+  "rabi al thani": "Rabiulakhir",
   "jumada al ula": "Jamadilawal",
-  "jumada al ulaa": "Jamadilawal",      // extra variation
+  "jumada al ulaa": "Jamadilawal",
   "jumada al akhira": "Jamadilakhir",
-  "jumada al akhirah": "Jamadilakhir",  // ⭐ FIX HERE ⭐
   "jumada al akhirah": "Jamadilakhir",
-
   "rajab": "Rejab",
   "shaban": "Syaaban",
   "ramadan": "Ramadan",
   "shawwal": "Syawal",
-
   "dhul qadah": "Zulkaedah",
   "dhul qada": "Zulkaedah",
-  "dhu al qadah": "Zulkaedah",          // variation
-
+  "dhu al qadah": "Zulkaedah",
   "dhul hijjah": "Zulhijjah",
-  "dhu al hijjah": "Zulhijjah"          // variation
+  "dhu al hijjah": "Zulhijjah"
 };
 
-/* Gregorian month names in Bahasa Malaysia */
+// Gregorian month names in Bahasa Malaysia
 const MONTHS_BM = ["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
 
 /* ============================================================
-   DATE HANDLING (Gregorian + Hijri)
+   DATE HANDLING: setAutoDates() -> Gregorian (BM) + Hijri (BM)
 ============================================================ */
 async function setAutoDates(){
   try {
@@ -122,18 +120,22 @@ async function setAutoDates(){
     setText("dateTodayG", `${dd} ${gMonthNameBM} ${yyyy}`);
 
     // Hijri via Aladhan
-    const res = await fetch(`https://api.aladhan.com/v1/gToH?date=${dateStr}`);
-    if(!res.ok) throw new Error("Aladhan HTTP " + res.status);
-    const j = await res.json();
-
-    if(j && j.data && j.data.hijri){
-      const h = j.data.hijri;
-      // API may provide month.en (English transliteration) or month.ar (Arabic script)
-      const rawMonth = (h.month && (h.month.en || h.month.ar)) || "";
-      const norm = normalizeHijriName(rawMonth);
-      const hijriMonthBM = HIJRI_MONTH_BM[norm] || rawMonth || "";
-      setText("dateTodayH", `${h.day} ${hijriMonthBM} ${h.year}H`);
-      return;
+    try {
+      const res = await fetch(`https://api.aladhan.com/v1/gToH?date=${dateStr}`);
+      if(!res.ok) throw new Error("Aladhan HTTP " + res.status);
+      const j = await res.json();
+      if(j && j.data && j.data.hijri){
+        const h = j.data.hijri;
+        // API may provide month.en (English transliteration) or month.ar (Arabic)
+        const rawMonth = (h.month && (h.month.en || h.month.ar)) || "";
+        const norm = normalizeHijriName(rawMonth);
+        const hijriMonthBM = HIJRI_MONTH_BM[norm] || rawMonth || "";
+        setText("dateTodayH", `${h.day} ${hijriMonthBM} ${h.year}H`);
+        return;
+      }
+    } catch(e){
+      dbg("Aladhan fetch failed:", e);
+      // continue to fallback
     }
 
     // fallback
@@ -148,21 +150,19 @@ async function setAutoDates(){
 function normalizeHijriName(name) {
   if (!name) return "";
   return name
-    .normalize("NFD")                    // remove accents
-    .replace(/[\u0300-\u036f]/g, "")     // strip diacritics
-    .replace(/ā/g, "a")                  // long vowels → normal
-    .replace(/ū/g, "u")
-    .replace(/á/g, "a")
-    .replace(/í/g, "i")
-    .replace(/-/g, " ")                  // hyphens → space
-    .replace(/'/g, "")                   // apostrophes
+    .normalize ? name.normalize("NFD").replace(/[\u0300-\u036f]/g, "") : name
+    // replace common long vowels/diacritics and punctuation
+    .replace(/ā/g, "a").replace(/ū/g, "u")
+    .replace(/á/g, "a").replace(/í/g, "i")
+    .replace(/-/g," ").replace(/–/g," ").replace(/—/g," ")
+    .replace(/-/g, " ")
+    .replace(/'/g, "")
     .toLowerCase()
     .trim();
 }
 
 /* ============================================================
-   ZONE MAP (keyword detection) — keep as your detection source
-   (trimmed/clean; modify keywords if you want more matches)
+   ZONE MAP (keyword detection)
 ============================================================ */
 const ZONE_MAP = {
   "JHR01": ["pulau aur","pulau pemanggil"],
@@ -235,84 +235,6 @@ const ZONE_MAP = {
   "WLY02": ["labuan"]
 };
 
-/* ============================================================
-   ZONE INFO (DISPLAY PURPOSE ONLY) — your preferred names
-============================================================ */
-const ZONE_INFO = {
-  "JHR01": { negeri: "Johor", daerah: "Pulau Aur dan Pulau Pemanggil" },
-  "JHR02": { negeri: "Johor", daerah: "Johor Bahru, Kota Tinggi, Mersing, Kulai" },
-  "JHR03": { negeri: "Johor", daerah: "Kluang, Pontian" },
-  "JHR04": { negeri: "Johor", daerah: "Batu Pahat, Muar, Segamat, Gemas Johor, Tangkak" },
-
-  "KDH01": { negeri: "Kedah", daerah: "Kota Setar, Kubang Pasu, Pokok Sena (Daerah Kecil)" },
-  "KDH02": { negeri: "Kedah", daerah: "Kuala Muda, Yan, Pendang" },
-  "KDH03": { negeri: "Kedah", daerah: "Padang Terap, Sik" },
-  "KDH04": { negeri: "Kedah", daerah: "Baling" },
-  "KDH05": { negeri: "Kedah", daerah: "Bandar Baharu, Kulim" },
-  "KDH06": { negeri: "Kedah", daerah: "Langkawi" },
-  "KDH07": { negeri: "Kedah", daerah: "Puncak Gunung Jerai" },
-
-  "KTN01": { negeri: "Kelantan", daerah: "Bachok, Kota Bharu, Machang, Pasir Mas, Pasir Puteh, Tanah Merah, Tumpat, Kuala Krai, Mukim Chiku" },
-  "KTN02": { negeri: "Kelantan", daerah: "Gua Musang (Daerah Galas Dan Bertam), Jeli, Jajahan Kecil Lojing" },
-
-  "MLK01": { negeri: "Melaka", daerah: "SELURUH NEGERI MELAKA" },
-
-  "NGS01": { negeri: "Negeri Sembilan", daerah: "Tampin, Jempol" },
-  "NGS02": { negeri: "Negeri Sembilan", daerah: "Jelebu, Kuala Pilah, Rembau" },
-  "NGS03": { negeri: "Negeri Sembilan", daerah: "Port Dickson, Seremban" },
-
-  "PHG01": { negeri: "Pahang", daerah: "Pulau Tioman" },
-  "PHG02": { negeri: "Pahang", daerah: "Kuantan, Pekan, Rompin, Muadzam Shah" },
-  "PHG03": { negeri: "Pahang", daerah: "Jerantut, Temerloh, Maran, Bera, Chenor, Jengka" },
-  "PHG04": { negeri: "Pahang", daerah: "Bentong, Lipis, Raub" },
-  "PHG05": { negeri: "Pahang", daerah: "Genting Sempah, Janda Baik, Bukit Tinggi" },
-  "PHG06": { negeri: "Pahang", daerah: "Cameron Highlands, Genting Higlands, Bukit Fraser" },
-
-  "PRK01": { negeri: "Perak", daerah: "Tapah, Slim River, Tanjung Malim" },
-  "PRK02": { negeri: "Perak", daerah: "Kuala Kangsar, Sg. Siput , Ipoh, Batu Gajah, Kampar" },
-  "PRK03": { negeri: "Perak", daerah: "Lenggong, Pengkalan Hulu, Grik" },
-  "PRK04": { negeri: "Perak", daerah: "Temengor, Belum" },
-  "PRK05": { negeri: "Perak", daerah: "Kg Gajah, Teluk Intan, Bagan Datuk, Seri Iskandar, Beruas, Parit, Lumut, Sitiawan, Pulau Pangkor" },
-  "PRK06": { negeri: "Perak", daerah: "Selama, Taiping, Bagan Serai, Parit Buntar" },
-  "PRK07": { negeri: "Perak", daerah: "Bukit Larut" },
-
-  "PLS01": { negeri: "Perlis", daerah: "SELURUH NEGERI PERLIS" },
-
-  "PNG01": { negeri: "Pulau Pinang", daerah: "SELURUH NEGERI PULAU PINANG" },
-
-  "SBH01": { negeri: "Sabah", daerah: "Bahagian Sandakan (Timur), Bukit Garam, Semawang, Temanggong, Tambisan, Bandar Sandakan, Sukau" },
-  "SBH02": { negeri: "Sabah", daerah: "Beluran, Telupid, Pinangah, Terusan, Kuamut, Bahagian Sandakan (Barat)" },
-  "SBH03": { negeri: "Sabah", daerah: "Lahad Datu, Silabukan, Kunak, Sahabat, Semporna, Tungku, Bahagian Tawau (Timur)" },
-  "SBH04": { negeri: "Sabah", daerah: "Bandar Tawau, Balong, Merotai, Kalabakan, Bahagian Tawau (Barat)" },
-  "SBH05": { negeri: "Sabah", daerah: "Kudat, Kota Marudu, Pitas, Pulau Banggi, Bahagian Kudat" },
-  "SBH06": { negeri: "Sabah", daerah: "Gunung Kinabalu" },
-  "SBH07": { negeri: "Sabah", daerah: "Kota Kinabalu, Ranau, Kota Belud, Tuaran, Penampang, Papar, Putatan, Bahagian Pantai Barat" },
-  "SBH08": { negeri: "Sabah", daerah: "Pensiangan, Keningau, Tambunan, Nabawan, Bahagian Pendalaman (Atas)" },
-  "SBH09": { negeri: "Sabah", daerah: "Beaufort, Kuala Penyu, Sipitang, Tenom, Long Pasia, Membakut, Weston, Bahagian Pendalaman (Bawah)" },
-
-  "SWK01": { negeri: "Sarawak", daerah: "Limbang, Lawas, Sundar, Trusan" },
-  "SWK02": { negeri: "Sarawak", daerah: "Miri, Niah, Bekenu, Sibuti, Marudi" },
-  "SWK03": { negeri: "Sarawak", daerah: "Pandan, Belaga, Suai, Tatau, Sebauh, Bintulu" },
-  "SWK04": { negeri: "Sarawak", daerah: "Sibu, Mukah, Dalat, Song, Igan, Oya, Balingian, Kanowit, Kapit" },
-  "SWK05": { negeri: "Sarawak", daerah: "Sarikei, Matu, Julau, Rajang, Daro, Bintangor, Belawai" },
-  "SWK06": { negeri: "Sarawak", daerah: "Lubok Antu, Sri Aman, Roban, Debak, Kabong, Lingga, Engkelili, Betong, Spaoh, Pusa, Saratok" },
-  "SWK07": { negeri: "Sarawak", daerah: "Serian, Simunjan, Samarahan, Sebuyau, Meludam" },
-  "SWK08": { negeri: "Sarawak", daerah: "Kuching, Bau, Lundu, Sematan" },
-  "SWK09": { negeri: "Sarawak", daerah: "Zon Khas (Kampung Patarikan)" },
-
-  "SGR01": { negeri: "Selangor", daerah: "Gombak, Petaling, Sepang, Hulu Langat, Hulu Selangor, Shah Alam" },
-  "SGR02": { negeri: "Selangor", daerah: "Kuala Selangor, Sabak Bernam" },
-  "SGR03": { negeri: "Selangor", daerah: "Klang, Kuala Langat" },
-
-  "TRG01": { negeri: "Terengganu", daerah: "Kuala Terengganu, Marang, Kuala Nerus" },
-  "TRG02": { negeri: "Terengganu", daerah: "Besut, Setiu" },
-  "TRG03": { negeri: "Terengganu", daerah: "Hulu Terengganu" },
-  "TRG04": { negeri: "Terengganu", daerah: "Dungun, Kemaman" },
-
-  "WLY01": { negeri: "Wilayah Persekutuan", daerah: "Kuala Lumpur, Putrajaya" },
-  "WLY02": { negeri: "Wilayah Persekutuan", daerah: "Labuan" }
-};
-
 /* Build zoneKeywords for fast detection */
 const zoneKeywords = [];
 for(const [zone,arr] of Object.entries(ZONE_MAP)){
@@ -321,16 +243,14 @@ for(const [zone,arr] of Object.entries(ZONE_MAP)){
 }
 
 /* ============================================================
-   GEOLOCATION (single reverseGeocode + single ip fallback)
-   - Uses Nominatim with a proper User-Agent (important)
-   - Fallback to ipwho.is for GitHub Pages environments
+   GEOLOCATION (reverseGeocode + IP fallback)
 ============================================================ */
 async function reverseGeocode(lat, lon){
   try {
     const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`;
     const res = await fetch(url, {
       headers: {
-        // put your site/contact so OSM won't block heavy usage
+        // include a contact so heavy usage won't get blocked
         "User-Agent": "goldrainled.github.io/solatmalaysia (contact: goldrainled@gmail.com)"
       }
     });
@@ -432,7 +352,7 @@ async function detectZoneAndLoad(){
   if(foundZone){
     const standardized = foundZone.replace(/_alias$/, '');
     zoneCode = standardized;
-    if (ZONE_INFO[zoneCode]) {
+    if (ZONE_INFO && ZONE_INFO[zoneCode]) {
       setText("zoneName", `${zoneCode} – ${ZONE_INFO[zoneCode].daerah}`);
     } else {
       setText("zoneName", `${zoneCode} – ${capitalizePlace(placeStr)}`);
@@ -445,7 +365,9 @@ async function detectZoneAndLoad(){
 
   // 4) Load prayer times
   await loadPrayerTimesForZone(zoneCode);
-   applyJawiLabels();
+
+  // 5) Ensure prayer labels show Jawi
+  setPrayerLabels();
 }
 
 /* ============================================================
@@ -517,6 +439,9 @@ async function loadPrayerTimesForZone(Z){
     determineNextPrayer();
     updateHighlight();
     updateCurrentPrayerCard();
+
+    // Ensure labels show Jawi after load
+    setPrayerLabels();
 
   } catch(err){
     dbg("loadPrayerTimesForZone error:", err);
@@ -640,6 +565,7 @@ function updateCurrentPrayerCard(){
 
   setText("currentPrayerName", `${active} ${PRAYER_JAWI[active] || ""}`);
   const activeTime = prayerTimes[active];
+  setText("currentPrayerTime", activeTime ? format(activeTime) : "--:--");
 }
 
 function updateHighlight(){
@@ -662,23 +588,27 @@ function updateHighlight(){
 ============================================================ */
 (async function init(){
 
+  // Ensure row labels are set early (some pages use static HTML but we overwrite to ensure Jawi)
+  setPrayerLabels();
+
   await setAutoDates();
   scaleToFit();
 
+  // If a fixed zone is provided by the page (eg. window.SELECTED_ZONE)
   if (typeof window.SELECTED_ZONE !== "undefined" && window.SELECTED_ZONE) {
     zoneCode = window.SELECTED_ZONE;
-    if (ZONE_INFO[zoneCode]) {
+    if (ZONE_INFO && ZONE_INFO[zoneCode]) {
+      // show location name if available
       setText("zoneName", `${zoneCode} – ${ZONE_INFO[zoneCode].daerah}`);
     } else {
       setText("zoneName", zoneCode);
     }
     await loadPrayerTimesForZone(zoneCode);
+    // ensure labels in case the page didn't have them yet
+    setPrayerLabels();
     return;
   }
 
-  // auto-detect mode (root)
+  // Auto detect mode (root)
   await detectZoneAndLoad();
 })();
-
-
-
