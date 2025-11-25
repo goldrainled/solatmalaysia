@@ -569,18 +569,22 @@ function updateHighlight(){
   scaleToFit();
 
   // ⭐ FIXED ZONE MODE
-  if (typeof window.SELECTED_ZONE !== "undefined") {
+  // ⭐ FIXED ZONE MODE (DEVICE)
+if (typeof window.SELECTED_ZONE !== "undefined") {
+
     zoneCode = window.SELECTED_ZONE;
 
-    // Show correct Negeri + Daerah based on ZONE_INFO
+    // Show correct district name
     if (ZONE_INFO[zoneCode]) {
         setText("zoneName", `${zoneCode} – ${ZONE_INFO[zoneCode].daerah}`);
     } else {
         setText("zoneName", zoneCode);
     }
 
+    // Load prayer times immediately
     await loadPrayerTimesForZone(zoneCode);
-    return; // stop auto-detect
+    return; // STOP auto-detect completely
 }
+
 
 
