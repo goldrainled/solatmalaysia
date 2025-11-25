@@ -30,6 +30,41 @@ function setText(id, txt){
   el.innerText = txt;
 }
 
+/* ============================================================
+   PRAYER NAMES + JAWI (Option A - same line)
+   Format: "Label (Jawi)"
+============================================================ */
+const PRAYER_LABELS = {
+  Imsak  : "Imsak (إمساك)",
+  Subuh  : "Subuh (صبح)",
+  Syuruk : "Syuruk (شروق)",
+  Zohor  : "Zohor (ظهر)",
+  Asar   : "Asar (عصر)",
+  Maghrib: "Maghrib (مغرب)",
+  Isyak  : "Isyak (عشاء)"
+};
+
+/* put prayer labels into the HTML (assumes each prayer-row first span is label) */
+function setPrayerLabels(){
+  try {
+    const map = {
+      Imsak: "cardImsak",
+      Subuh: "cardSubuh",
+      Syuruk: "cardSyuruk",
+      Zohor: "cardZohor",
+      Asar: "cardAsar",
+      Maghrib: "cardMaghrib",
+      Isyak: "cardIsyak"
+    };
+    for(const [key,id] of Object.entries(map)){
+      const card = document.getElementById(id);
+      if(!card) continue;
+      const firstSpan = card.querySelector("span:first-child");
+      if(firstSpan) firstSpan.innerText = PRAYER_LABELS[key] || key;
+    }
+  } catch(e){ dbg("setPrayerLabels error:", e); }
+}
+
 // Hijri month names (Arabic → Bahasa Malaysia)
 const HIJRI_MONTH_BM = {
   "muharram": "Muharam",
@@ -56,10 +91,11 @@ const HIJRI_MONTH_BM = {
   "dhu al hijjah": "Zulhijjah"          // variation
 };
 
-
+/* Gregorian month names in Bahasa Malaysia */
+const MONTHS_BM = ["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
 
 /* ============================================================
-   DATE HANDLING
+   DATE HANDLING (Gregorian + Hijri)
 ============================================================ */
 async function setAutoDates(){
   try {
@@ -69,26 +105,26 @@ async function setAutoDates(){
     const yyyy = now.getFullYear();
     const dateStr = `${dd}-${mm}-${yyyy}`;
 
+    // Gregorian display in BM
+    const gMonthNameBM = MONTHS_BM[now.getMonth()] || new Intl.DateTimeFormat('en-US',{month:'long'}).format(now);
+    setText("dateTodayG", `${dd} ${gMonthNameBM} ${yyyy}`);
+
+    // Hijri via Aladhan
     const res = await fetch(`https://api.aladhan.com/v1/gToH?date=${dateStr}`);
+    if(!res.ok) throw new Error("Aladhan HTTP " + res.status);
     const j = await res.json();
 
     if(j && j.data && j.data.hijri){
       const h = j.data.hijri;
-      const gMonthName = new Intl.DateTimeFormat('en-US',{month:'long'}).format(now);
-      setText("dateTodayG", `${dd} ${gMonthName} ${yyyy}`);
-       
-       const hijriMonthEN = (h.month && (h.month.en || h.month.ar)) || "";
-       const norm = normalizeHijriName(hijriMonthEN);
-       const hijriMonthBM = HIJRI_MONTH_BM[norm] || hijriMonthEN;
-
-// ⭐ DISPLAY THE HIJRI DATE (THIS MUST EXIST)
-setText("dateTodayH", `${h.day} ${hijriMonthBM} ${h.year}H`);
-
-return;
-
+      // API may provide month.en (English transliteration) or month.ar (Arabic script)
+      const rawMonth = (h.month && (h.month.en || h.month.ar)) || "";
+      const norm = normalizeHijriName(rawMonth);
+      const hijriMonthBM = HIJRI_MONTH_BM[norm] || rawMonth || "";
+      setText("dateTodayH", `${h.day} ${hijriMonthBM} ${h.year}H`);
+      return;
     }
 
-    setText("dateTodayG", now.toLocaleDateString());
+    // fallback
     setText("dateTodayH", "");
   } catch(e){
     dbg("setAutoDates error:", e);
