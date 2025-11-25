@@ -179,7 +179,7 @@ html, body {
 }
 
 .card-current {
-    padding: clamp(14px, 2.8vw, 28px);
+    padding: clamp(11px, 2.8vw, 22px);
     width: 100%;
     border-radius: 20px;
     background: rgba(0, 0, 0, 0.45);
