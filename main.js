@@ -207,21 +207,6 @@ for(const [zone,arr] of Object.entries(ZONE_MAP)){
   arr.forEach(k => zoneKeywords.push({ zone, key: k.toLowerCase() }));
 }
 
-function determineZoneFromPlace(placeStr){
-  if(!placeStr) return null;
-  const norm = placeStr.toLowerCase().replace(/[^\w\s]/g,' ');
-  // pass 1 - non-alias zones
-  for(const z of zoneKeywords){
-    if(z.zone.endsWith("_alias")) continue;
-    if(norm.includes(z.key)) return z.zone;
-  }
-  // pass 2 - include aliases
-  for(const z of zoneKeywords){
-    if(norm.includes(z.key)) return z.zone;
-  }
-  return null;
-}
-
 /* ============================================================
    REWRITTEN GEOLOCATION SYSTEM (GPS → IPWHO → ZONE)
    - Accurate GPS physical location
