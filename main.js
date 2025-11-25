@@ -120,60 +120,85 @@ function shortenCountry(placeStr){
 }
 
 /* ============================================================
-   ZONE MAP (Fixed + Cleaned + No Duplicate Keys)
+   ZONE INFO (DISPLAY PURPOSE ONLY)
+   - Preferred Negeri + Daerah names (your provided list)
+   - Does NOT affect auto-detection
 ============================================================ */
-const ZONE_MAP = {
-  "JHR01": ["pulau aur","pulau pemanggil"],
+const ZONE_INFO = {
+  "JHR01": { negeri: "Johor", daerah: "Pulau Aur dan Pulau Pemanggil" },
+  "JHR02": { negeri: "Johor", daerah: "Johor Bahru, Kota Tinggi, Mersing, Kulai" },
+  "JHR03": { negeri: "Johor", daerah: "Kluang, Pontian" },
+  "JHR04": { negeri: "Johor", daerah: "Batu Pahat, Muar, Segamat, Gemas Johor, Tangkak" },
 
-  "JHR02": [
-    "johor bahru","jb","johor","kota tinggi",
-    "mersing","johor bharu","jhr02"
-  ],
+  "KDH01": { negeri: "Kedah", daerah: "Kota Setar, Kubang Pasu, Pokok Sena (Daerah Kecil)" },
+  "KDH02": { negeri: "Kedah", daerah: "Kuala Muda, Yan, Pendang" },
+  "KDH03": { negeri: "Kedah", daerah: "Padang Terap, Sik" },
+  "KDH04": { negeri: "Kedah", daerah: "Baling" },
+  "KDH05": { negeri: "Kedah", daerah: "Bandar Baharu, Kulim" },
+  "KDH06": { negeri: "Kedah", daerah: "Langkawi" },
+  "KDH07": { negeri: "Kedah", daerah: "Puncak Gunung Jerai" },
 
-  "JHR03": ["kluang","pontian"],
-  "JHR04": ["batu pahat","muar","segamat","gemas"],
+  "KTN01": { negeri: "Kelantan", daerah: "Bachok, Kota Bharu, Machang, Pasir Mas, Pasir Puteh, Tanah Merah, Tumpat, Kuala Krai, Mukim Chiku" },
+  "KTN02": { negeri: "Kelantan", daerah: "Gua Musang (Daerah Galas Dan Bertam), Jeli, Jajahan Kecil Lojing" },
 
-  "KDH01": ["kota setar","kubang pasu","pokok sena"],
-  "KDH02": ["kuala muda","yan","pendang"],
-  "KDH03": ["padang terap","sik"],
-  "KDH04": ["baling"],
-  "KDH05": ["bandar baharu","kulim"],
-  "KDH06": ["langkawi"],
-  "KDH07": ["gunung jerai"],
+  "MLK01": { negeri: "Melaka", daerah: "SELURUH NEGERI MELAKA" },
 
-  "KTN01": [
-    "bachok","kota bharu","machang","pasir mas",
-    "pasir puteh","tanah merah","tumpat","kuala krai"
-  ],
+  "NGS01": { negeri: "Negeri Sembilan", daerah: "Tampin, Jempol" },
+  "NGS02": { negeri: "Negeri Sembilan", daerah: "Jelebu, Kuala Pilah, Rembau" },
+  "NGS03": { negeri: "Negeri Sembilan", daerah: "Port Dickson, Seremban" },
 
-  "MLK01": ["alor gajah","melaka"],
+  "PHG01": { negeri: "Pahang", daerah: "Pulau Tioman" },
+  "PHG02": { negeri: "Pahang", daerah: "Kuantan, Pekan, Rompin, Muadzam Shah" },
+  "PHG03": { negeri: "Pahang", daerah: "Jerantut, Temerloh, Maran, Bera, Chenor, Jengka" },
+  "PHG04": { negeri: "Pahang", daerah: "Bentong, Lipis, Raub" },
+  "PHG05": { negeri: "Pahang", daerah: "Genting Sempah, Janda Baik, Bukit Tinggi" },
+  "PHG06": { negeri: "Pahang", daerah: "Cameron Highlands, Genting Higlands, Bukit Fraser" },
 
-  "PLS01": ["perlis","kangar"],
+  "PRK01": { negeri: "Perak", daerah: "Tapah, Slim River, Tanjung Malim" },
+  "PRK02": { negeri: "Perak", daerah: "Kuala Kangsar, Sg. Siput , Ipoh, Batu Gajah, Kampar" },
+  "PRK03": { negeri: "Perak", daerah: "Lenggong, Pengkalan Hulu, Grik" },
+  "PRK04": { negeri: "Perak", daerah: "Temengor, Belum" },
+  "PRK05": { negeri: "Perak", daerah: "Kg Gajah, Teluk Intan, Bagan Datuk, Seri Iskandar, Beruas, Parit, Lumut, Sitiawan, Pulau Pangkor" },
+  "PRK06": { negeri: "Perak", daerah: "Selama, Taiping, Bagan Serai, Parit Buntar" },
+  "PRK07": { negeri: "Perak", daerah: "Bukit Larut" },
 
-  "PNG01": ["pulau pinang","george town","penang","seberang perai"],
+  "PLS01": { negeri: "Perlis", daerah: "SELURUH NEGERI PERLIS" },
 
-  "PHG01": ["pahang","kuantan","cameron"],
-  "PHG02": ["temerloh","lipis","raub"],
+  "PNG01": { negeri: "Pulau Pinang", daerah: "SELURUH NEGERI PULAU PINANG" },
 
-  "PRK01": ["ipoh","perak","kinta","manjung","taiping","kerian"],
+  "SBH01": { negeri: "Sabah", daerah: "Bahagian Sandakan (Timur), Bukit Garam, Semawang, Temanggong, Tambisan, Bandar Sandakan, Sukau" },
+  "SBH02": { negeri: "Sabah", daerah: "Beluran, Telupid, Pinangah, Terusan, Kuamut, Bahagian Sandakan (Barat)" },
+  "SBH03": { negeri: "Sabah", daerah: "Lahad Datu, Silabukan, Kunak, Sahabat, Semporna, Tungku, Bahagian Tawau (Timur)" },
+  "SBH04": { negeri: "Sabah", daerah: "Bandar Tawau, Balong, Merotai, Kalabakan, Bahagian Tawau (Barat)" },
+  "SBH05": { negeri: "Sabah", daerah: "Kudat, Kota Marudu, Pitas, Pulau Banggi, Bahagian Kudat" },
+  "SBH06": { negeri: "Sabah", daerah: "Gunung Kinabalu" },
+  "SBH07": { negeri: "Sabah", daerah: "Kota Kinabalu, Ranau, Kota Belud, Tuaran, Penampang, Papar, Putatan, Bahagian Pantai Barat" },
+  "SBH08": { negeri: "Sabah", daerah: "Pensiangan, Keningau, Tambunan, Nabawan, Bahagian Pendalaman (Atas)" },
+  "SBH09": { negeri: "Sabah", daerah: "Beaufort, Kuala Penyu, Sipitang, Tenom, Long Pasia, Membakut, Weston, Bahagian Pendalaman (Bawah)" },
 
-  "SGR01": [
-    "selangor","shah alam","kajang","klang","petaling",
-    "gombak","kuala langat","kuala selangor","hulu selangor"
-  ],
+  "SWK01": { negeri: "Sarawak", daerah: "Limbang, Lawas, Sundar, Trusan" },
+  "SWK02": { negeri: "Sarawak", daerah: "Miri, Niah, Bekenu, Sibuti, Marudi" },
+  "SWK03": { negeri: "Sarawak", daerah: "Pandan, Belaga, Suai, Tatau, Sebauh, Bintulu" },
+  "SWK04": { negeri: "Sarawak", daerah: "Sibu, Mukah, Dalat, Song, Igan, Oya, Balingian, Kanowit, Kapit" },
+  "SWK05": { negeri: "Sarawak", daerah: "Sarikei, Matu, Julau, Rajang, Daro, Bintangor, Belawai" },
+  "SWK06": { negeri: "Sarawak", daerah: "Lubok Antu, Sri Aman, Roban, Debak, Kabong, Lingga, Engkelili, Betong, Spaoh, Pusa, Saratok" },
+  "SWK07": { negeri: "Sarawak", daerah: "Serian, Simunjan, Samarahan, Sebuyau, Meludam" },
+  "SWK08": { negeri: "Sarawak", daerah: "Kuching, Bau, Lundu, Sematan" },
+  "SWK09": { negeri: "Sarawak", daerah: "Zon Khas (Kampung Patarikan)" },
 
-  "KUL01": ["kuala lumpur","kl","wp kuala lumpur","wp kl"],
+  "SGR01": { negeri: "Selangor", daerah: "Gombak, Petaling, Sepang, Hulu Langat, Hulu Selangor, Shah Alam" },
+  "SGR02": { negeri: "Selangor", daerah: "Kuala Selangor, Sabak Bernam" },
+  "SGR03": { negeri: "Selangor", daerah: "Klang, Kuala Langat" },
 
-  "SBH01": ["sabah","kota kinabalu","sandakan","tawau"],
-  "SBH02": ["labuan"],
+  "TRG01": { negeri: "Terengganu", daerah: "Kuala Terengganu, Marang, Kuala Nerus" },
+  "TRG02": { negeri: "Terengganu", daerah: "Besut, Setiu" },
+  "TRG03": { negeri: "Terengganu", daerah: "Hulu Terengganu" },
+  "TRG04": { negeri: "Terengganu", daerah: "Dungun, Kemaman" },
 
-  "SRW01": ["sri aman","sarawak","kuching","sibu","miri"],
-
-  "TRG01": ["kuala terengganu"],
-  "KEL01": ["kelantan"],
-
-  "JHR02_alias": ["johor","johor bahru","jb"]
+  "WLY01": { negeri: "Wilayah Persekutuan", daerah: "Kuala Lumpur, Putrajaya" },
+  "WLY02": { negeri: "Wilayah Persekutuan", daerah: "Labuan" }
 };
+
 
 
 const zoneKeywords = [];
@@ -347,7 +372,12 @@ async function detectZoneAndLoad(){
     const standardized = foundZone.replace(/_alias$/, '');
     zoneCode = standardized;
 
-    setText("zoneName", `${zoneCode.toUpperCase()} - ${capitalizePlace(placeStr)}`);
+    if (ZONE_INFO[zoneCode]) {
+    setText("zoneName", `${zoneCode} – ${ZONE_INFO[zoneCode].daerah}`);
+} else {
+    setText("zoneName", `${zoneCode} – ${capitalizePlace(placeStr)}`);
+}
+
     dbg("Zone determined:", zoneCode);
 
   } else {
