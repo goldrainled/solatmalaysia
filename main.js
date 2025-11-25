@@ -681,9 +681,10 @@ function updateCurrentPrayerCard(){
     if(t <= now) active = name;
   }
 
-  setText("currentPrayerName", active);
   const activeTime = prayerTimes[active];
-  setText("currentPrayerTime", activeTime ? format(activeTime) : "--:--");
+   setText("currentPrayerName", `${active} ${PRAYER_JAWI[active] || ""}`);
+   setText("currentPrayerTime", activeTime ? format(activeTime) : "--:--");
+
 }
 
 function updateHighlight(){
