@@ -32,27 +32,20 @@ function setText(id, txt){
 
 // Hijri month names (Arabic → Bahasa Malaysia)
 const HIJRI_MONTH_BM = {
-  "Muharram": "Muharam",
-  "Safar": "Safar",
-  "Rabi Al-Awwal": "Rabiulawal",
-  "Rabi Al-Thani": "Rabiulakhir",
-  "Jumada Al-Awwal": "Jamadilawal",
-  "Jumada Al-Thani": "Jamadilakhir",
-  "Rajab": "Rejab",
-  "Shaban": "Syaaban",
-  "Ramadan": "Ramadan",
-  "Shawwal": "Syawal",
-  "Dhul Qadah": "Zulkaedah",
-  "Dhul Hijjah": "Zulhijjah",
-
-  // variations from API (Aladhan)
-  "Rabi' Al-Awwal": "Rabiulawal",
-  "Rabi' Al-Thani": "Rabiulakhir",
-  "Jumada Al-Ula": "Jamadilawal",
-  "Jumada Al-Akhirah": "Jamadilakhir",
-  "Dhu Al-Qadah": "Zulkaedah",
-  "Dhu Al-Hijjah": "Zulhijjah"
+  "muharram": "Muharam",
+  "safar": "Safar",
+  "rabi al awwal": "Rabiulawal",
+  "rabi al thani": "Rabiulakhir",
+  "jumada al ula": "Jamadilawal",
+  "jumada al akhira": "Jamadilakhir",
+  "rajab": "Rejab",
+  "shaban": "Syaaban",
+  "ramadan": "Ramadan",
+  "shawwal": "Syawal",
+  "dhul qadah": "Zulkaedah",
+  "dhul hijjah": "Zulhijjah"
 };
+
 
 /* ============================================================
    DATE HANDLING
@@ -74,8 +67,9 @@ async function setAutoDates(){
       setText("dateTodayG", `${dd} ${gMonthName} ${yyyy}`);
        
        const hijriMonthEN = (h.month && (h.month.en || h.month.ar)) || "";
-       const hijriMonthBM = HIJRI_MONTH_BM[hijriMonthEN] || hijriMonthEN;
-       setText("dateTodayH", `${h.day} ${hijriMonthBM} ${h.year}H`);
+       const norm = normalizeHijriName(hijriMonthEN);
+       const hijriMonthBM = HIJRI_MONTH_BM[norm] || hijriMonthEN;
+
 
       return;
     }
