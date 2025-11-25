@@ -564,7 +564,19 @@ function updateHighlight(){
    STARTUP
 ============================================================ */
 (async function init(){
+
   await setAutoDates();
   scaleToFit();
+
+  // ⭐ FIXED ZONE MODE
+  if (typeof window.SELECTED_ZONE !== "undefined") {
+      zoneCode = window.SELECTED_ZONE;
+      setText("zoneName", zoneCode + " – Zon Tetap");
+      await loadPrayerTimesForZone(zoneCode);
+      return; // ← STOP AUTO-DETECT
+  }
+
+  // Auto detect mode (mobile/PC)
   await detectZoneAndLoad();
 })();
+
