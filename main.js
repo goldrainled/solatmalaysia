@@ -177,72 +177,87 @@ function normalizeHijriName(name) {
    (trimmed/clean; modify keywords if you want more matches)
 ============================================================ */
 const ZONE_MAP = {
+
+  /* Johor */
   "JHR01": ["pulau aur","pulau pemanggil"],
-  "JHR02": ["johor bahru","jb","johor","kota tinggi","mersing","kulai","jhr02"],
+  "JHR02": ["johor bahru","jb","johor","kota tinggi","mersing","kulai","skudai","tebrau"],
   "JHR03": ["kluang","pontian"],
   "JHR04": ["batu pahat","muar","segamat","gemas","tangkak"],
 
+  /* Kedah */
   "KDH01": ["kota setar","kubang pasu","pokok sena"],
   "KDH02": ["kuala muda","yan","pendang"],
   "KDH03": ["padang terap","sik"],
   "KDH04": ["baling"],
   "KDH05": ["bandar baharu","kulim"],
   "KDH06": ["langkawi"],
-  "KDH07": ["gunung jerai"],
+  "KDH07": ["gunung jerai","jerai"],
 
+  /* Kelantan */
   "KTN01": ["bachok","kota bharu","machang","pasir mas","pasir puteh","tanah merah","tumpat","kuala krai"],
-  "KTN02": ["jela","gua musang","jeli"],
+  "KTN02": ["gua musang","jeli","lojing"],
 
-  "MLK01": ["alor gajah","melaka","melaka tengah"],
+  /* Melaka */
+  "MLK01": ["melaka","melaka tengah","alor gajah","jasin","ayer keroh","masjid tanah"],
 
-  "PLS01": ["perlis","kangar"],
+  /* Perlis */
+  "PLS01": ["perlis","kangar","arau","padang besar"],
 
-  "PNG01": ["pulau pinang","georgetown","penang","seberang perai"],
+  /* Pulau Pinang */
+  "PNG01": ["pulau pinang","penang","georgetown","seberang perai","butterworth"],
 
-  "PHG01": ["kuantan","pahang","pulau tioman","cameron"],
-  "PHG02": ["temerloh","lipis","raub"],
-  "PHG03": ["jerantut","temerloh","maran"],
+  /* Pahang */
+  "PHG01": ["pulau tioman","tioman"],
+  "PHG02": ["kuantan","pekan","rompin","muadzam"],
+  "PHG03": ["jerantut","temerloh","maran","bera","chenor","jengka"],
   "PHG04": ["bentong","lipis","raub"],
   "PHG05": ["genting sempah","janda baik","bukit tinggi"],
   "PHG06": ["cameron highlands","bukit fraser","genting"],
+  "PHG07": ["rompin","endau","pontian johor"],
 
-  "PRK01": ["tapah","slim river","tanjung malim","ipoh","perak","kinta"],
+  /* Perak */
+  "PRK01": ["tapah","slim river","tanjung malim"],
   "PRK02": ["kuala kangsar","sungai siput","ipoh","batu gajah","kampar"],
   "PRK03": ["lenggong","pengkalan hulu","grik"],
   "PRK04": ["temengor","belum"],
-  "PRK05": ["teluk intan","bagan datuk","sitiawan","pangkor"],
+  "PRK05": ["teluk intan","bagan datuk","seri iskandar","lumut","sitiawan","pangkor"],
   "PRK06": ["taiping","selama","bagan serai","parit buntar"],
-  "PRK07": ["bukit larut","maxwell hill","taiping"],
+  "PRK07": ["bukit larut","maxwell hill"],
 
-  "SBH01": ["sandakan","sabah","kota kinabalu","tawau"],
-  "SBH02": ["labuan"],
-  "SBH03": ["lahad datu","semporna","kunak","tungku"],
-  "SBH04": ["tawau","kalabakan"],
-  "SBH05": ["kudat","pulau banggi","pitas"],
-  "SBH06": ["kinabalu","mount kinabalu"],
-  "SBH07": ["kota kinabalu","ranau","penampang","papar","putatan"],
+  /* Sabah */
+  "SBH01": ["sandakan","bukit garam","semawang","tambisan","sukau"],
+  "SBH02": ["beluran","telupid","pinangah","terusan","kuamut"],
+  "SBH03": ["lahad datu","kunak","semporna","tungku","sahabat"],
+  "SBH04": ["tawau","balong","merotai","kalabakan"],
+  "SBH05": ["kudat","kota marudu","pitas","pulau banggi"],
+  "SBH06": ["gunung kinabalu","kinabalu","mount kinabalu"],
+  "SBH07": ["kota kinabalu","ranau","tuaran","penampang","papar","putatan"],
   "SBH08": ["keningau","tambunan","nabawan"],
-  "SBH09": ["beaufort","sipitang","tenom"],
+  "SBH09": ["beaufort","kuala penyu","sipitang","tenom","long pasia","membakut","weston"],
 
+  /* Sarawak */
   "SWK01": ["limbang","lawas"],
-  "SWK02": ["miri"],
-  "SWK03": ["bintulu"],
-  "SWK04": ["mukah","sibu"],
-  "SWK05": ["sarikei"],
-  "SWK06": ["sri aman","lubok antu","betong"],
-  "SWK07": ["serian","samarahan"],
-  "SWK08": ["kuching","bau","lundu"],
-  "SWK09": ["kampung patarikan"],
+  "SWK02": ["miri","niah","bekenu","sibuti"],
+  "SWK03": ["bintulu","tatau","sebauh"],
+  "SWK04": ["sibu","mukah","dalat","song","kanowit","kapit"],
+  "SWK05": ["sarikei","matu","julau","rajang","daro","bintangor","belawai"],
+  "SWK06": ["sri aman","lubok antu","betong","spaoh","pusa","saratok"],
+  "SWK07": ["serian","simunjan","samarahan","sebangan","meludam"],
+  "SWK08": ["kuching","bau","lundu","sematan"],
+  "SWK09": ["kampung patarikan","patarikan"],
 
-  "SGR01": ["selangor","shah alam","gombak","petaling","klang","hulu langat","sepang","hulu selangor"],
+  /* Selangor */
+  "SGR01": ["shah alam","gombak","petaling","sepang","hulu langat","hulu selangor"],
   "SGR02": ["kuala selangor","sabak bernam"],
   "SGR03": ["klang","kuala langat"],
 
-  "TRG01": ["kuala terengganu","marang"],
+  /* Terengganu */
+  "TRG01": ["kuala terengganu","marang","kuala nerus"],
   "TRG02": ["besut","setiu"],
   "TRG03": ["hulu terengganu"],
   "TRG04": ["dungun","kemaman"],
 
+  /* Wilayah Persekutuan */
   "WLY01": ["kuala lumpur","putrajaya","wp kuala lumpur"],
   "WLY02": ["labuan"]
 };
@@ -279,6 +294,7 @@ const ZONE_INFO = {
   "PHG04": { negeri: "Pahang", daerah: "Bentong, Lipis, Raub" },
   "PHG05": { negeri: "Pahang", daerah: "Genting Sempah, Janda Baik, Bukit Tinggi" },
   "PHG06": { negeri: "Pahang", daerah: "Cameron Highlands, Genting Higlands, Bukit Fraser" },
+  "PHG07": { negeri: "Pahang", daerah: "Zon Khas Daerah Rompin, (Mukim Rompin, Mukim Endau,Mukim Pontian)" },
 
   "PRK01": { negeri: "Perak", daerah: "Tapah, Slim River, Tanjung Malim" },
   "PRK02": { negeri: "Perak", daerah: "Kuala Kangsar, Sg. Siput , Ipoh, Batu Gajah, Kampar" },
@@ -288,7 +304,7 @@ const ZONE_INFO = {
   "PRK06": { negeri: "Perak", daerah: "Selama, Taiping, Bagan Serai, Parit Buntar" },
   "PRK07": { negeri: "Perak", daerah: "Bukit Larut" },
 
-  "PLS01": { negeri: "Perlis", daerah: "SELURUH NEGERI PERLIS" },
+  "PLS01": { negeri: "Perlis", daerah: "Kangar, Padang Besar, Arau" },
 
   "PNG01": { negeri: "Pulau Pinang", daerah: "SELURUH NEGERI PULAU PINANG" },
 
