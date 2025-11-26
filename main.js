@@ -513,15 +513,29 @@ async function loadPrayerTimesForZone(Z){
     const data = await res.json();
 
     const list = Array.isArray(data.prayerTime) ? data.prayerTime : [];
+     // ===== DATE MATCH FIX =====
     const today = new Date();
     const dd = String(today.getDate()).padStart(2,'0');
     const yyyy = today.getFullYear();
     const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    const key1 = `${dd}-${months[today.getMonth()]}-${yyyy}`;
-    const key2 = `${dd}-${months[today.getMonth()].toUpperCase()}-${yyyy}`;
 
-    let todayEntry = list.find(p => (p && (p.date === key1 || p.date === key2)));
-    if(!todayEntry) todayEntry = list[list.length - 1] || {};
+    // Today's key in lowercase
+    const keyTodayLower = `${dd}-${months[today.getMonth()]}-${yyyy}`.toLowerCase();
+
+    // Try to match ignoring case
+    let todayEntry = list.find(p =>
+      p && p.date && p.date.toLowerCase() === keyTodayLower
+    );
+
+    // Fallback → also try uppercase API responses
+    if (!todayEntry) {
+      todayEntry = list.find(p =>
+        p && p.date && p.date.toLowerCase() === keyTodayLower.toLowerCase()
+      );
+    }
+
+    // Last fallback → use the last entry
+    if (!todayEntry) todayEntry = list[list.length - 1] || {};
 
     prayerTimes = {
       Imsak   : fixTime(todayEntry.imsak),
