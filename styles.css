@@ -1,14 +1,7 @@
-
-/* styles.css — Optimized for Option A (NO JS scaling)
-   - Mobile-first responsive
-   - No transform()/scale() required
-   - Constrained max-width so UI doesn't blow up on desktop/TV
-   - Invisible scrollbars, smooth touch scrolling
-   - Prevent Chrome auto-dark tint and overscroll glow
-*/
-
-/* reset & base */
-* { box-sizing: border-box; }
+/* ============================================================
+   GLOBAL RESET
+============================================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
 html, body {
     margin: 0;
     padding: 0;
@@ -34,8 +27,10 @@ html, body {
 .slideshow-bg {
     position: fixed;
     inset: 0;
-    width: 100vw;
     height: 100vh;
+    min-height: 100vh;
+    min-height: 100svh;
+    min-height: 100dvh
     z-index: 0;
     overflow: hidden;
 }
