@@ -230,10 +230,12 @@ html, body {
 ============================================================= */
 
 .countdown-container {
-    display: flex;
-    justify-content: center;
-    gap: 22px;
-    margin: 22px auto 32px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3vw;
+    /* 🔴 REMOVE padding that limits width */
+    padding: 0;
 }
 
 .count-item {
