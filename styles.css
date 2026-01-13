@@ -398,6 +398,32 @@ html, body {
     }
 }
 
+/* =========================================
+   LED 256px – Reduce Current Time
+========================================= */
+@media (max-width: 300px) {
+
+    /* Title: "Waktu Sekarang" */
+    .card-title {
+        font-size: 14px;     /* smaller */
+        margin-bottom: 4px; /* tighter */
+    }
+
+    /* Current time value (HH:MM:SS) */
+    #currentTime,
+    .time-big {
+        font-size: 22px;    /* 🔴 main reduction */
+        line-height: 1;
+        font-weight: 800;
+    }
+
+    /* Reduce padding of the card that holds time */
+    .card,
+    .card-current {
+        padding: 8px 6px;   /* was too large */
+        margin: 8px auto;
+    }
+}
 
 /* Prevent content from touching the very top/ bottom on small screens */
 @media (max-height: 700px) {
