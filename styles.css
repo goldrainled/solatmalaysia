@@ -139,7 +139,7 @@ html, body {
 
 /* Row 2 — Hijri date (bigger & stronger) */
 #dateTodayH {
-    font-size: clamp(20px, 3.8vw, 38px);
+    font-size: clamp(16px, 3.8vw, 38px);
     font-weight: 650;
     opacity: 0.95;
     line-height: 1.1;
