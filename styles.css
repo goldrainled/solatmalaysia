@@ -345,13 +345,6 @@ html, body {
     }
 }
 
-@media (max-width: 300px) {
-    * {
-        box-shadow: none !important;
-        text-shadow: none !important;
-    }
-}
-
 /* =========================================
    LED 256px – FORCE 3 COLUMN COUNTDOWN
 ========================================= */
