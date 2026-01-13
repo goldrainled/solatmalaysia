@@ -290,7 +290,7 @@ html, body {
 .prayer-row {
     flex-shrink: 0;
     background: rgba(0, 0, 0, 0.45);
-    border-radius: 14px;
+    border-radius: 20px;
     padding: clamp(12px, 3vw, 18px) clamp(16px, 4vw, 24px);
     width: 100%;
     margin: 8px auto;
@@ -304,7 +304,7 @@ html, body {
 /* Active prayer highlight */
 .currentPrayer {
     background: #c7a000 !important;
-    border: 3px solid #ffe44c !important;
+    border: 2px solid #ffe44c !important;
     box-shadow: 0 0 18px #ffea73;
     color: #000 !important;
 }
