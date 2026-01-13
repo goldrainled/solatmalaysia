@@ -152,6 +152,7 @@ html, body {
     font-weight: 700;
     line-height: 1.1;
     text-align: center;
+    text-shadow: 0 0 12px rgba(0,0,0,0.6);
 
     max-width: 100%;
     padding: 0 6px;
@@ -228,12 +229,12 @@ html, body {
 
 /* Section title */
 .section-title {
-    font-size: clamp(18px, 3.5vw, 32px);
-    font-weight: 800;
-    margin-top: 26px;
-    margin-bottom: 14px;
+    font-size: clamp(18px, 3.2vw, 32px);
+    font-weight: 700;
+    margin-top: 12px;
+    margin-bottom: 12px;
     text-align: center;
-    text-shadow: 2px 2px 5px rgba(0,0,0,0.6);
+    text-shadow: 0 0 12px rgba(0,0,0,0.6);
 }
 
 /* =============================================================
