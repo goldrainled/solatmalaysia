@@ -290,7 +290,7 @@ html, body {
 .prayer-row {
     flex-shrink: 0;
     background: rgba(0, 0, 0, 0.45);
-    border-radius: 14px;
+    border-radius: 6px;
     padding: clamp(12px, 3vw, 18px) clamp(16px, 4vw, 24px);
     width: 100%;
     margin: 8px auto;
