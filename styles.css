@@ -94,8 +94,8 @@ html, body {
     max-width: 1224px;
     min-width: 200px;
 
-   min-height: 100%;          /* allow content to grow */
-   height: auto;              /* IMPORTANT: prevent clipping */
+    min-height: 100%;          /* allow content to grow */
+    height: auto;              /* IMPORTANT: prevent clipping */
 
     display: flex;
     flex-direction: column;
@@ -120,7 +120,7 @@ html, body {
 /* HEADER AREA 3 ROWS */
 .header-area {
     margin-top:6px;
-    margin-bottom:20px;
+    margin-bottom:10px;
     text-align:center;
     padding-left:8px;
     padding-right:8px;
