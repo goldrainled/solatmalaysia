@@ -92,10 +92,10 @@ html, body {
 .app-root {
     width: 100%;
     max-width: 1224px;
-    min-width: 100px;
+    min-width: 200px;
 
-    height: 100%;
-    min-height: 100dvh;
+    min-height: 100%;          /* allow content to grow */
+    height: auto;              /* IMPORTANT: prevent clipping */
 
     display: flex;
     flex-direction: column;
@@ -108,7 +108,7 @@ html, body {
     scroll-behavior: smooth;
 
     position: relative;
-    z-index: 2;
+    z-index: 2;;
 }
 
 .app-root {
