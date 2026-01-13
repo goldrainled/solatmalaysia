@@ -357,7 +357,7 @@ html, body {
     }
 
     .count-item {
-        padding: 6px 2px;       /* 🔴 CRITICAL */
+        padding: 10px 2px;       /* 🔴 CRITICAL */
         min-width: 0;
         min-height: 0;
 
