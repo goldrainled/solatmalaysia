@@ -146,13 +146,20 @@ html, body {
     text-shadow: 0 0 12px rgba(0,0,0,0.6);
 }
 
-/* Row 3 — Location (bigger but slightly softer) */
+/* Row 3 — Location (fit in 2 lines instead of breaking layout) */
 #zoneName {
-    font-size: clamp(20px, 3.8vw, 38px);
+    font-size: clamp(14px, 3.2vw, 26px);
     font-weight: 700;
-    opacity: 0.85;
-    line-height: 1.1;
-    text-shadow: 0 0 10px rgba(0,0,0,0.6);
+    line-height: 1.15;
+    text-align: center;
+
+    max-width: 100%;
+    padding: 0 6px;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 #currentPrayerName {
